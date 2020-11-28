@@ -65,19 +65,6 @@ Game_ufcProjectile.prototype.update = function () {
   ) {
     this.destroyProjectile();
   }
-  // console.log(
-  //   this.canvasX,
-  //   this.canvasY,
-  //   this.screenX(this._target._x),
-  //   this.screenY(this._target._y),
-  //   PIXI.utils.dist(
-  //     this.canvasX,
-  //     this.canvasY,
-  //     this.screenX(this._target._x),
-  //     this.screenY(this._target._y)
-  //   ),
-  //   this.rotation
-  // );
 };
 
 Game_ufcProjectile.prototype.destroyProjectile = function () {

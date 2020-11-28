@@ -20,9 +20,6 @@ Game_TDEnemy.prototype.initialize = function (enemyName, spawnId, tdId) {
       effect: null,
     };
   }
-  // let pos = $gameMap.positionToCanvas(this._spawn._x, this._spawn._y);
-  // this._x = pos.x;
-  // this._y = pos.y;
   this._x = this._spawn._x;
   this._y = this._spawn._y;
   this._realX = this._spawn._x;
@@ -33,7 +30,6 @@ Game_TDEnemy.prototype.initialize = function (enemyName, spawnId, tdId) {
   this._moveSpeed = this._realMoveSpeed;
   this._animationPlaying = false;
   this._event = new PIXI.utils.EventEmitter();
-  // this._moveSpeed = 2;
 };
 
 Game_TDEnemy.prototype.getEnemyData = function () {
@@ -134,20 +130,6 @@ Game_TDEnemy.prototype.attack = function (eventid) {
     +this._enemyData.attackAnimation
   );
   TowerDefenseManager.attackTower(+this._enemyData.attackDamage);
-  // $gameParty.members().forEach((member) => {
-  //   if (member._actorId === TowerDefenseManager.getTowerId) {
-  //     if (member.isAlive()) {
-  //       member.gainHp(-+this._enemyData.attackDamage);
-  //       if (member.isDead()) {
-  //         member.performCollapse();
-  //       }
-  //     }
-  //   }
-  // });
-  // const value = this.operateValue(params[2], params[3], params[4]);
-  // this.iterateActorEx(params[0], params[1], (actor) => {
-  //   this.changeHp(actor, value, params[5]);
-  // });
 };
 
 Game_TDEnemy.prototype.attacked = function (damage) {

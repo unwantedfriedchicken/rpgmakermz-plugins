@@ -65,22 +65,12 @@ Sprite_ufcProjectile.prototype.updateCharacterFrame = function () {
   const ph = this.patternHeight();
   const sx = (this.characterBlockX() + this.characterPatternX()) * pw;
   const sy = (this.characterBlockY() + this.characterPatternY()) * ph;
-  // this.updateHalfBodySprites();
-  // if (this._bushDepth > 0) {
-  //   const d = this._bushDepth;
-  //   this._upperBody.setFrame(sx, sy, pw, ph - d);
-  //   this._lowerBody.setFrame(sx, sy + ph - d, pw, d);
-  //   this.setFrame(sx, sy, 0, ph);
-  // } else {
   this.setFrame(sx, sy, pw, ph);
-  // }
 };
 
 Sprite_ufcProjectile.prototype.patternWidth = function () {
   if (this._tileId > 0) {
     return $gameMap.tileWidth();
-  } else if (this._isBigCharacter) {
-    return this.bitmap.width / 3;
   } else {
     return this.bitmap.width / 12;
   }
@@ -89,30 +79,18 @@ Sprite_ufcProjectile.prototype.patternWidth = function () {
 Sprite_ufcProjectile.prototype.patternHeight = function () {
   if (this._tileId > 0) {
     return $gameMap.tileHeight();
-  } else if (this._isBigCharacter) {
-    return this.bitmap.height / 4;
   } else {
     return this.bitmap.height / 8;
   }
 };
 
 Sprite_ufcProjectile.prototype.characterBlockX = function () {
-  if (this._isBigCharacter) {
-    return 0;
-  } else {
-    const index = this._projectileData.characterIndex;
-    return (index % 4) * 3;
-  }
+  const index = this._projectileData.characterIndex;
+  return (index % 4) * 3;
 };
 
 Sprite_ufcProjectile.prototype.characterBlockY = function () {
-  if (this._isBigCharacter) {
-    return 0;
-  } else {
-    const index = this._projectileData.characterIndexY;
-    // return Math.floor(index / 4) * 4;
-    return index;
-  }
+  return this._projectileData.characterIndexY;
 };
 
 Sprite_ufcProjectile.prototype.characterPatternX = function () {

@@ -25,7 +25,6 @@ Sprite_ufcTDEnemy.prototype.initMembers = function (enemyData) {
   this._enemy._event.on("addEffect", this.addEffect, this);
   this._enemy._event.on("removeEffect", this.removeEffect, this);
   this.setCharacterBitmap();
-  // this.addEffect(TowerDefenseManager.EFFECTS.COLD);
 };
 Sprite_ufcTDEnemy.prototype.destroy = function () {
   this._enemy._event.removeListener("addEffect", this.addEffect, this);
@@ -72,7 +71,6 @@ Sprite_ufcTDEnemy.prototype.update = function () {
     return;
   }
   Sprite.prototype.update.call(this);
-  // this.updateBitmap();
   this.updateCharacterFrame();
   this.updatePosition();
   if (this._enemy.isDestroyed()) {
@@ -82,8 +80,6 @@ Sprite_ufcTDEnemy.prototype.update = function () {
   if (!this._enemy.isAnimationPlaying() && this._enemy.isDestroyed()) {
     this.destroyEnemy();
   }
-  // this.updateOther();
-  // this.updateVisibility();
 };
 
 Sprite_ufcTDEnemy.prototype.destroyEnemy = function () {
@@ -92,11 +88,8 @@ Sprite_ufcTDEnemy.prototype.destroyEnemy = function () {
   // since use request animation, this sprite can't be destroyed immediately
   // so try delete it from targes animation first
   SceneManager.getSpriteSetMap().removeTargetFromAnimation(this);
-  // SceneManager.getSpriteSetMap().removeAllAnimations();
-  // this.parent.removeChild(this);
-  this.destroy();
 
-  // Sprite.prototype.destroy.call(this);
+  this.destroy();
 };
 
 Sprite_ufcTDEnemy.prototype.setCharacterBitmap = function () {
@@ -116,15 +109,7 @@ Sprite_ufcTDEnemy.prototype.updateCharacterFrame = function () {
   const ph = this.patternHeight();
   const sx = (this.characterBlockX() + this.characterPatternX()) * pw;
   const sy = (this.characterBlockY() + this.characterPatternY()) * ph;
-  // this.updateHalfBodySprites();
-  // if (this._bushDepth > 0) {
-  //   const d = this._bushDepth;
-  //   this._upperBody.setFrame(sx, sy, pw, ph - d);
-  //   this._lowerBody.setFrame(sx, sy + ph - d, pw, d);
-  //   this.setFrame(sx, sy, 0, ph);
-  // } else {
   this.setFrame(sx, sy, pw, ph);
-  // }
 };
 
 Sprite_ufcTDEnemy.prototype.patternWidth = function () {

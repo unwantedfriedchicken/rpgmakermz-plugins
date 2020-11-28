@@ -299,13 +299,6 @@ Data_ufcGrid.prototype.calcGrid = function () {
       }
 
       this._gridData[x][y] = true;
-      // let event = $gameMap.eventsXyNt(x, y);
-      // let eventNt = false;
-      // if (event.length > 0) {
-      // c++;
-      //   this._eventData.push({ event: event, pos: { x: x, y: y } });
-      //   eventNt = true;
-      // }
       if (
         !$gameMap.checkPassage(x, y, bit) ||
         $gamePlayer.getGuideAction().checkTerrainTag(x, y)
@@ -363,19 +356,6 @@ Data_ufcGrid.prototype.posY = function (y) {
   return y * $gameMap.tileHeight();
 };
 
-Data_ufcGrid.prototype.calcGrid___ = function () {
-  let grid = this._data.getGrid();
-  for (let x = 0; x < grid.length; x++) {
-    for (let y = 0; y < grid[x].length; y++) {
-      if (grid[x][y]) {
-        this.fillGrid(x, y);
-      } else {
-        this.clearGrid(x, y);
-      }
-    }
-  }
-};
-
 Data_ufcGrid.prototype.fillGrid = function (x, y) {
   this._bitmap.fillRect(
     this.posX(x) + this._lineSize / 2,
@@ -417,9 +397,6 @@ Game_TDEnemy.prototype.initialize = function (enemyName, spawnId, tdId) {
       effect: null,
     };
   }
-  // let pos = $gameMap.positionToCanvas(this._spawn._x, this._spawn._y);
-  // this._x = pos.x;
-  // this._y = pos.y;
   this._x = this._spawn._x;
   this._y = this._spawn._y;
   this._realX = this._spawn._x;
@@ -430,7 +407,6 @@ Game_TDEnemy.prototype.initialize = function (enemyName, spawnId, tdId) {
   this._moveSpeed = this._realMoveSpeed;
   this._animationPlaying = false;
   this._event = new PIXI.utils.EventEmitter();
-  // this._moveSpeed = 2;
 };
 
 Game_TDEnemy.prototype.getEnemyData = function () {
@@ -531,20 +507,6 @@ Game_TDEnemy.prototype.attack = function (eventid) {
     +this._enemyData.attackAnimation
   );
   TowerDefenseManager.attackTower(+this._enemyData.attackDamage);
-  // $gameParty.members().forEach((member) => {
-  //   if (member._actorId === TowerDefenseManager.getTowerId) {
-  //     if (member.isAlive()) {
-  //       member.gainHp(-+this._enemyData.attackDamage);
-  //       if (member.isDead()) {
-  //         member.performCollapse();
-  //       }
-  //     }
-  //   }
-  // });
-  // const value = this.operateValue(params[2], params[3], params[4]);
-  // this.iterateActorEx(params[0], params[1], (actor) => {
-  //   this.changeHp(actor, value, params[5]);
-  // });
 };
 
 Game_TDEnemy.prototype.attacked = function (damage) {
@@ -644,19 +606,6 @@ Game_TowerDefense.prototype.update = function () {
     for (let i = 0; i < $gameMap.ufcEnemies().length; i++) {
       const enemy = $gameMap.ufcEnemies()[i];
       if (this.isInTowerRange(enemy._x, enemy._y) && !enemy.isDestroyed()) {
-        // console.log(
-        //   "touch:",
-        //   enemy._x,
-        //   this._x - this._towerData._range,
-        //   this._x + +this._towerData._range
-        // );
-        // console.log(
-        //   "touch:",
-        //   enemy._y,
-        //   this._y - this._towerData._range,
-        //   this._y + +this._towerData._range
-        // );
-        // console.log("enemy in tower range");
         this._target = enemy;
         break;
       }
@@ -668,7 +617,6 @@ Game_TowerDefense.prototype.update = function () {
     ) {
       // clear target
       this._target = null;
-      // console.log("enemy out tower range");
     } else {
       // shoot projectile
       if (this._attackTime <= 0) {
@@ -791,19 +739,6 @@ Game_ufcProjectile.prototype.update = function () {
   ) {
     this.destroyProjectile();
   }
-  // console.log(
-  //   this.canvasX,
-  //   this.canvasY,
-  //   this.screenX(this._target._x),
-  //   this.screenY(this._target._y),
-  //   PIXI.utils.dist(
-  //     this.canvasX,
-  //     this.canvasY,
-  //     this.screenX(this._target._x),
-  //     this.screenY(this._target._y)
-  //   ),
-  //   this.rotation
-  // );
 };
 
 Game_ufcProjectile.prototype.destroyProjectile = function () {
@@ -827,37 +762,10 @@ Sprite_ufcGrid.prototype.constructor = Sprite_ufcGrid;
 Sprite_ufcGrid.prototype.initialize = function (data) {
   Sprite.prototype.initialize.call(this, data._bitmap);
   this._data = data;
-  // this.bitmap.fillRect(
-  //   0,
-  //   0,
-  //   this.bitmap.width,
-  //   this.bitmap.height,
-  //   this._gridColor
-  // );
-
-  // for (let i = 0; i < $gameMap.width(); i++) {
-  //   this.bitmap.clearRect(
-  //     this.posX(i) - this._lineSize / 2,
-  //     this.posY(0),
-  //     this._lineSize,
-  //     this.bitmap.height
-  //   );
-  // }
-
-  // for (let i = 0; i < $gameMap.height(); i++) {
-  //   this.bitmap.clearRect(
-  //     this.posX(0),
-  //     this.posY(i) - this._lineSize / 2,
-  //     this.bitmap.width,
-  //     this._lineSize
-  //   );
-  // }
-
   this.opacity = 60;
   this.z = 20;
   this._data._event.on("showGrid", this.setVisible, this);
   this.setVisible(false);
-  // this.setVisible(true);
 };
 
 Sprite_ufcGrid.prototype.setVisible = function (visible) {
@@ -955,22 +863,12 @@ Sprite_ufcProjectile.prototype.updateCharacterFrame = function () {
   const ph = this.patternHeight();
   const sx = (this.characterBlockX() + this.characterPatternX()) * pw;
   const sy = (this.characterBlockY() + this.characterPatternY()) * ph;
-  // this.updateHalfBodySprites();
-  // if (this._bushDepth > 0) {
-  //   const d = this._bushDepth;
-  //   this._upperBody.setFrame(sx, sy, pw, ph - d);
-  //   this._lowerBody.setFrame(sx, sy + ph - d, pw, d);
-  //   this.setFrame(sx, sy, 0, ph);
-  // } else {
   this.setFrame(sx, sy, pw, ph);
-  // }
 };
 
 Sprite_ufcProjectile.prototype.patternWidth = function () {
   if (this._tileId > 0) {
     return $gameMap.tileWidth();
-  } else if (this._isBigCharacter) {
-    return this.bitmap.width / 3;
   } else {
     return this.bitmap.width / 12;
   }
@@ -979,30 +877,18 @@ Sprite_ufcProjectile.prototype.patternWidth = function () {
 Sprite_ufcProjectile.prototype.patternHeight = function () {
   if (this._tileId > 0) {
     return $gameMap.tileHeight();
-  } else if (this._isBigCharacter) {
-    return this.bitmap.height / 4;
   } else {
     return this.bitmap.height / 8;
   }
 };
 
 Sprite_ufcProjectile.prototype.characterBlockX = function () {
-  if (this._isBigCharacter) {
-    return 0;
-  } else {
-    const index = this._projectileData.characterIndex;
-    return (index % 4) * 3;
-  }
+  const index = this._projectileData.characterIndex;
+  return (index % 4) * 3;
 };
 
 Sprite_ufcProjectile.prototype.characterBlockY = function () {
-  if (this._isBigCharacter) {
-    return 0;
-  } else {
-    const index = this._projectileData.characterIndexY;
-    // return Math.floor(index / 4) * 4;
-    return index;
-  }
+  return this._projectileData.characterIndexY;
 };
 
 Sprite_ufcProjectile.prototype.characterPatternX = function () {
@@ -1045,7 +931,6 @@ Sprite_ufcTDEnemy.prototype.initMembers = function (enemyData) {
   this._enemy._event.on("addEffect", this.addEffect, this);
   this._enemy._event.on("removeEffect", this.removeEffect, this);
   this.setCharacterBitmap();
-  // this.addEffect(TowerDefenseManager.EFFECTS.COLD);
 };
 Sprite_ufcTDEnemy.prototype.destroy = function () {
   this._enemy._event.removeListener("addEffect", this.addEffect, this);
@@ -1092,7 +977,6 @@ Sprite_ufcTDEnemy.prototype.update = function () {
     return;
   }
   Sprite.prototype.update.call(this);
-  // this.updateBitmap();
   this.updateCharacterFrame();
   this.updatePosition();
   if (this._enemy.isDestroyed()) {
@@ -1102,8 +986,6 @@ Sprite_ufcTDEnemy.prototype.update = function () {
   if (!this._enemy.isAnimationPlaying() && this._enemy.isDestroyed()) {
     this.destroyEnemy();
   }
-  // this.updateOther();
-  // this.updateVisibility();
 };
 
 Sprite_ufcTDEnemy.prototype.destroyEnemy = function () {
@@ -1112,11 +994,8 @@ Sprite_ufcTDEnemy.prototype.destroyEnemy = function () {
   // since use request animation, this sprite can't be destroyed immediately
   // so try delete it from targes animation first
   SceneManager.getSpriteSetMap().removeTargetFromAnimation(this);
-  // SceneManager.getSpriteSetMap().removeAllAnimations();
-  // this.parent.removeChild(this);
-  this.destroy();
 
-  // Sprite.prototype.destroy.call(this);
+  this.destroy();
 };
 
 Sprite_ufcTDEnemy.prototype.setCharacterBitmap = function () {
@@ -1136,15 +1015,7 @@ Sprite_ufcTDEnemy.prototype.updateCharacterFrame = function () {
   const ph = this.patternHeight();
   const sx = (this.characterBlockX() + this.characterPatternX()) * pw;
   const sy = (this.characterBlockY() + this.characterPatternY()) * ph;
-  // this.updateHalfBodySprites();
-  // if (this._bushDepth > 0) {
-  //   const d = this._bushDepth;
-  //   this._upperBody.setFrame(sx, sy, pw, ph - d);
-  //   this._lowerBody.setFrame(sx, sy + ph - d, pw, d);
-  //   this.setFrame(sx, sy, 0, ph);
-  // } else {
   this.setFrame(sx, sy, pw, ph);
-  // }
 };
 
 Sprite_ufcTDEnemy.prototype.patternWidth = function () {
@@ -1318,8 +1189,6 @@ Sprite_ufcTDTower.prototype.initMembers = function (ufcTD) {
 
 Sprite_ufcTDTower.prototype.setSelectPosition = function () {
   this.move($gameMap.tileWidth() / 2, $gameMap.tileHeight());
-  // this._rangeGraphics.x = $gameMap.tileWidth() / 2;
-  // this._rangeGraphics.y = $gameMap.tileHeight() / 2;
 };
 
 Sprite_ufcTDTower.prototype.getRangeGraphics = function () {
@@ -1334,10 +1203,7 @@ Sprite_ufcTDTower.prototype.update = function () {
   Sprite.prototype.update.call(this);
   this.updateCharacterFrame();
   if (this._towerData._placeMode) return;
-  // this.updateBitmap();
   this.updatePosition();
-  // this.updateOther();
-  // this.updateVisibility();
   if (this._tower.isDestroyed()) this.destroySprite();
 };
 
@@ -1365,15 +1231,7 @@ Sprite_ufcTDTower.prototype.updateCharacterFrame = function () {
   const ph = this.patternHeight();
   const sx = (this.characterBlockX() + 1) * pw;
   const sy = (this.characterBlockY() + 0) * ph;
-  // this.updateHalfBodySprites();
-  // if (this._bushDepth > 0) {
-  //   const d = this._bushDepth;
-  //   this._upperBody.setFrame(sx, sy, pw, ph - d);
-  //   this._lowerBody.setFrame(sx, sy + ph - d, pw, d);
-  //   this.setFrame(sx, sy, 0, ph);
-  // } else {
   this.setFrame(sx, sy, pw, ph);
-  // }
 };
 
 Sprite_ufcTDTower.prototype.patternWidth = function () {
@@ -1430,7 +1288,6 @@ PluginManager.registerCommand("UFCTowerDefense", "setupEnemy", function (args) {
 });
 
 PluginManager.registerCommand("UFCTowerDefense", "setSpawn", function (args) {
-  // console.log(JSON.stringify($gameMap._events[this._eventId]));
   if (!$dataTDSpawnLocation[this._mapId])
     $dataTDSpawnLocation[this._mapId] = {};
 
@@ -1501,7 +1358,6 @@ PluginManager.registerCommand(
     }
 
     $dataTDTrigger[this._mapId][evnt._x][evnt._y].direction = args["direction"];
-    // TowerDefenseManager.addDBMoveTrigger(args);
   }
 );
 
@@ -1525,7 +1381,6 @@ PluginManager.registerCommand(
       attackEventId: args["attackEventId"],
       animationId: args["animationId"],
     };
-    // TowerDefenseManager.addDBMoveTrigger(args);
   }
 );
 
@@ -1988,15 +1843,14 @@ Game_Map.prototype.updateTowerDefenseWave = function () {
           });
         }
       }
-      // console.log("time:", td[i]._timeSpawn);
       td[i]._timeSpawn--;
       if (td[i]._timeSpawn <= 0) {
         this.ufcSpawnEnemy(td[i]._enemy, td[i]._spawnLocationId);
-        console.log("spawn", $dataTDEnemy[td[i]._enemy].name);
+        // console.log("spawn", $dataTDEnemy[td[i]._enemy].name);
         td[i]._timeSpawn = td[i]._delayPerSpawn;
         td[i]._numberSpawn--;
         if (td[i]._numberSpawn <= 0) {
-          console.log("spawn complete");
+          // console.log("spawn complete");
           td.splice(i, 1);
           i--;
         }
@@ -2060,7 +1914,6 @@ Spriteset_Map.prototype.createCharacters = function () {
     this._tilemap.addChild(new Sprite_ufcProjectile(projectile));
   }
 
-  // $gameMap._towerDefenseGrid.setParent(this._tilemap);
   this._tilemap.addChild(new Sprite_ufcGrid($gameMap.ufcGetGrid()));
   if (TowerDefenseManager.getState != "idle") {
     TowerDefenseManager.selectTowerMode();
@@ -2172,8 +2025,6 @@ TowerDefenseManager.selectTower = function (towerData) {
   this._selectedUFCTD.setPlaceMode(true);
   // Disable Open Menu
   $gameSystem.disableMenu();
-  // console.log("select ");
-  // this.selectTowerMode();
 };
 
 TowerDefenseManager.cancelSelect = function () {
@@ -2202,7 +2053,6 @@ TowerDefenseManager.selectTowerMode = function () {
     new Game_TowerDefense(this.getSelectedTowerData(), $gameMap._mapId)
   );
   $gamePlayer.getGuideAction().setActive(true);
-  // $gamePlayer.getGuideAction().resetParent();
 
   $gamePlayer.getGuideActionGraphics().addChild(selectedTower);
   $gameMap.ufcGetGrid().setVisible(true);
@@ -2232,8 +2082,6 @@ TowerDefenseManager.addDBEnemy = function (enemyData) {
   for (let data in enemyData) {
     $dataTDEnemy[enemyData.id][data] = enemyData[data];
   }
-  // enemyData.id = $dataTDEnemy.length;
-  // $dataTDEnemy.push(enemyData);
 };
 
 TowerDefenseManager.placeTower = function () {
@@ -2341,10 +2189,10 @@ TowerDefenseManager.addTower = function (itemid, item) {
 
 TowerDefenseManager.convertDirection = function (direction) {
   let dir = 2;
-  // let _isArray = direction.split(",");
-  // if (_isArray.length > 1) {
-  //   direction = PIXI.utils.randomArray(direction);
-  // }
+  let _isMultipleDirection = direction.split("/");
+  if (_isMultipleDirection.length > 1) {
+    direction = PIXI.utils.randomArray(_isMultipleDirection);
+  }
   switch (direction) {
     case "Left":
       dir = 4;
@@ -2357,24 +2205,6 @@ TowerDefenseManager.convertDirection = function (direction) {
       break;
     case "Up":
       dir = 8;
-      break;
-    case "Left/Right":
-      dir = Math.random() >= 0.5 ? 4 : 6;
-      break;
-    case "Down/Left":
-      dir = Math.random() >= 0.5 ? 2 : 4;
-      break;
-    case "Down/Right":
-      dir = Math.random() >= 0.5 ? 2 : 6;
-      break;
-    case "Up/Right":
-      dir = Math.random() >= 0.5 ? 8 : 6;
-      break;
-    case "Up/Left":
-      dir = Math.random() >= 0.5 ? 8 : 4;
-      break;
-    case "Up/Down":
-      dir = Math.random() >= 0.5 ? 8 : 2;
       break;
     case "Random":
       dir = PIXI.utils.randomArray([4, 6, 2, 8]);
@@ -2554,10 +2384,6 @@ Window_BaseExtend.prototype.drawTextEx = function (text, x, y, width, align) {
     x += this.itemWidth() / 2;
     x -= textWidth / 2;
     x -= this.itemPadding() * 2;
-  } else if (align == "right") {
-    let _x = c;
-    x = this.itemWidth();
-    x -= _x;
   }
   this.resetFontSettings();
   const textState = this.createTextState(text, x, y, width);
@@ -2715,8 +2541,6 @@ Window_TowerActionButton.prototype.onOk = function () {
       this._towerDataDestroyCallback();
       break;
   }
-  // console.log(this._list[this.index()]);
-  // this.activate();
   this.close();
 };
 
@@ -2908,7 +2732,6 @@ Window_TowerActionButton.prototype.drawTowerStatus = function (x, y, align) {
         textY + i * textHeight,
         150
       );
-      // this.changeTextColor(ColorManager.paramchangeTextColor(diffvalue));
       this.statusWindow2.changeTextColor(ColorManager.systemColor());
       if (statusValue[i] > statusValue2[i]) {
         this.statusWindow2.changeTextColor(ColorManager.powerDownColor());
@@ -3063,7 +2886,6 @@ Window_TowerActionButton.prototype.updateChildren = function () {
   }
 };
 Window_TowerActionButton.prototype.refresh = function () {
-  // this.makeItemList();
   for (const child of this.children) {
     if (child.contents) {
       child.contents.clear();

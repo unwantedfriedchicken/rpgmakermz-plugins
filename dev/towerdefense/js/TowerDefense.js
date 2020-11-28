@@ -5,7 +5,6 @@ PluginManager.registerCommand("UFCTowerDefense", "setupEnemy", function (args) {
 });
 
 PluginManager.registerCommand("UFCTowerDefense", "setSpawn", function (args) {
-  // console.log(JSON.stringify($gameMap._events[this._eventId]));
   if (!$dataTDSpawnLocation[this._mapId])
     $dataTDSpawnLocation[this._mapId] = {};
 
@@ -76,7 +75,6 @@ PluginManager.registerCommand(
     }
 
     $dataTDTrigger[this._mapId][evnt._x][evnt._y].direction = args["direction"];
-    // TowerDefenseManager.addDBMoveTrigger(args);
   }
 );
 
@@ -100,7 +98,6 @@ PluginManager.registerCommand(
       attackEventId: args["attackEventId"],
       animationId: args["animationId"],
     };
-    // TowerDefenseManager.addDBMoveTrigger(args);
   }
 );
 
@@ -563,15 +560,14 @@ Game_Map.prototype.updateTowerDefenseWave = function () {
           });
         }
       }
-      // console.log("time:", td[i]._timeSpawn);
       td[i]._timeSpawn--;
       if (td[i]._timeSpawn <= 0) {
         this.ufcSpawnEnemy(td[i]._enemy, td[i]._spawnLocationId);
-        console.log("spawn", $dataTDEnemy[td[i]._enemy].name);
+        // console.log("spawn", $dataTDEnemy[td[i]._enemy].name);
         td[i]._timeSpawn = td[i]._delayPerSpawn;
         td[i]._numberSpawn--;
         if (td[i]._numberSpawn <= 0) {
-          console.log("spawn complete");
+          // console.log("spawn complete");
           td.splice(i, 1);
           i--;
         }
@@ -635,7 +631,6 @@ Spriteset_Map.prototype.createCharacters = function () {
     this._tilemap.addChild(new Sprite_ufcProjectile(projectile));
   }
 
-  // $gameMap._towerDefenseGrid.setParent(this._tilemap);
   this._tilemap.addChild(new Sprite_ufcGrid($gameMap.ufcGetGrid()));
   if (TowerDefenseManager.getState != "idle") {
     TowerDefenseManager.selectTowerMode();

@@ -43,13 +43,6 @@ Data_ufcGrid.prototype.calcGrid = function () {
       }
 
       this._gridData[x][y] = true;
-      // let event = $gameMap.eventsXyNt(x, y);
-      // let eventNt = false;
-      // if (event.length > 0) {
-      // c++;
-      //   this._eventData.push({ event: event, pos: { x: x, y: y } });
-      //   eventNt = true;
-      // }
       if (
         !$gameMap.checkPassage(x, y, bit) ||
         $gamePlayer.getGuideAction().checkTerrainTag(x, y)
@@ -105,19 +98,6 @@ Data_ufcGrid.prototype.posX = function (x) {
 
 Data_ufcGrid.prototype.posY = function (y) {
   return y * $gameMap.tileHeight();
-};
-
-Data_ufcGrid.prototype.calcGrid___ = function () {
-  let grid = this._data.getGrid();
-  for (let x = 0; x < grid.length; x++) {
-    for (let y = 0; y < grid[x].length; y++) {
-      if (grid[x][y]) {
-        this.fillGrid(x, y);
-      } else {
-        this.clearGrid(x, y);
-      }
-    }
-  }
 };
 
 Data_ufcGrid.prototype.fillGrid = function (x, y) {

@@ -103,8 +103,6 @@ TowerDefenseManager.selectTower = function (towerData) {
   this._selectedUFCTD.setPlaceMode(true);
   // Disable Open Menu
   $gameSystem.disableMenu();
-  // console.log("select ");
-  // this.selectTowerMode();
 };
 
 TowerDefenseManager.cancelSelect = function () {
@@ -133,7 +131,6 @@ TowerDefenseManager.selectTowerMode = function () {
     new Game_TowerDefense(this.getSelectedTowerData(), $gameMap._mapId)
   );
   $gamePlayer.getGuideAction().setActive(true);
-  // $gamePlayer.getGuideAction().resetParent();
 
   $gamePlayer.getGuideActionGraphics().addChild(selectedTower);
   $gameMap.ufcGetGrid().setVisible(true);
@@ -163,8 +160,6 @@ TowerDefenseManager.addDBEnemy = function (enemyData) {
   for (let data in enemyData) {
     $dataTDEnemy[enemyData.id][data] = enemyData[data];
   }
-  // enemyData.id = $dataTDEnemy.length;
-  // $dataTDEnemy.push(enemyData);
 };
 
 TowerDefenseManager.placeTower = function () {
@@ -272,10 +267,10 @@ TowerDefenseManager.addTower = function (itemid, item) {
 
 TowerDefenseManager.convertDirection = function (direction) {
   let dir = 2;
-  // let _isArray = direction.split(",");
-  // if (_isArray.length > 1) {
-  //   direction = PIXI.utils.randomArray(direction);
-  // }
+  let _isMultipleDirection = direction.split("/");
+  if (_isMultipleDirection.length > 1) {
+    direction = PIXI.utils.randomArray(_isMultipleDirection);
+  }
   switch (direction) {
     case "Left":
       dir = 4;
@@ -288,24 +283,6 @@ TowerDefenseManager.convertDirection = function (direction) {
       break;
     case "Up":
       dir = 8;
-      break;
-    case "Left/Right":
-      dir = Math.random() >= 0.5 ? 4 : 6;
-      break;
-    case "Down/Left":
-      dir = Math.random() >= 0.5 ? 2 : 4;
-      break;
-    case "Down/Right":
-      dir = Math.random() >= 0.5 ? 2 : 6;
-      break;
-    case "Up/Right":
-      dir = Math.random() >= 0.5 ? 8 : 6;
-      break;
-    case "Up/Left":
-      dir = Math.random() >= 0.5 ? 8 : 4;
-      break;
-    case "Up/Down":
-      dir = Math.random() >= 0.5 ? 8 : 2;
       break;
     case "Random":
       dir = PIXI.utils.randomArray([4, 6, 2, 8]);

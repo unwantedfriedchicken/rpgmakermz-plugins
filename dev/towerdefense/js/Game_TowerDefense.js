@@ -52,19 +52,6 @@ Game_TowerDefense.prototype.update = function () {
     for (let i = 0; i < $gameMap.ufcEnemies().length; i++) {
       const enemy = $gameMap.ufcEnemies()[i];
       if (this.isInTowerRange(enemy._x, enemy._y) && !enemy.isDestroyed()) {
-        // console.log(
-        //   "touch:",
-        //   enemy._x,
-        //   this._x - this._towerData._range,
-        //   this._x + +this._towerData._range
-        // );
-        // console.log(
-        //   "touch:",
-        //   enemy._y,
-        //   this._y - this._towerData._range,
-        //   this._y + +this._towerData._range
-        // );
-        // console.log("enemy in tower range");
         this._target = enemy;
         break;
       }
@@ -76,7 +63,6 @@ Game_TowerDefense.prototype.update = function () {
     ) {
       // clear target
       this._target = null;
-      // console.log("enemy out tower range");
     } else {
       // shoot projectile
       if (this._attackTime <= 0) {

@@ -6,7 +6,6 @@ module.exports = function (grunt) {
   grunt.initConfig({
     pkg: grunt.file.readJSON("package.json"),
     watch: {
-      // If any .less file changes in directory "less" then run the "less" task.
       files: ["js/*.js", "help/*.js", "global/*.js", "addon/*.js"],
       tasks: DEFAULTTASK,
     },

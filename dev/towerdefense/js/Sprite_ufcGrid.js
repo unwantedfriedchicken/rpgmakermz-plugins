@@ -8,37 +8,10 @@ Sprite_ufcGrid.prototype.constructor = Sprite_ufcGrid;
 Sprite_ufcGrid.prototype.initialize = function (data) {
   Sprite.prototype.initialize.call(this, data._bitmap);
   this._data = data;
-  // this.bitmap.fillRect(
-  //   0,
-  //   0,
-  //   this.bitmap.width,
-  //   this.bitmap.height,
-  //   this._gridColor
-  // );
-
-  // for (let i = 0; i < $gameMap.width(); i++) {
-  //   this.bitmap.clearRect(
-  //     this.posX(i) - this._lineSize / 2,
-  //     this.posY(0),
-  //     this._lineSize,
-  //     this.bitmap.height
-  //   );
-  // }
-
-  // for (let i = 0; i < $gameMap.height(); i++) {
-  //   this.bitmap.clearRect(
-  //     this.posX(0),
-  //     this.posY(i) - this._lineSize / 2,
-  //     this.bitmap.width,
-  //     this._lineSize
-  //   );
-  // }
-
   this.opacity = 60;
   this.z = 20;
   this._data._event.on("showGrid", this.setVisible, this);
   this.setVisible(false);
-  // this.setVisible(true);
 };
 
 Sprite_ufcGrid.prototype.setVisible = function (visible) {

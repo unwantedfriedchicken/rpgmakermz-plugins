@@ -48,8 +48,6 @@ Sprite_ufcTDTower.prototype.initMembers = function (ufcTD) {
 
 Sprite_ufcTDTower.prototype.setSelectPosition = function () {
   this.move($gameMap.tileWidth() / 2, $gameMap.tileHeight());
-  // this._rangeGraphics.x = $gameMap.tileWidth() / 2;
-  // this._rangeGraphics.y = $gameMap.tileHeight() / 2;
 };
 
 Sprite_ufcTDTower.prototype.getRangeGraphics = function () {
@@ -64,10 +62,7 @@ Sprite_ufcTDTower.prototype.update = function () {
   Sprite.prototype.update.call(this);
   this.updateCharacterFrame();
   if (this._towerData._placeMode) return;
-  // this.updateBitmap();
   this.updatePosition();
-  // this.updateOther();
-  // this.updateVisibility();
   if (this._tower.isDestroyed()) this.destroySprite();
 };
 
@@ -95,15 +90,7 @@ Sprite_ufcTDTower.prototype.updateCharacterFrame = function () {
   const ph = this.patternHeight();
   const sx = (this.characterBlockX() + 1) * pw;
   const sy = (this.characterBlockY() + 0) * ph;
-  // this.updateHalfBodySprites();
-  // if (this._bushDepth > 0) {
-  //   const d = this._bushDepth;
-  //   this._upperBody.setFrame(sx, sy, pw, ph - d);
-  //   this._lowerBody.setFrame(sx, sy + ph - d, pw, d);
-  //   this.setFrame(sx, sy, 0, ph);
-  // } else {
   this.setFrame(sx, sy, pw, ph);
-  // }
 };
 
 Sprite_ufcTDTower.prototype.patternWidth = function () {

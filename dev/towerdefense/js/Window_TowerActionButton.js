@@ -85,8 +85,6 @@ Window_TowerActionButton.prototype.onOk = function () {
       this._towerDataDestroyCallback();
       break;
   }
-  // console.log(this._list[this.index()]);
-  // this.activate();
   this.close();
 };
 
@@ -278,7 +276,6 @@ Window_TowerActionButton.prototype.drawTowerStatus = function (x, y, align) {
         textY + i * textHeight,
         150
       );
-      // this.changeTextColor(ColorManager.paramchangeTextColor(diffvalue));
       this.statusWindow2.changeTextColor(ColorManager.systemColor());
       if (statusValue[i] > statusValue2[i]) {
         this.statusWindow2.changeTextColor(ColorManager.powerDownColor());
@@ -433,7 +430,6 @@ Window_TowerActionButton.prototype.updateChildren = function () {
   }
 };
 Window_TowerActionButton.prototype.refresh = function () {
-  // this.makeItemList();
   for (const child of this.children) {
     if (child.contents) {
       child.contents.clear();
