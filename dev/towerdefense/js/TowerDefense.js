@@ -40,16 +40,8 @@ PluginManager.registerCommand("UFCTowerDefense", "config", function (args) {
 });
 
 PluginManager.registerCommand("UFCTowerDefense", "startWave", function (args) {
-  TowerDefenseManager.startWave(args);
+  $gameMap.addTowerDefenseNewWave(args);
 });
-
-PluginManager.registerCommand(
-  "UFCTowerDefense",
-  "spawnProjectile",
-  function (args) {
-    TowerDefenseManager.startWave(args);
-  }
-);
 
 PluginManager.registerCommand(
   "UFCTowerDefense",
@@ -94,7 +86,7 @@ PluginManager.registerCommand(
     }
 
     $dataTDTrigger[this._mapId][evnt._x][evnt._y].destroy = {
-      attack: args["attack"] == "true" ? true : false,
+      attack: args["attack"] == "true",
       attackEventId: args["attackEventId"],
       animationId: args["animationId"],
     };
@@ -541,6 +533,10 @@ Game_Map.prototype.update = function (sceneActive) {
   this.updateProjectile();
 };
 
+Game_Map.prototype.addTowerDefenseNewWave = function (wavedata) {
+  this._towerDefenseWave.push(new ufcTowerWaveData(wavedata));
+};
+
 Game_Map.prototype.updateTowerDefenseWave = function () {
   if (this._towerDefenseWave.length > 0) {
     let td = this._towerDefenseWave;
@@ -600,6 +596,7 @@ Spriteset_Map.prototype.removeTargetFromAnimation = function (target) {
     for (let i = 0; i < anim._targets.length; i++) {
       if (anim._targets[i] == target) {
         anim._targets.splice(i, 1);
+        i--;
       }
     }
   }

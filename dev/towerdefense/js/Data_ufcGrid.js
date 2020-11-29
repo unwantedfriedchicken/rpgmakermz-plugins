@@ -6,8 +6,6 @@ Data_ufcGrid.prototype.initialize = function () {
   this._event = new PIXI.utils.EventEmitter();
   this._gridData = [];
   this._eventData = [];
-  this._onlyTerrain = [];
-  this._exceptTerrain = [];
   this._bitmap = new Bitmap(
     $gameMap.width() * $gameMap.tileWidth(),
     $gameMap.height() * $gameMap.tileHeight()
@@ -24,14 +22,6 @@ Data_ufcGrid.prototype.setVisible = function (visible) {
 
 Data_ufcGrid.prototype.getData = function () {
   return this._gridData;
-};
-
-Data_ufcGrid.prototype.setOnlyTerrain = function (terrain) {
-  this._onlyTerrain.push(...terrain);
-};
-
-Data_ufcGrid.prototype._exceptTerrain = function (terrain) {
-  this._exceptTerrain.push(...terrain);
 };
 
 Data_ufcGrid.prototype.calcGrid = function () {
@@ -82,9 +72,6 @@ Data_ufcGrid.prototype.updateEvents = function () {
       event.pos.x = event.event.x;
       event.pos.y = event.event.y;
     }
-  }
-  for (let x = 0; x < $gameMap.width(); x++) {
-    for (let y = 0; y < $gameMap.height(); y++) {}
   }
 };
 

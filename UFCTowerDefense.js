@@ -262,8 +262,6 @@ Data_ufcGrid.prototype.initialize = function () {
   this._event = new PIXI.utils.EventEmitter();
   this._gridData = [];
   this._eventData = [];
-  this._onlyTerrain = [];
-  this._exceptTerrain = [];
   this._bitmap = new Bitmap(
     $gameMap.width() * $gameMap.tileWidth(),
     $gameMap.height() * $gameMap.tileHeight()
@@ -280,14 +278,6 @@ Data_ufcGrid.prototype.setVisible = function (visible) {
 
 Data_ufcGrid.prototype.getData = function () {
   return this._gridData;
-};
-
-Data_ufcGrid.prototype.setOnlyTerrain = function (terrain) {
-  this._onlyTerrain.push(...terrain);
-};
-
-Data_ufcGrid.prototype._exceptTerrain = function (terrain) {
-  this._exceptTerrain.push(...terrain);
 };
 
 Data_ufcGrid.prototype.calcGrid = function () {
@@ -338,9 +328,6 @@ Data_ufcGrid.prototype.updateEvents = function () {
       event.pos.x = event.event.x;
       event.pos.y = event.event.y;
     }
-  }
-  for (let x = 0; x < $gameMap.width(); x++) {
-    for (let y = 0; y < $gameMap.height(); y++) {}
   }
 };
 
@@ -696,7 +683,6 @@ Game_ufcProjectile.prototype.initialize = function (
   this.characterName = bulletData.characterName;
   this.characterIndex = bulletData.characterIndex;
   this.characterIndexY = bulletData.characterIndexY;
-  // this.speed = 10;
   this.canvasX = this.screenX(this._x);
   this.canvasY = this.screenY(this._y);
   this.vX = 0;
@@ -1323,16 +1309,8 @@ PluginManager.registerCommand("UFCTowerDefense", "config", function (args) {
 });
 
 PluginManager.registerCommand("UFCTowerDefense", "startWave", function (args) {
-  TowerDefenseManager.startWave(args);
+  $gameMap.addTowerDefenseNewWave(args);
 });
-
-PluginManager.registerCommand(
-  "UFCTowerDefense",
-  "spawnProjectile",
-  function (args) {
-    TowerDefenseManager.startWave(args);
-  }
-);
 
 PluginManager.registerCommand(
   "UFCTowerDefense",
@@ -1377,7 +1355,7 @@ PluginManager.registerCommand(
     }
 
     $dataTDTrigger[this._mapId][evnt._x][evnt._y].destroy = {
-      attack: args["attack"] == "true" ? true : false,
+      attack: args["attack"] == "true",
       attackEventId: args["attackEventId"],
       animationId: args["animationId"],
     };
@@ -1824,6 +1802,10 @@ Game_Map.prototype.update = function (sceneActive) {
   this.updateProjectile();
 };
 
+Game_Map.prototype.addTowerDefenseNewWave = function (wavedata) {
+  this._towerDefenseWave.push(new ufcTowerWaveData(wavedata));
+};
+
 Game_Map.prototype.updateTowerDefenseWave = function () {
   if (this._towerDefenseWave.length > 0) {
     let td = this._towerDefenseWave;
@@ -1883,6 +1865,7 @@ Spriteset_Map.prototype.removeTargetFromAnimation = function (target) {
     for (let i = 0; i < anim._targets.length; i++) {
       if (anim._targets[i] == target) {
         anim._targets.splice(i, 1);
+        i--;
       }
     }
   }
@@ -1930,8 +1913,6 @@ TowerDefenseManager.initialize = function () {
   this._towerHealthVarId = 0;
   this._towerHealthMaxVarId = 0;
   this._gameoverSwitchId = 0;
-  this._stateWave = "idle";
-  this._startWave = [];
   this._state = "idle";
   this._selectedUFCTD = null;
   this._limitAnimation = 0;
@@ -1940,6 +1921,7 @@ TowerDefenseManager.initialize = function () {
   this._cacheSprite = [];
   this.addTowerList();
 };
+
 TowerDefenseManager.EFFECTS = {
   COLD: "cold",
   POISON: "poison",
@@ -1979,13 +1961,11 @@ TowerDefenseManager.config = function (args) {
   if (args["onlyTerrain"] != "0") {
     let ot = args["onlyTerrain"].split(",").map(Number);
     $gamePlayer.getGuideAction().setOnlyTerrain(ot);
-    this.onlyTerrain = [...ot];
   }
 
   if (args["exceptTerrain"] != "0") {
     let ot = args["exceptTerrain"].split(",").map(Number);
     $gamePlayer.getGuideAction().setExceptTerrain(ot);
-    this._exceptTerrain = [...ot];
   }
 
   if (args["limitAnimation"] != "0") {
@@ -2058,17 +2038,8 @@ TowerDefenseManager.selectTowerMode = function () {
   $gameMap.ufcGetGrid().setVisible(true);
 };
 
-TowerDefenseManager.getWaveState = function () {
-  return this._stateWave;
-};
-
 TowerDefenseManager.getSelectedTowerData = function () {
   return this._selectedUFCTD;
-};
-
-TowerDefenseManager.startWave = function (waveData) {
-  this._stateWave = "start";
-  $gameMap._towerDefenseWave.push(new ufcTowerWaveData(waveData));
 };
 
 TowerDefenseManager.addDBEnemy = function (enemyData) {
@@ -2829,10 +2800,6 @@ Window_TowerActionButton.prototype.drawTextEx = function (
     x += this.itemWidth() / 2;
     x -= textWidth / 2;
     x -= this.itemPadding() * 2;
-  } else if (align == "right") {
-    let _x = c;
-    x = this.itemWidth();
-    x -= _x;
   }
   this.resetFontSettings();
   const textState = this.createTextState(text, x, y, width);

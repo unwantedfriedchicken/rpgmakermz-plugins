@@ -373,10 +373,6 @@ Window_TowerActionButton.prototype.drawTextEx = function (
     x += this.itemWidth() / 2;
     x -= textWidth / 2;
     x -= this.itemPadding() * 2;
-  } else if (align == "right") {
-    let _x = c;
-    x = this.itemWidth();
-    x -= _x;
   }
   this.resetFontSettings();
   const textState = this.createTextState(text, x, y, width);

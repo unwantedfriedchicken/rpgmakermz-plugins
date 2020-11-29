@@ -22,7 +22,6 @@ Game_ufcProjectile.prototype.initialize = function (
   this.characterName = bulletData.characterName;
   this.characterIndex = bulletData.characterIndex;
   this.characterIndexY = bulletData.characterIndexY;
-  // this.speed = 10;
   this.canvasX = this.screenX(this._x);
   this.canvasY = this.screenY(this._y);
   this.vX = 0;

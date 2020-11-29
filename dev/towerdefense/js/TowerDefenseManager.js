@@ -8,8 +8,6 @@ TowerDefenseManager.initialize = function () {
   this._towerHealthVarId = 0;
   this._towerHealthMaxVarId = 0;
   this._gameoverSwitchId = 0;
-  this._stateWave = "idle";
-  this._startWave = [];
   this._state = "idle";
   this._selectedUFCTD = null;
   this._limitAnimation = 0;
@@ -18,6 +16,7 @@ TowerDefenseManager.initialize = function () {
   this._cacheSprite = [];
   this.addTowerList();
 };
+
 TowerDefenseManager.EFFECTS = {
   COLD: "cold",
   POISON: "poison",
@@ -57,13 +56,11 @@ TowerDefenseManager.config = function (args) {
   if (args["onlyTerrain"] != "0") {
     let ot = args["onlyTerrain"].split(",").map(Number);
     $gamePlayer.getGuideAction().setOnlyTerrain(ot);
-    this.onlyTerrain = [...ot];
   }
 
   if (args["exceptTerrain"] != "0") {
     let ot = args["exceptTerrain"].split(",").map(Number);
     $gamePlayer.getGuideAction().setExceptTerrain(ot);
-    this._exceptTerrain = [...ot];
   }
 
   if (args["limitAnimation"] != "0") {
@@ -136,17 +133,8 @@ TowerDefenseManager.selectTowerMode = function () {
   $gameMap.ufcGetGrid().setVisible(true);
 };
 
-TowerDefenseManager.getWaveState = function () {
-  return this._stateWave;
-};
-
 TowerDefenseManager.getSelectedTowerData = function () {
   return this._selectedUFCTD;
-};
-
-TowerDefenseManager.startWave = function (waveData) {
-  this._stateWave = "start";
-  $gameMap._towerDefenseWave.push(new ufcTowerWaveData(waveData));
 };
 
 TowerDefenseManager.addDBEnemy = function (enemyData) {

@@ -266,10 +266,17 @@
     if (this._perciseMode) {
       this.updateBlocked();
     }
-    if (this.getGraphics().children.length > 0) {
-      const GRAPHICSCHILD = this.getGraphics().children;
-      for (let i = 0; i < GRAPHICSCHILD.length; i++) {
-        GRAPHICSCHILD[i].update();
+
+    this.updateChild();
+  };
+
+  GuideAction.prototype.updateChild = function () {
+    let children = this.getGraphics().children;
+    if (children.length > 0) {
+      for (const child of children) {
+        if (child.update) {
+          child.update();
+        }
       }
     }
   };
