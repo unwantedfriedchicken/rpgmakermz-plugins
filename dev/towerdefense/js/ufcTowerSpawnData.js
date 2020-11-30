@@ -5,5 +5,5 @@ const ufcTowerSpawnData = function () {
 ufcTowerSpawnData.prototype.initialize = function (data) {
   this._x = data._x;
   this._y = data._y;
-  this._direction = TowerDefenseManager.convertDirection(data["direction"]);
+  this._direction = data["direction"];
 };

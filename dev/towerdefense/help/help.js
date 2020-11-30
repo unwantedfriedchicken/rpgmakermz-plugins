@@ -108,7 +108,7 @@
 
 @arg direction
 @text Direction
-@desc Defines enemy direction
+@desc Defines enemy direction, for multiple direction add "/" -> Left/Right/Up mean direction is left, right or up
 @type select
 @option Left
 @option Right
@@ -175,12 +175,19 @@
 
 @arg direction
 @text Direction Spawn
-@desc Defines this enemy default direction
+@desc Defines enemy default direction, for multiple direction add "/" -> Left/Right mean direction is left or right
 @type select
 @option Left
 @option Right
 @option Up
 @option Down
+@option Left/Right
+@option Down/Left
+@option Down/Right
+@option Up/Down
+@option Up/Right
+@option Up/Left
+@option Random
 @default Left
 
 @command setupEnemy

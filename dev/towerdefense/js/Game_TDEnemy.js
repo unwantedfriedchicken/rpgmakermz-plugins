@@ -5,14 +5,14 @@ function Game_TDEnemy() {
 Game_TDEnemy.prototype = Object.create(Game_Character.prototype);
 Game_TDEnemy.prototype.constructor = Game_TDEnemy;
 
-Game_TDEnemy.prototype.initialize = function (enemyName, spawnId, tdId) {
+Game_TDEnemy.prototype.initialize = function (enemyName, spawnId) {
   Game_Character.prototype.initialize.call(this);
-  this._tdId = tdId;
-  this._characterSpriteId = $gameMap.getCharacterSprites().length;
   this._mapId = $gameMap._mapId;
   this._enemyData = Object.assign({}, $dataTDEnemy[enemyName]);
   this._spawn = $dataTDSpawnLocation[this._mapId][spawnId];
-  this._direction = this._spawn._direction;
+  this._direction = TowerDefenseManager.convertDirection(
+    this._spawn._direction
+  );
   this._effects = {};
   for (const effect in TowerDefenseManager.EFFECTS) {
     this._effects[TowerDefenseManager.EFFECTS[effect]] = {

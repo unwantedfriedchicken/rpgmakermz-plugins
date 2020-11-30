@@ -26,11 +26,13 @@ Sprite_ufcTDEnemy.prototype.initMembers = function (enemyData) {
   this._enemy._event.on("removeEffect", this.removeEffect, this);
   this.setCharacterBitmap();
 };
+
 Sprite_ufcTDEnemy.prototype.destroy = function () {
   this._enemy._event.removeListener("addEffect", this.addEffect, this);
   this._enemy._event.removeListener("removeEffect", this.removeEffect, this);
   Sprite.prototype.destroy.call(this);
 };
+
 Sprite_ufcTDEnemy.prototype.addEffect = function (effect) {
   let _effect = 0;
   switch (effect) {

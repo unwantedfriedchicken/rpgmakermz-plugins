@@ -39,9 +39,11 @@
     this._event = new PIXI.utils.EventEmitter();
   };
 
-  GuideAction.prototype.getMouseMode = function () {
-    return this._mouseMode;
-  };
+  Object.defineProperty(GuideAction.prototype, "isMouseMode", {
+    get: function () {
+      return this._mouseMode;
+    },
+  });
 
   GuideAction.prototype.setMouseMode = function (mode) {
     this._mouseMode = mode;
@@ -50,7 +52,7 @@
 
   GuideAction.prototype.resetParent = function () {
     const _spritesetmap = SceneManager.getSpriteSetMap();
-    if (this.getMouseMode()) {
+    if (this.isMouseMode) {
       this._graphics.setParent(_spritesetmap._tilemap);
     } else {
       for (const character of _spritesetmap._characterSprites) {
@@ -134,7 +136,7 @@
     x = this._x,
     y = this._y
   ) {
-    if (this._mouseMode) {
+    if (this.isMouseMode) {
       return;
     }
     this._x = x;
@@ -236,7 +238,7 @@
 
   GuideAction.prototype.update = function () {
     if (!this.isActive()) return;
-    if (this._mouseMode) {
+    if (this.isMouseMode) {
       if (!this._mouseTrigger.trigger) {
         this._x = $gameMap.canvasToMapX(TouchInput.x);
         this._y = $gameMap.canvasToMapY(TouchInput.y);
@@ -282,7 +284,7 @@
   };
 
   GuideAction.prototype.onPointerMove = function (e) {
-    if (this._mouseMode) {
+    if (this.isMouseMode) {
       this._tmpMouseData.x = TouchInput.x;
       this._tmpMouseData.y = TouchInput.y;
       return;
@@ -296,7 +298,7 @@
   };
 
   GuideAction.prototype.updateBlocked = function () {
-    if (this._mouseMode) {
+    if (this.isMouseMode) {
       if (!this.canPassMouse(this._x, this._y)) {
         if (!this.isBlocked()) {
           this.setBlocked(true);
@@ -307,11 +309,9 @@
     } else {
       if (!this.canPass(this._x, this._y, this._d)) {
         if (!this.isBlocked()) {
-          // this.setVisible(false);
           this.setBlocked(true);
         }
       } else if (this.isBlocked()) {
-        // this.setVisible(true);
         this.setBlocked(false);
       }
     }
@@ -345,14 +345,6 @@
   GuideAction.prototype.getGraphics = function () {
     if (this.isDestroyed()) this.reset();
     return this._graphics;
-  };
-
-  GuideAction.prototype.getOnlyTerrain = function () {
-    return this._onlyTerrain;
-  };
-
-  GuideAction.prototype.getExceptTerrain = function () {
-    return this._exceptTerrain;
   };
 
   GuideAction.prototype.isCollidedWithCharacters = function (x, y) {
@@ -395,14 +387,11 @@
   Game_Player.prototype.clearTransferInfo = function () {
     Game_Player_clearTransferInfo.apply(this, arguments);
     this.getGuideAction().setDirection(this._direction, this._x, this._y);
-
-    // this._guideAction.setActive(false);
   };
 
   const Game_Player_setDirection = Game_Player.prototype.setDirection;
   Game_Player.prototype.setDirection = function (d) {
     Game_Player_setDirection.apply(this, arguments);
-    // console.log($gameMap.isPassable(this._x, this._y, d));
     this._guideAction.setDirection(d, this._x, this._y);
   };
 

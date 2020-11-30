@@ -8,13 +8,17 @@ TowerDefenseManager.initialize = function () {
   this._towerHealthVarId = 0;
   this._towerHealthMaxVarId = 0;
   this._gameoverSwitchId = 0;
-  this._state = "idle";
+  this._state = TowerDefenseManager.STATE.IDLE;
   this._selectedUFCTD = null;
   this._limitAnimation = 0;
   this._controlBuildingMouse = false;
-  this._mouseData = { move: false, x: 0, y: 0 };
   this._cacheSprite = [];
   this.addTowerList();
+};
+
+TowerDefenseManager.STATE = {
+  IDLE: "idle",
+  BUILD: "build",
 };
 
 TowerDefenseManager.EFFECTS = {
@@ -95,7 +99,7 @@ TowerDefenseManager.actionTower = function (towerData, callback) {
 };
 
 TowerDefenseManager.selectTower = function (towerData) {
-  this._state = "build";
+  this._state = TowerDefenseManager.STATE.BUILD;
   this._selectedUFCTD = new ufcTowerData(towerData);
   this._selectedUFCTD.setPlaceMode(true);
   // Disable Open Menu
@@ -115,7 +119,7 @@ TowerDefenseManager.cancelSelect = function () {
 };
 
 TowerDefenseManager.clearSelect = function () {
-  this._state = "idle";
+  this._state = TowerDefenseManager.STATE.IDLE;
   this._selectedUFCTD = null;
   $gameSystem.enableMenu();
   $gamePlayer.getGuideAction().setActive(false);
@@ -228,8 +232,6 @@ TowerDefenseManager.addTower = function (itemid, item) {
     if (tdMode) {
       let dataNote = /<(\w*)(:?)([^>]*)>/g.exec(lines[i]);
       if (dataNote) data[dataNote[1]] = dataNote[3];
-    } else {
-      break;
     }
   }
   if (data) {

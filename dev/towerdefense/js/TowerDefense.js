@@ -198,17 +198,6 @@ Window_ShopStatus.prototype.isTowerItem = function () {
 
 // ------------------------------------------------------------------
 
-// Add Ignore with name
-// const _Window_Command_addCommand = Window_Command.prototype.addCommand;
-// Window_Command.prototype.addCommand = function () {
-//   _Window_Command_addCommand.call(this, ...arguments);
-//   let _l = this._list[this._list.length - 1];
-//   if (_l.name.slice(0, 3) == "/ds") {
-//     _l.name = _l.name.slice(3);
-//     _l.enabled = false;
-//   }
-// };
-
 Game_Character.prototype.moveAwayFromHere = function () {
   const d = [4, 2, 6, 8];
   for (let i = 0; i < d.length; i++) {
@@ -225,7 +214,7 @@ const _Game_Player_triggerButtonAction =
 Game_Player.prototype.triggerButtonAction = function () {
   if (
     Input.isTriggered("ok") &&
-    TowerDefenseManager.getState == "build" &&
+    TowerDefenseManager.getState == TowerDefenseManager.STATE.BUILD &&
     !this.getGuideAction().isBlocked()
   ) {
     TowerDefenseManager.placeTower();
@@ -242,9 +231,9 @@ Game_Player.prototype.triggerButtonAction = function () {
 const _Game_Player_moveByInput = Game_Player.prototype.moveByInput;
 Game_Player.prototype.moveByInput = function () {
   if (
-    TowerDefenseManager.getState == "build" &&
+    TowerDefenseManager.getState == TowerDefenseManager.STATE.BUILD &&
     this.getInputDirection() > 0 &&
-    this.getGuideAction().getMouseMode()
+    this.getGuideAction().isMouseMode
   ) {
     this.getGuideAction().setMouseMode(false);
   }
@@ -255,7 +244,7 @@ const _Game_Player_executeMove = Game_Player.prototype.executeMove;
 Game_Player.prototype.executeMove = function () {
   if (
     $gameTemp.isDestinationValid() &&
-    TowerDefenseManager.getState == "build"
+    TowerDefenseManager.getState == TowerDefenseManager.STATE.BUILD
   ) {
     const destX = $gameTemp.destinationX();
     const destY = $gameTemp.destinationY();
@@ -279,7 +268,10 @@ const _Game_Player_update = Game_Player.prototype.update;
 Game_Player.prototype.update = function () {
   _Game_Player_update.call(this, ...arguments);
 
-  if (TouchInput.isTriggered() && TowerDefenseManager.getState == "build") {
+  if (
+    TouchInput.isTriggered() &&
+    TowerDefenseManager.getState == TowerDefenseManager.STATE.BUILD
+  ) {
     const x = $gameMap.canvasToMapX(TouchInput.x);
     const y = $gameMap.canvasToMapY(TouchInput.y);
     if (this.pos(x, y)) {
@@ -299,7 +291,7 @@ Game_Player.prototype.triggerTouchActionD2 = function (x2, y2) {
 };
 
 Game_Player.prototype.checkEventTower = function (x, y) {
-  if (TowerDefenseManager.getState != "idle") return;
+  if (TowerDefenseManager.getState != TowerDefenseManager.STATE.IDLE) return;
   let x2 = x;
   let y2 = y;
   if (!x2 || !y2) {
@@ -328,7 +320,7 @@ Scene_Map.prototype.updateCallMenu = function () {
   _Scene_Map_updateCallMenu.call(this);
   if (
     !this.isMenuEnabled() &&
-    TowerDefenseManager.getState == "build" &&
+    TowerDefenseManager.getState == TowerDefenseManager.STATE.BUILD &&
     this.isMenuCalled()
   ) {
     TowerDefenseManager.cancelSelect();
@@ -478,7 +470,7 @@ Game_Map.prototype.ufcAddTower = function (towerData) {
 
 Game_Map.prototype.ufcSpawnEnemy = function (enemyName, spawnId) {
   let newEnemy = this._towerDefenseEnemy.push(
-    new Game_TDEnemy(enemyName, spawnId, this.ufcEnemies().length)
+    new Game_TDEnemy(enemyName, spawnId)
   );
   this.ufcAddCharacterSprites(
     new Sprite_ufcTDEnemy(this._towerDefenseEnemy[newEnemy - 1])
@@ -541,29 +533,11 @@ Game_Map.prototype.updateTowerDefenseWave = function () {
   if (this._towerDefenseWave.length > 0) {
     let td = this._towerDefenseWave;
     for (let i = 0; i < td.length; i++) {
-      if (td[i]._delay > 0) {
-        td[i]._delay--;
-        continue;
-      }
-      if (!td[i]._start) {
-        td[i]._start = true;
-        if (td[i]._startSE != "0") {
-          AudioManager.playSe({
-            name: td[i]._startSE,
-            volume: td[i]._startSEVolume,
-            pitch: 100,
-            pan: 0,
-          });
-        }
-      }
-      td[i]._timeSpawn--;
-      if (td[i]._timeSpawn <= 0) {
-        this.ufcSpawnEnemy(td[i]._enemy, td[i]._spawnLocationId);
-        // console.log("spawn", $dataTDEnemy[td[i]._enemy].name);
-        td[i]._timeSpawn = td[i]._delayPerSpawn;
-        td[i]._numberSpawn--;
-        if (td[i]._numberSpawn <= 0) {
-          // console.log("spawn complete");
+      td[i].update();
+
+      if (td[i].isSpawnEnemy()) {
+        this.ufcSpawnEnemy(...td[i].getEnemy());
+        if (td[i].isDone()) {
           td.splice(i, 1);
           i--;
         }
@@ -629,7 +603,7 @@ Spriteset_Map.prototype.createCharacters = function () {
   }
 
   this._tilemap.addChild(new Sprite_ufcGrid($gameMap.ufcGetGrid()));
-  if (TowerDefenseManager.getState != "idle") {
+  if (TowerDefenseManager.getState != TowerDefenseManager.STATE.IDLE) {
     TowerDefenseManager.selectTowerMode();
   }
 };
