@@ -255,6 +255,14 @@
 @desc Defines enemy scale
 */
 
+var Imported = Imported || {};
+Imported.UFCTowerDefense = true;
+
+var UFC = UFC || {};
+UFC.UFCTD = UFC.UFCTD || {};
+UFC.UFCTD.VERSION = 1.0;
+UFC.UFCTD.ALIAS = UFC.UFCTD.ALIAS || {};
+
 var $dataTDEnemy = $dataTDEnemy || {};
 var $dataTDSpawnLocation = $dataTDSpawnLocation || {};
 var $dataTDTrigger = $dataTDTrigger || {};
@@ -422,23 +430,23 @@ Game_TDEnemy.prototype.update = function () {
 
   this.updateEffects();
   if (!this.isMoving()) {
-    if (
-      $dataTDTrigger[this._mapId] &&
-      $dataTDTrigger[this._mapId][this._x] &&
-      $dataTDTrigger[this._mapId][this._x][this._y]
-    ) {
-      if ($dataTDTrigger[this._mapId][this._x][this._y].direction) {
-        this.setDirection(
-          TowerDefenseManager.convertDirection(
-            $dataTDTrigger[this._mapId][this._x][this._y].direction
-          )
-        );
-      }
-      if ($dataTDTrigger[this._mapId][this._x][this._y].destroy) {
-        this.triggerDestroy(
-          $dataTDTrigger[this._mapId][this._x][this._y].destroy
-        );
-        return;
+    let getTrigger = TowerDefenseManager.getTrigger(
+      this._mapId,
+      this._x,
+      this._y
+    );
+    if (getTrigger) {
+      for (let trigger in getTrigger) {
+        switch (trigger) {
+          case TowerDefenseManager.TRIGGERTYPE.DIRECTION:
+            this.setDirection(
+              TowerDefenseManager.convertDirection(getTrigger[trigger])
+            );
+            break;
+          case TowerDefenseManager.TRIGGERTYPE.DESTROY:
+            this.triggerDestroy(getTrigger[trigger]);
+            return;
+        }
       }
     }
     this.moveStraight(this._direction);
@@ -1331,18 +1339,12 @@ PluginManager.registerCommand(
   "UFCTowerDefense",
   "triggerMove",
   function (args) {
-    if (!$dataTDTrigger[this._mapId]) {
-      $dataTDTrigger[this._mapId] = [];
-    }
-    let evnt = $gameMap._events[this._eventId];
-    if (!$dataTDTrigger[this._mapId][evnt._x]) {
-      $dataTDTrigger[this._mapId][evnt._x] = [];
-    }
-    if (!$dataTDTrigger[this._mapId][evnt._x][evnt._y]) {
-      $dataTDTrigger[this._mapId][evnt._x][evnt._y] = {};
-    }
-
-    $dataTDTrigger[this._mapId][evnt._x][evnt._y].direction = args["direction"];
+    TowerDefenseManager.addDBTrigger(
+      this._mapId,
+      this._eventId,
+      TowerDefenseManager.TRIGGERTYPE.DIRECTION,
+      args["direction"]
+    );
   }
 );
 
@@ -1350,22 +1352,16 @@ PluginManager.registerCommand(
   "UFCTowerDefense",
   "triggerDestroy",
   function (args) {
-    if (!$dataTDTrigger[this._mapId]) {
-      $dataTDTrigger[this._mapId] = [];
-    }
-    let evnt = $gameMap._events[this._eventId];
-    if (!$dataTDTrigger[this._mapId][evnt._x]) {
-      $dataTDTrigger[this._mapId][evnt._x] = [];
-    }
-    if (!$dataTDTrigger[this._mapId][evnt._x][evnt._y]) {
-      $dataTDTrigger[this._mapId][evnt._x][evnt._y] = {};
-    }
-
-    $dataTDTrigger[this._mapId][evnt._x][evnt._y].destroy = {
-      attack: args["attack"] == "true",
-      attackEventId: args["attackEventId"],
-      animationId: args["animationId"],
-    };
+    TowerDefenseManager.addDBTrigger(
+      this._mapId,
+      this._eventId,
+      TowerDefenseManager.TRIGGERTYPE.DESTROY,
+      {
+        attack: args["attack"] == "true",
+        attackEventId: args["attackEventId"],
+        animationId: args["animationId"],
+      }
+    );
   }
 );
 
@@ -1385,16 +1381,17 @@ SceneManager.getSpriteSetMap = function () {
   return this.getScene()._spriteset;
 };
 
-const _Datamanager_createGameObjects = DataManager.createGameObjects;
+UFC.UFCTD.ALIAS._Datamanager_createGameObjects = DataManager.createGameObjects;
 DataManager.createGameObjects = function () {
-  _Datamanager_createGameObjects.call(this);
+  UFC.UFCTD.ALIAS._Datamanager_createGameObjects.call(this);
   TowerDefenseManager.initialize();
 };
 
 // Add Status Tower For shop -----------------------------------------
-const _Window_ShopStatus_refresh = Window_ShopStatus.prototype.refresh;
+UFC.UFCTD.ALIAS._Window_ShopStatus_refresh =
+  Window_ShopStatus.prototype.refresh;
 Window_ShopStatus.prototype.refresh = function () {
-  _Window_ShopStatus_refresh.call(this);
+  UFC.UFCTD.ALIAS._Window_ShopStatus_refresh.call(this);
 
   if (this._item) {
     if (this.isTowerItem) {
@@ -1485,7 +1482,7 @@ Game_Character.prototype.moveAwayFromHere = function () {
   return false;
 };
 
-const _Game_Player_triggerButtonAction =
+UFC.UFCTD.ALIAS._Game_Player_triggerButtonAction =
   Game_Player.prototype.triggerButtonAction;
 Game_Player.prototype.triggerButtonAction = function () {
   if (
@@ -1501,10 +1498,13 @@ Game_Player.prototype.triggerButtonAction = function () {
     return true;
   }
 
-  return _Game_Player_triggerButtonAction.apply(this, arguments);
+  return UFC.UFCTD.ALIAS._Game_Player_triggerButtonAction.apply(
+    this,
+    arguments
+  );
 };
 
-const _Game_Player_moveByInput = Game_Player.prototype.moveByInput;
+UFC.UFCTD.ALIAS._Game_Player_moveByInput = Game_Player.prototype.moveByInput;
 Game_Player.prototype.moveByInput = function () {
   if (
     TowerDefenseManager.getState == TowerDefenseManager.STATE.BUILD &&
@@ -1513,10 +1513,10 @@ Game_Player.prototype.moveByInput = function () {
   ) {
     this.getGuideAction().setMouseMode(false);
   }
-  _Game_Player_moveByInput.call(this);
+  UFC.UFCTD.ALIAS._Game_Player_moveByInput.call(this);
 };
 
-const _Game_Player_executeMove = Game_Player.prototype.executeMove;
+UFC.UFCTD.ALIAS._Game_Player_executeMove = Game_Player.prototype.executeMove;
 Game_Player.prototype.executeMove = function () {
   if (
     $gameTemp.isDestinationValid() &&
@@ -1537,12 +1537,12 @@ Game_Player.prototype.executeMove = function () {
       return;
     }
   }
-  _Game_Player_executeMove.call(this, ...arguments);
+  UFC.UFCTD.ALIAS._Game_Player_executeMove.call(this, ...arguments);
 };
 
-const _Game_Player_update = Game_Player.prototype.update;
+UFC.UFCTD.ALIAS._Game_Player_update = Game_Player.prototype.update;
 Game_Player.prototype.update = function () {
-  _Game_Player_update.call(this, ...arguments);
+  UFC.UFCTD.ALIAS._Game_Player_update.call(this, ...arguments);
 
   if (
     TouchInput.isTriggered() &&
@@ -1558,12 +1558,15 @@ Game_Player.prototype.update = function () {
 };
 
 // Touch input, check event there (check function Game_Player.prototype.triggerTouchAction)
-const _Game_Player_triggerTouchActionD2 =
+UFC.UFCTD.ALIAS._Game_Player_triggerTouchActionD2 =
   Game_Player.prototype.triggerTouchActionD2;
 Game_Player.prototype.triggerTouchActionD2 = function (x2, y2) {
   if (this.checkEventTower(x2, y2)) return true;
 
-  return _Game_Player_triggerTouchActionD2.call(this, ...arguments);
+  return UFC.UFCTD.ALIAS._Game_Player_triggerTouchActionD2.call(
+    this,
+    ...arguments
+  );
 };
 
 Game_Player.prototype.checkEventTower = function (x, y) {
@@ -1591,9 +1594,9 @@ Game_Player.prototype.checkEventTower = function (x, y) {
 //   ImageManager.loadSystem("TDSet");
 // };
 
-const _Scene_Map_updateCallMenu = Scene_Map.prototype.updateCallMenu;
+UFC.UFCTD.ALIAS._Scene_Map_updateCallMenu = Scene_Map.prototype.updateCallMenu;
 Scene_Map.prototype.updateCallMenu = function () {
-  _Scene_Map_updateCallMenu.call(this);
+  UFC.UFCTD.ALIAS._Scene_Map_updateCallMenu.call(this);
   if (
     !this.isMenuEnabled() &&
     TowerDefenseManager.getState == TowerDefenseManager.STATE.BUILD &&
@@ -1603,9 +1606,10 @@ Scene_Map.prototype.updateCallMenu = function () {
   }
 };
 
-var _Scene_Map_createAllWindows = Scene_Map.prototype.createAllWindows;
+UFC.UFCTD.ALIAS._Scene_Map_createAllWindows =
+  Scene_Map.prototype.createAllWindows;
 Scene_Map.prototype.createAllWindows = function () {
-  _Scene_Map_createAllWindows.call(this);
+  UFC.UFCTD.ALIAS._Scene_Map_createAllWindows.call(this);
   this.createGoldWindow();
   this.createTowerActionButtonWindow();
   this.createTDHealth();
@@ -1641,9 +1645,9 @@ Scene_Map.prototype.getTowerAction = function () {
 };
 // ----------------------------------- End HUD -------------------------
 
-const _Scene_ItemBase_applyItem = Scene_ItemBase.prototype.applyItem;
+UFC.UFCTD.ALIAS._Scene_ItemBase_applyItem = Scene_ItemBase.prototype.applyItem;
 Scene_ItemBase.prototype.applyItem = function () {
-  _Scene_ItemBase_applyItem.apply(this, arguments);
+  UFC.UFCTD.ALIAS._Scene_ItemBase_applyItem.apply(this, arguments);
   if (this.item().ufcTower) {
     TowerDefenseManager.selectTower(this.item().ufcTower);
     SceneManager.goto(Scene_Map);
@@ -1651,32 +1655,36 @@ Scene_ItemBase.prototype.applyItem = function () {
 };
 
 // Change Gold
-const _Game_Interpreter_command125 = Game_Interpreter.prototype.command125;
+UFC.UFCTD.ALIAS._Game_Interpreter_command125 =
+  Game_Interpreter.prototype.command125;
 Game_Interpreter.prototype.command125 = function () {
-  _Game_Interpreter_command125.apply(this, arguments);
+  UFC.UFCTD.ALIAS._Game_Interpreter_command125.apply(this, arguments);
   $gameMap.updateGoldHud();
   return true;
 };
 
 // variable to make message busy
-const _Game_Message_clear = Game_Message.prototype.clear;
+UFC.UFCTD.ALIAS._Game_Message_clear = Game_Message.prototype.clear;
 Game_Message.prototype.clear = function () {
-  _Game_Message_clear.call(this);
+  UFC.UFCTD.ALIAS._Game_Message_clear.call(this);
   this._windowTowerActionShow = false;
 };
 
-const _Game_Message_isBusy = Game_Message.prototype.isBusy;
+UFC.UFCTD.ALIAS._Game_Message_isBusy = Game_Message.prototype.isBusy;
 Game_Message.prototype.isBusy = function () {
-  return this._windowTowerActionShow || _Game_Message_isBusy.call(this);
+  return (
+    this._windowTowerActionShow ||
+    UFC.UFCTD.ALIAS._Game_Message_isBusy.call(this)
+  );
 };
 
 Game_Message.prototype.setWindowTower = function (showTower) {
   this._windowTowerActionShow = showTower;
 };
 
-const _Game_Map_initialize = Game_Map.prototype.initialize;
+UFC.UFCTD.ALIAS._Game_Map_initialize = Game_Map.prototype.initialize;
 Game_Map.prototype.initialize = function () {
-  _Game_Map_initialize.apply(this, arguments);
+  UFC.UFCTD.ALIAS._Game_Map_initialize.apply(this, arguments);
   this._towerDefenseList = [];
   this._towerDefenseWave = [];
   this._towerDefenseEnemy = [];
@@ -1684,9 +1692,9 @@ Game_Map.prototype.initialize = function () {
   this._towerDefenseGrid = null;
 };
 
-const _Game_Map_setup = Game_Map.prototype.setup;
+UFC.UFCTD.ALIAS._Game_Map_setup = Game_Map.prototype.setup;
 Game_Map.prototype.setup = function (mapId) {
-  _Game_Map_setup.call(this, mapId);
+  UFC.UFCTD.ALIAS._Game_Map_setup.call(this, mapId);
   this._towerDefenseGrid = new Data_ufcGrid();
 };
 
@@ -1723,9 +1731,11 @@ Game_Map.prototype.ufcAddCharacterSprites = function (characterSprite) {
     _spriteSet._characterSprites[newSpritesetIndex - 1]
   );
 };
+
 Game_Map.prototype.getCharacterSprites = function () {
   return SceneManager.getSpriteSetMap()._characterSprites;
 };
+
 Game_Map.prototype.ufcAddProjectile = function (projectileData) {
   // since projectile dont need animation, don't include to _charactersprites
   const _spriteSet = SceneManager.getSpriteSetMap();
@@ -1793,9 +1803,9 @@ Game_Map.prototype.positionToCanvas = function (x, y) {
   return { x: this.xToCanvas(x), y: this.yToCanvas(y) };
 };
 
-const _Game_Map_update = Game_Map.prototype.update;
+UFC.UFCTD.ALIAS._Game_Map_update = Game_Map.prototype.update;
 Game_Map.prototype.update = function (sceneActive) {
-  _Game_Map_update.call(this, sceneActive);
+  UFC.UFCTD.ALIAS._Game_Map_update.call(this, sceneActive);
   this.updateTowerDefenseWave();
   this.updateTowerDefenseEnemy();
   this.updateProjectile();
@@ -1852,11 +1862,10 @@ Spriteset_Map.prototype.removeTargetFromAnimation = function (target) {
   }
 };
 
-const _Spriteset_Map_createCharacters =
+UFC.UFCTD.ALIAS._Spriteset_Map_createCharacters =
   Spriteset_Map.prototype.createCharacters;
-
 Spriteset_Map.prototype.createCharacters = function () {
-  _Spriteset_Map_createCharacters.apply(this, arguments);
+  UFC.UFCTD.ALIAS._Spriteset_Map_createCharacters.call(this);
 
   // Create Tower
   let towers = $gameMap._events.filter(
@@ -1900,6 +1909,11 @@ TowerDefenseManager.initialize = function () {
   this._controlBuildingMouse = false;
   this._cacheSprite = [];
   this.addTowerList();
+};
+
+TowerDefenseManager.TRIGGERTYPE = {
+  DESTROY: "destroy",
+  DIRECTION: "direction",
 };
 
 TowerDefenseManager.STATE = {
@@ -2038,6 +2052,37 @@ TowerDefenseManager.addDBEnemy = function (enemyData) {
   for (let data in enemyData) {
     $dataTDEnemy[enemyData.id][data] = enemyData[data];
   }
+};
+
+TowerDefenseManager.addDBTrigger = function (
+  mapId,
+  eventId,
+  triggerType,
+  triggerValue
+) {
+  if (!$dataTDTrigger[mapId]) {
+    $dataTDTrigger[mapId] = [];
+  }
+  let evnt = $gameMap._events[eventId];
+  if (!$dataTDTrigger[mapId][evnt._x]) {
+    $dataTDTrigger[mapId][evnt._x] = [];
+  }
+  if (!$dataTDTrigger[mapId][evnt._x][evnt._y]) {
+    $dataTDTrigger[mapId][evnt._x][evnt._y] = {};
+  }
+
+  $dataTDTrigger[mapId][evnt._x][evnt._y][triggerType] = triggerValue;
+};
+
+TowerDefenseManager.getTrigger = function (mapid, x, y) {
+  if (
+    $dataTDTrigger[mapid] &&
+    $dataTDTrigger[mapid][x] &&
+    $dataTDTrigger[mapid][x][y]
+  ) {
+    return $dataTDTrigger[mapid][x][y];
+  }
+  return false;
 };
 
 TowerDefenseManager.placeTower = function () {

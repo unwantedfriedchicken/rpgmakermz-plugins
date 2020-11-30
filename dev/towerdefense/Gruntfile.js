@@ -31,8 +31,8 @@ module.exports = function (grunt) {
         // location of result file
         dest: PATHDEST + NAMEPLUGIN + ".js",
         options: {
-          banner: "(() => { \n 'use strict';\n",
-          footer: "})();",
+          // banner: "(() => { \n 'use strict';\n",
+          // footer: "})();",
         },
       },
       uglify: {

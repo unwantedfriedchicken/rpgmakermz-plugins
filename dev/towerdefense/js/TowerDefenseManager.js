@@ -16,6 +16,11 @@ TowerDefenseManager.initialize = function () {
   this.addTowerList();
 };
 
+TowerDefenseManager.TRIGGERTYPE = {
+  DESTROY: "destroy",
+  DIRECTION: "direction",
+};
+
 TowerDefenseManager.STATE = {
   IDLE: "idle",
   BUILD: "build",
@@ -152,6 +157,37 @@ TowerDefenseManager.addDBEnemy = function (enemyData) {
   for (let data in enemyData) {
     $dataTDEnemy[enemyData.id][data] = enemyData[data];
   }
+};
+
+TowerDefenseManager.addDBTrigger = function (
+  mapId,
+  eventId,
+  triggerType,
+  triggerValue
+) {
+  if (!$dataTDTrigger[mapId]) {
+    $dataTDTrigger[mapId] = [];
+  }
+  let evnt = $gameMap._events[eventId];
+  if (!$dataTDTrigger[mapId][evnt._x]) {
+    $dataTDTrigger[mapId][evnt._x] = [];
+  }
+  if (!$dataTDTrigger[mapId][evnt._x][evnt._y]) {
+    $dataTDTrigger[mapId][evnt._x][evnt._y] = {};
+  }
+
+  $dataTDTrigger[mapId][evnt._x][evnt._y][triggerType] = triggerValue;
+};
+
+TowerDefenseManager.getTrigger = function (mapid, x, y) {
+  if (
+    $dataTDTrigger[mapid] &&
+    $dataTDTrigger[mapid][x] &&
+    $dataTDTrigger[mapid][x][y]
+  ) {
+    return $dataTDTrigger[mapid][x][y];
+  }
+  return false;
 };
 
 TowerDefenseManager.placeTower = function () {

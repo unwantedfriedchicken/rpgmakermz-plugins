@@ -53,23 +53,23 @@ Game_TDEnemy.prototype.update = function () {
 
   this.updateEffects();
   if (!this.isMoving()) {
-    if (
-      $dataTDTrigger[this._mapId] &&
-      $dataTDTrigger[this._mapId][this._x] &&
-      $dataTDTrigger[this._mapId][this._x][this._y]
-    ) {
-      if ($dataTDTrigger[this._mapId][this._x][this._y].direction) {
-        this.setDirection(
-          TowerDefenseManager.convertDirection(
-            $dataTDTrigger[this._mapId][this._x][this._y].direction
-          )
-        );
-      }
-      if ($dataTDTrigger[this._mapId][this._x][this._y].destroy) {
-        this.triggerDestroy(
-          $dataTDTrigger[this._mapId][this._x][this._y].destroy
-        );
-        return;
+    let getTrigger = TowerDefenseManager.getTrigger(
+      this._mapId,
+      this._x,
+      this._y
+    );
+    if (getTrigger) {
+      for (let trigger in getTrigger) {
+        switch (trigger) {
+          case TowerDefenseManager.TRIGGERTYPE.DIRECTION:
+            this.setDirection(
+              TowerDefenseManager.convertDirection(getTrigger[trigger])
+            );
+            break;
+          case TowerDefenseManager.TRIGGERTYPE.DESTROY:
+            this.triggerDestroy(getTrigger[trigger]);
+            return;
+        }
       }
     }
     this.moveStraight(this._direction);
