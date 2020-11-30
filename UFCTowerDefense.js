@@ -405,6 +405,7 @@ Game_TDEnemy.prototype.initialize = function (enemyName, spawnId) {
   this.setDirection(this._direction);
   this._realMoveSpeed = +this._enemyData.moveSpeed;
   this._moveSpeed = this._realMoveSpeed;
+  this._isStun = false;
   this._animationPlaying = false;
   this._event = new PIXI.utils.EventEmitter();
 };
@@ -460,17 +461,28 @@ Game_TDEnemy.prototype.updateEffects = function () {
     if (!this._effects[effect].enable) {
       switch (effect) {
         case TowerDefenseManager.EFFECTS.COLD:
-          this._moveSpeed = Math.max(
-            0.1,
-            (this._moveSpeed *
-              (100 - this._effects[effect].effect.getEffect())) /
-              100
+          // Always pick the most effective effect
+          this._moveSpeed = Math.min(
+            this._moveSpeed,
+            Math.max(
+              0.1,
+              (this._realMoveSpeed *
+                (100 - this._effects[effect].effect.getEffect())) /
+                100
+            )
           );
           break;
         case TowerDefenseManager.EFFECTS.POISON:
           this._effects[effect].effect.setEPSCallback(() =>
             this.attacked({ damage: this._effects[effect].effect.getEffect() })
           );
+          break;
+        case TowerDefenseManager.EFFECTS.STUN:
+          if (!this._effects[effect].effect.getChanceEffect()) {
+            this._effects[effect].effect = null;
+            return;
+          }
+          this._isStun = true;
           break;
       }
       this._event.emit("addEffect", effect);
@@ -482,12 +494,20 @@ Game_TDEnemy.prototype.updateEffects = function () {
         case TowerDefenseManager.EFFECTS.COLD:
           this._moveSpeed = this._realMoveSpeed;
           break;
+        case TowerDefenseManager.EFFECTS.STUN:
+          this._isStun = false;
+          break;
       }
       this._effects[effect].enable = false;
       this._effects[effect].effect = null;
       this._event.emit("removeEffect", effect);
     }
   }
+};
+
+Game_TDEnemy.prototype.distancePerFrame = function () {
+  if (this._isStun) return 0;
+  else return Game_Character.prototype.distancePerFrame.call(this);
 };
 
 Game_TDEnemy.prototype.triggerDestroy = function (destroyData) {
@@ -946,6 +966,9 @@ Sprite_ufcTDEnemy.prototype.addEffect = function (effect) {
       break;
     case TowerDefenseManager.EFFECTS.POISON:
       _effect = 1;
+      break;
+    case TowerDefenseManager.EFFECTS.STUN:
+      _effect = 5;
       break;
   }
   this.addChild(new Sprite_ufcTDEnemyEffect(effect, _effect, 0, 25));
@@ -1924,6 +1947,7 @@ TowerDefenseManager.STATE = {
 TowerDefenseManager.EFFECTS = {
   COLD: "cold",
   POISON: "poison",
+  STUN: "stun",
 };
 
 TowerDefenseManager.setLimitAnimation = function (limit) {
@@ -2302,6 +2326,10 @@ ufcTowerEffects.prototype.epsCallback = function () {
 
 ufcTowerEffects.prototype.getEffect = function () {
   return this._effect;
+};
+
+ufcTowerEffects.prototype.getChanceEffect = function () {
+  return this._effect > Math.randomInt(100);
 };
 
 ufcTowerEffects.prototype.isDone = function () {

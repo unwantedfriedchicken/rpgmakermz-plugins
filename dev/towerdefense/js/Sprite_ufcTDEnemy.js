@@ -42,6 +42,9 @@ Sprite_ufcTDEnemy.prototype.addEffect = function (effect) {
     case TowerDefenseManager.EFFECTS.POISON:
       _effect = 1;
       break;
+    case TowerDefenseManager.EFFECTS.STUN:
+      _effect = 5;
+      break;
   }
   this.addChild(new Sprite_ufcTDEnemyEffect(effect, _effect, 0, 25));
 };
