@@ -253,6 +253,15 @@
 @type number
 @default 1
 @desc Defines enemy scale
+
+@arg enemyType
+@text Enemy Type
+@type select
+@option All
+@option Air
+@option Ground
+@default All
+@desc Defines enemy type
 */
 
 var Imported = Imported || {};
@@ -411,6 +420,17 @@ Game_TDEnemy.prototype.initialize = function (enemyName, spawnId) {
   this._event = new PIXI.utils.EventEmitter();
 };
 
+Game_TDEnemy.prototype.isSameType = function (type) {
+  if (
+    type === TowerDefenseManager.ENEMYTYPE.ALL ||
+    type === this._enemyData.enemyType ||
+    this._enemyData.enemyType === TowerDefenseManager.ENEMYTYPE.ALL
+  )
+    return true;
+
+  return false;
+};
+
 Game_TDEnemy.prototype.getEnemyData = function () {
   return this._enemyData;
 };
@@ -513,15 +533,11 @@ Game_TDEnemy.prototype.updateEffects = function () {
 };
 
 Game_TDEnemy.prototype.updateMoveSpeed = function () {
-  if (Object.keys(this._moveSpeedEffects).length >= 0) {
-    let newSpeed = this._realMoveSpeed;
-    for (let speedEffect in this._moveSpeedEffects) {
-      newSpeed += this._moveSpeedEffects[speedEffect];
-    }
-    this._moveSpeed = newSpeed;
-  } else {
-    this._moveSpeed = this._realMoveSpeed;
+  let newSpeed = this._realMoveSpeed;
+  for (let speedEffect in this._moveSpeedEffects) {
+    newSpeed += this._moveSpeedEffects[speedEffect];
   }
+  this._moveSpeed = newSpeed;
 };
 
 Game_TDEnemy.prototype.removeMoveSpeedEffect = function (effect) {
@@ -661,9 +677,12 @@ Game_TowerDefense.prototype.update = function () {
   this._attackTime--;
   if (!this._target && $gameMap.ufcEnemies().length > 0) {
     // Search target
-    for (let i = 0; i < $gameMap.ufcEnemies().length; i++) {
-      const enemy = $gameMap.ufcEnemies()[i];
-      if (this.isInTowerRange(enemy._x, enemy._y) && !enemy.isDestroyed()) {
+    for (const enemy of $gameMap.ufcEnemies()) {
+      if (
+        this.isInTowerRange(enemy._x, enemy._y) &&
+        !enemy.isDestroyed() &&
+        enemy.isSameType(this._towerData._attackType)
+      ) {
         this._target = enemy;
         break;
       }
@@ -1349,6 +1368,7 @@ Sprite_ufcTDTower.prototype.setPosition = function (x, y) {
 PluginManager.registerCommand("UFCTowerDefense", "setupEnemy", function (args) {
   args.characterName = $gameMap._events[this._eventId]._characterName;
   args.characterIndex = $gameMap._events[this._eventId]._characterIndex;
+  args["enemyType"] = args["enemyType"].toLowerCase();
   TowerDefenseManager.addDBEnemy(args);
 });
 
@@ -1975,6 +1995,12 @@ TowerDefenseManager.initialize = function () {
   this.addTowerList();
 };
 
+TowerDefenseManager.ENEMYTYPE = {
+  AIR: "air",
+  GROUND: "ground",
+  ALL: "all",
+};
+
 TowerDefenseManager.TRIGGERTYPE = {
   DESTROY: "destroy",
   DIRECTION: "direction",
@@ -2054,10 +2080,6 @@ TowerDefenseManager.cacheImage = function () {
   for (let image of this._cacheSprite) {
     ImageManager.loadCharacter(image);
   }
-};
-
-TowerDefenseManager.isWaveEnd = function () {
-  return $gameMap.ufcEnemies().length <= 0;
 };
 
 TowerDefenseManager.actionTower = function (towerData, callback) {
@@ -2321,6 +2343,7 @@ ufcTowerData.prototype.initialize = function (data) {
     }
   }
   this._effectsNote = data["effectsnote"];
+  this._attackType = data["attacktype"];
   this._x = 0;
   this._y = 0;
   this._rangeVisible = true;

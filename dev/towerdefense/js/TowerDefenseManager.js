@@ -16,6 +16,12 @@ TowerDefenseManager.initialize = function () {
   this.addTowerList();
 };
 
+TowerDefenseManager.ENEMYTYPE = {
+  AIR: "air",
+  GROUND: "ground",
+  ALL: "all",
+};
+
 TowerDefenseManager.TRIGGERTYPE = {
   DESTROY: "destroy",
   DIRECTION: "direction",
@@ -95,10 +101,6 @@ TowerDefenseManager.cacheImage = function () {
   for (let image of this._cacheSprite) {
     ImageManager.loadCharacter(image);
   }
-};
-
-TowerDefenseManager.isWaveEnd = function () {
-  return $gameMap.ufcEnemies().length <= 0;
 };
 
 TowerDefenseManager.actionTower = function (towerData, callback) {

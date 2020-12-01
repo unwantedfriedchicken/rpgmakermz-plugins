@@ -34,6 +34,17 @@ Game_TDEnemy.prototype.initialize = function (enemyName, spawnId) {
   this._event = new PIXI.utils.EventEmitter();
 };
 
+Game_TDEnemy.prototype.isSameType = function (type) {
+  if (
+    type === TowerDefenseManager.ENEMYTYPE.ALL ||
+    type === this._enemyData.enemyType ||
+    this._enemyData.enemyType === TowerDefenseManager.ENEMYTYPE.ALL
+  )
+    return true;
+
+  return false;
+};
+
 Game_TDEnemy.prototype.getEnemyData = function () {
   return this._enemyData;
 };
@@ -136,15 +147,11 @@ Game_TDEnemy.prototype.updateEffects = function () {
 };
 
 Game_TDEnemy.prototype.updateMoveSpeed = function () {
-  if (Object.keys(this._moveSpeedEffects).length >= 0) {
-    let newSpeed = this._realMoveSpeed;
-    for (let speedEffect in this._moveSpeedEffects) {
-      newSpeed += this._moveSpeedEffects[speedEffect];
-    }
-    this._moveSpeed = newSpeed;
-  } else {
-    this._moveSpeed = this._realMoveSpeed;
+  let newSpeed = this._realMoveSpeed;
+  for (let speedEffect in this._moveSpeedEffects) {
+    newSpeed += this._moveSpeedEffects[speedEffect];
   }
+  this._moveSpeed = newSpeed;
 };
 
 Game_TDEnemy.prototype.removeMoveSpeedEffect = function (effect) {

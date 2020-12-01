@@ -49,9 +49,12 @@ Game_TowerDefense.prototype.update = function () {
   this._attackTime--;
   if (!this._target && $gameMap.ufcEnemies().length > 0) {
     // Search target
-    for (let i = 0; i < $gameMap.ufcEnemies().length; i++) {
-      const enemy = $gameMap.ufcEnemies()[i];
-      if (this.isInTowerRange(enemy._x, enemy._y) && !enemy.isDestroyed()) {
+    for (const enemy of $gameMap.ufcEnemies()) {
+      if (
+        this.isInTowerRange(enemy._x, enemy._y) &&
+        !enemy.isDestroyed() &&
+        enemy.isSameType(this._towerData._attackType)
+      ) {
         this._target = enemy;
         break;
       }

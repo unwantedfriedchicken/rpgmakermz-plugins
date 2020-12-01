@@ -253,4 +253,13 @@
 @type number
 @default 1
 @desc Defines enemy scale
+
+@arg enemyType
+@text Enemy Type
+@type select
+@option All
+@option Air
+@option Ground
+@default All
+@desc Defines enemy type
 */

@@ -40,6 +40,7 @@ ufcTowerData.prototype.initialize = function (data) {
     }
   }
   this._effectsNote = data["effectsnote"];
+  this._attackType = data["attacktype"];
   this._x = 0;
   this._y = 0;
   this._rangeVisible = true;
