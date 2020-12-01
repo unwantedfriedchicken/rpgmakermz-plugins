@@ -2,8 +2,13 @@
 
 ## Version 1.1 - dev
 
+Special thanks to [@wrigty12](https://forums.rpgmakerweb.com/index.php?members/wrigty12.25770/), [@estriole](https://forums.rpgmakerweb.com/index.php?members/estriole.2487/) for their inputs!
+
 - CHANGE: Add chance parameter to effects, effect parameter is become ( `ID EFFECT | EFFECT | DURATION | CHANCE` ) If `CHANCE` not stated it's automatic become `100`, ex: `cold|80|240|50` -> `ID cold | 80% decrease movement speed | 4s duration | 50% chance`
-- BUGFIX: Effect cold to pick most effective effect
-- ADD: Stun effect, effects -> `stun|0|240|80` -> `ID stun | NOTHING | duration stun | chance stun`
+- CHANGE: If tower base attack 0, the tower will stop/never searching enemy, it's usefull if want make pure auras tower
+- CHANGE: Tower now will display range attack when get selected, range is also updated when get buff range from aura tower
+- CHANGE: Effect now will to pick most effective effect
+- ADD: Stun effect, effects -> `stun|0|240|80` -> `ID stun | do nothing | duration stun | chance stun`
 - ADD: Rage effect, make the enemy walk faster -> `rage|100|240|30` -> `ID rage | 100% increase movement speed | 4s duration | 30% chance`
-- ADD: Enemy types, tower only can attack same type or all type. current type is `air | ground | all`. There is new plugin command variable for setup enemy it is `Enemy Type`. For tower need note `<attacktype:all>` value need lower case. If enemy type is all then any tower attack type can attack it, also same with tower
+- ADD: Enemy types, tower can only attack same type or all type. current type is `air | ground | all`. There is new plugin command variable for `Setup Enemy` it is `Enemy Type`. For tower need note `<attacktype:all>` value need lower case. If enemy type is all then any tower attack type can attack it, also same with tower
+- ADD: Aura tower type, this aura give buff to other tower that in aura tower range, tower can give negative & multiple effect. the tower need note `<auras:attack|2|fixed>` this mean -> `ID auratype | value | aura type mode`, there's 2 aura type mode `fixed | percentage`. `fixed` mean tower will give fixed increment/decrement to the tower ex: `<auras:attack|2|fixed>` mean the tower attack will increase by _2_. `percentage` is percentage of the tower ex: `<auras:attackspeed|90|percentage>` mean the tower will increase 90% more faster. to give negative effect add - infront the value `<auras:range|-2|fixed>` will decrease range by _2_

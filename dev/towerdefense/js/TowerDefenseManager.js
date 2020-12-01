@@ -16,6 +16,17 @@ TowerDefenseManager.initialize = function () {
   this.addTowerList();
 };
 
+TowerDefenseManager.AURATYPEMODE = {
+  FIXED: "fixed",
+  PERCENTAGE: "percentage",
+};
+
+TowerDefenseManager.AURATYPE = {
+  ATTACK: "attack",
+  ATTACKSPEED: "attackspeed",
+  RANGE: "range",
+};
+
 TowerDefenseManager.ENEMYTYPE = {
   AIR: "air",
   GROUND: "ground",
@@ -140,6 +151,7 @@ TowerDefenseManager.selectTowerMode = function () {
   const selectedTower = new Sprite_ufcTDTower(
     new Game_TowerDefense(this.getSelectedTowerData(), $gameMap._mapId)
   );
+  selectedTower.setRangeVisibility(true);
   $gamePlayer.getGuideAction().setActive(true);
 
   $gamePlayer.getGuideActionGraphics().addChild(selectedTower);
@@ -198,9 +210,9 @@ TowerDefenseManager.placeTower = function () {
   let _gPosition = $gamePlayer.getGuideAction().getPosition();
   this._selectedUFCTD._x = _gPosition.x;
   this._selectedUFCTD._y = _gPosition.y;
-  this._selectedUFCTD._rangeVisible = false;
   this._selectedUFCTD.setPlaceMode(false);
   $gameMap.ufcAddTower(this._selectedUFCTD);
+  this._selectedUFCTD.setRangeVisibility(false);
 
   this.clearSelect();
 

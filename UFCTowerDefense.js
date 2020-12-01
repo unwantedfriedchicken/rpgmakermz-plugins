@@ -637,17 +637,6 @@ Game_TowerDefense.prototype.initialize = function (towerData, mapId) {
   Game_Character.prototype.initialize.call(this);
   this._mapId = mapId;
   this._towerData = towerData;
-  this._bulletData = {
-    damage: {
-      damage: this._towerData._attack,
-      effects: this._towerData._effects,
-    },
-    speed: +this._towerData._bulletSpeed,
-    animationId: this._towerData._bulletAnimationId,
-    characterName: this._towerData._bulletCharacterName,
-    characterIndex: +this._towerData._bulletCharacterIndex,
-    characterIndexY: +this._towerData._bulletCharacterIndexY,
-  };
   this._attackTime = 0;
   this._x = this._towerData._x;
   this._y = this._towerData._y;
@@ -655,6 +644,33 @@ Game_TowerDefense.prototype.initialize = function (towerData, mapId) {
   this._realY = this._towerData._y;
   this._target = null;
   this._destroy = false;
+  this._towerEffectedByAura = [];
+  this.getTowerData().checkGetBuffs();
+  if (this._towerData.getAuras()) {
+    this.addAuraEffects();
+  }
+};
+
+Game_TowerDefense.prototype.addAuraEffects = function () {
+  let towers = $gameMap._events.filter(
+    (event) =>
+      event instanceof Game_TowerDefense &&
+      PIXI.utils.isInRange(
+        event._x,
+        event._y,
+        this._x,
+        this._y,
+        this._towerData.getRange()
+      )
+  );
+  for (const tower of towers) {
+    tower.getTowerData().setBuffs(this._towerData.getAuras());
+    this.addTowerEffectedByAura(tower.getTowerData());
+  }
+};
+
+Game_TowerDefense.prototype.addTowerEffectedByAura = function (tower) {
+  this._towerEffectedByAura.push(tower);
 };
 
 Game_TowerDefense.prototype.getTowerData = function () {
@@ -675,11 +691,21 @@ Game_TowerDefense.prototype.refresh = function () {
 
 Game_TowerDefense.prototype.update = function () {
   this._attackTime--;
-  if (!this._target && $gameMap.ufcEnemies().length > 0) {
+  if (
+    !this._target &&
+    $gameMap.ufcEnemies().length > 0 &&
+    this._towerData._attack > 0
+  ) {
     // Search target
     for (const enemy of $gameMap.ufcEnemies()) {
       if (
-        this.isInTowerRange(enemy._x, enemy._y) &&
+        PIXI.utils.isInRange(
+          enemy._x,
+          enemy._y,
+          this._x,
+          this._y,
+          this._towerData.getRange()
+        ) &&
         !enemy.isDestroyed() &&
         enemy.isSameType(this._towerData._attackType)
       ) {
@@ -689,7 +715,13 @@ Game_TowerDefense.prototype.update = function () {
     }
   } else if (this._target) {
     if (
-      !this.isInTowerRange(this._target.x, this._target.y) ||
+      !PIXI.utils.isInRange(
+        this._target.x,
+        this._target.y,
+        this._x,
+        this._y,
+        this._towerData.getRange()
+      ) ||
       this._target.isDestroyed()
     ) {
       // clear target
@@ -697,30 +729,22 @@ Game_TowerDefense.prototype.update = function () {
     } else {
       // shoot projectile
       if (this._attackTime <= 0) {
-        this._attackTime = this._towerData._attackSpeed;
+        this._attackTime = this._towerData.getAttackSpeed();
         this.attack(this._target);
       }
     }
   }
 };
 
-Game_TowerDefense.prototype.isInTowerRange = function (x, y) {
-  return (
-    x <= this._x + this._towerData._range &&
-    x >= this._x - this._towerData._range &&
-    y <= this._y + this._towerData._range &&
-    y >= this._y - this._towerData._range
-  );
-};
-
 Game_TowerDefense.prototype.attack = function (enemy) {
   let projectileId = $gameMap.ufcProjectiles();
+  // Update bullet
   $gameMap.ufcAddProjectile(
     new Game_ufcProjectile(
       this._x,
       this._y,
       enemy,
-      this._bulletData,
+      this._towerData.getBulletData(),
       projectileId
     )
   );
@@ -733,8 +757,14 @@ Game_TowerDefense.prototype.destroy = function () {
     pitch: 100,
     pan: 0,
   });
-  this._destroy = true;
   $gameMap.ufcDestroyTower(this);
+
+  for (let tower of this._towerEffectedByAura) {
+    tower.resetBuffs();
+    tower.checkGetBuffs();
+  }
+  this._towerEffectedByAura = [];
+  this._destroy = true;
 };
 
 Game_TowerDefense.prototype.isDestroyed = function () {
@@ -1244,7 +1274,7 @@ Sprite_ufcTDTower.prototype.initMembers = function (ufcTD) {
   this._tilesetId = 0;
   this._upperBody = null;
   this._lowerBody = null;
-  this._range = this._tower.getTowerData()._range;
+  this._range = this._tower.getTowerData().getRange();
 
   let _rangeGraphics = new PIXI.Graphics();
   _rangeGraphics.beginFill(0x17b978, 0.4);
@@ -1265,10 +1295,14 @@ Sprite_ufcTDTower.prototype.initMembers = function (ufcTD) {
 
   this.addChild(this._rangeGraphics);
   this.setCharacterBitmap();
-  this._rangeVisible = this._towerData._rangeVisible;
   if (this._towerData._placeMode) this.setSelectPosition();
 
-  this.setVisibleRange(this._rangeVisible);
+  this._towerData._event.on(
+    "setRangeVisibility",
+    this.setRangeVisibility,
+    this
+  );
+  this.setRangeVisibility(false);
 };
 
 Sprite_ufcTDTower.prototype.setSelectPosition = function () {
@@ -1356,13 +1390,22 @@ Sprite_ufcTDTower.prototype.characterBlockY = function () {
   }
 };
 
-Sprite_ufcTDTower.prototype.setVisibleRange = function (visible) {
+Sprite_ufcTDTower.prototype.setRangeVisibility = function (visible) {
   this._rangeGraphics.visible = visible;
 };
 
 Sprite_ufcTDTower.prototype.setPosition = function (x, y) {
   let pos = $gameMap.positionToCanvas(x, y);
   this.move(pos.x, pos.y);
+};
+
+Sprite_ufcTDTower.prototype.destroy = function (options) {
+  this._towerData._event.removeListener(
+    "setRangeVisibility",
+    this.setRangeVisibility,
+    this
+  );
+  Sprite.prototype.destroy.call(this, options);
 };
 
 PluginManager.registerCommand("UFCTowerDefense", "setupEnemy", function (args) {
@@ -1455,6 +1498,13 @@ PIXI.utils.dist = function (x1, y1, x2, y2) {
 
 PIXI.utils.randomArray = function (array) {
   return array[Math.floor(Math.random() * array.length)];
+};
+
+// x1 y1 is the object that want to be compared with x2 y2 + range
+PIXI.utils.isInRange = function (x1, y1, x2, y2, range) {
+  return (
+    x1 <= x2 + range && x1 >= x2 - range && y1 <= y2 + range && y1 >= y2 - range
+  );
 };
 
 SceneManager.getScene = function () {
@@ -1995,6 +2045,17 @@ TowerDefenseManager.initialize = function () {
   this.addTowerList();
 };
 
+TowerDefenseManager.AURATYPEMODE = {
+  FIXED: "fixed",
+  PERCENTAGE: "percentage",
+};
+
+TowerDefenseManager.AURATYPE = {
+  ATTACK: "attack",
+  ATTACKSPEED: "attackspeed",
+  RANGE: "range",
+};
+
 TowerDefenseManager.ENEMYTYPE = {
   AIR: "air",
   GROUND: "ground",
@@ -2119,6 +2180,7 @@ TowerDefenseManager.selectTowerMode = function () {
   const selectedTower = new Sprite_ufcTDTower(
     new Game_TowerDefense(this.getSelectedTowerData(), $gameMap._mapId)
   );
+  selectedTower.setRangeVisibility(true);
   $gamePlayer.getGuideAction().setActive(true);
 
   $gamePlayer.getGuideActionGraphics().addChild(selectedTower);
@@ -2177,9 +2239,9 @@ TowerDefenseManager.placeTower = function () {
   let _gPosition = $gamePlayer.getGuideAction().getPosition();
   this._selectedUFCTD._x = _gPosition.x;
   this._selectedUFCTD._y = _gPosition.y;
-  this._selectedUFCTD._rangeVisible = false;
   this._selectedUFCTD.setPlaceMode(false);
   $gameMap.ufcAddTower(this._selectedUFCTD);
+  this._selectedUFCTD.setRangeVisibility(false);
 
   this.clearSelect();
 
@@ -2308,11 +2370,11 @@ const ufcTowerData = function () {
 ufcTowerData.prototype.initialize = function (data) {
   this._id = data["id"];
   this._name = data["name"];
-  this._attack = data["attack"];
+  this._attack = +data["attack"];
   this._range = +data["range"];
   this._character = data["character"];
   this._characterIndex = data["characterindex"];
-  this._attackSpeed = data["attackspeed"];
+  this._attackSpeed = +data["attackspeed"];
   this._bulletSpeed = data["bulletspeed"];
   this._bulletAnimationId = data["bulletanimationid"];
   this._bulletCharacterName = data["bulletspritename"];
@@ -2342,17 +2404,154 @@ ufcTowerData.prototype.initialize = function (data) {
       });
     }
   }
+  this._auras = [];
+  if (data["auras"]) {
+    let auras = data["auras"].split(",");
+    for (const aura of auras) {
+      let _aura = aura.split("|");
+      this._auras.push({
+        name: _aura[0],
+        effect: +_aura[1],
+        type: _aura[2] || "fixed",
+      });
+    }
+  }
   this._effectsNote = data["effectsnote"];
   this._attackType = data["attacktype"];
+  this._buffs = {};
+  this.resetBuffs();
   this._x = 0;
   this._y = 0;
-  this._rangeVisible = true;
+  this._event = new PIXI.utils.EventEmitter();
   this._placeMode = false;
+};
+
+ufcTowerData.prototype.setRangeVisibility = function (visible) {
+  this._event.emit("setRangeVisibility", visible);
+};
+
+ufcTowerData.prototype.getBulletData = function () {
+  return {
+    damage: {
+      damage: this.getAttack(),
+      effects: this._effects,
+    },
+    speed: +this._bulletSpeed,
+    animationId: this._bulletAnimationId,
+    characterName: this._bulletCharacterName,
+    characterIndex: +this._bulletCharacterIndex,
+    characterIndexY: +this._bulletCharacterIndexY,
+  };
+};
+
+ufcTowerData.prototype.getBuffs = function (buff) {
+  if (!buff) return this._buffs;
+
+  return this._buffs[buff];
+};
+
+ufcTowerData.prototype.getBaseValWithAuraType = function (type) {
+  switch (type) {
+    case TowerDefenseManager.AURATYPE.ATTACK:
+      return this.getBaseAttack;
+    case TowerDefenseManager.AURATYPE.RANGE:
+      return this.getBaseRange;
+    case TowerDefenseManager.AURATYPE.ATTACKSPEED:
+      return this.getBaseAttackSpeed;
+  }
+  return false;
+};
+
+ufcTowerData.prototype.resetBuffs = function () {
+  for (const aura in TowerDefenseManager.AURATYPE) {
+    this._buffs[TowerDefenseManager.AURATYPE[aura]] = 0;
+  }
+};
+
+ufcTowerData.prototype.getAttack = function () {
+  return Math.max(
+    0,
+    this.getBaseAttack + this._buffs[TowerDefenseManager.AURATYPE.ATTACK]
+  );
+};
+
+ufcTowerData.prototype.getRange = function () {
+  return Math.max(
+    0,
+    this.getBaseRange + this._buffs[TowerDefenseManager.AURATYPE.RANGE]
+  );
+};
+
+ufcTowerData.prototype.getAttackSpeed = function () {
+  return (
+    this.getBaseAttackSpeed +
+    this._buffs[TowerDefenseManager.AURATYPE.ATTACKSPEED] * -1
+  );
+};
+
+ufcTowerData.prototype.setBuffs = function (buffs) {
+  for (const buff of buffs) {
+    let be = buff.effect;
+    if (buff.type === TowerDefenseManager.AURATYPEMODE.PERCENTAGE) {
+      be = this.getBaseValWithAuraType(buff.name) * (be / 100);
+    }
+
+    if (this._buffs[buff.name] === 0) {
+      this._buffs[buff.name] = be;
+    } else {
+      if (buff.name === TowerDefenseManager.AURATYPE.ATTACKSPEED) {
+        this._buffs[buff.name] = Math.min(be, this._buffs[buff.name]);
+      } else {
+        this._buffs[buff.name] = Math.max(be, this._buffs[buff.name]);
+      }
+    }
+  }
 };
 
 ufcTowerData.prototype.setPlaceMode = function (mode) {
   this._placeMode = mode;
 };
+
+ufcTowerData.prototype.getAuras = function () {
+  return this._auras.length > 0 ? this._auras : false;
+};
+
+ufcTowerData.prototype.checkGetBuffs = function () {
+  let towers = $gameMap._events.filter(
+    (event) =>
+      event instanceof Game_TowerDefense &&
+      event.getTowerData().getAuras() &&
+      PIXI.utils.isInRange(
+        this._x,
+        this._y,
+        event._x,
+        event._y,
+        event.getTowerData().getRange()
+      )
+  );
+  for (const tower of towers) {
+    this.setBuffs(tower.getTowerData().getAuras());
+    tower.addTowerEffectedByAura(this);
+  }
+};
+
+Object.defineProperty(ufcTowerData.prototype, "getBaseAttack", {
+  get: function () {
+    return this._attack;
+  },
+});
+
+Object.defineProperty(ufcTowerData.prototype, "getBaseRange", {
+  get: function () {
+    return this._range;
+  },
+});
+
+Object.defineProperty(ufcTowerData.prototype, "getBaseAttackSpeed", {
+  get: function () {
+    return this._attackSpeed;
+  },
+});
 
 Object.defineProperty(ufcTowerData.prototype, "getPlaceMode", {
   get: function () {
@@ -2686,6 +2885,8 @@ Window_TowerActionButton.prototype.onOk = function () {
 };
 
 Window_TowerActionButton.prototype.close = function () {
+  if (this._towerData) this._towerData.setRangeVisibility(false);
+
   for (const child of this.children) {
     if (child.close) {
       child.close();
@@ -2736,6 +2937,7 @@ Window_TowerActionButton.prototype.setTower = function (
   this.show();
   this.activate();
   this.select(0);
+  this._towerData.setRangeVisibility(true);
 };
 
 Window_TowerActionButton.prototype.open = function () {
@@ -2771,13 +2973,13 @@ Window_TowerActionButton.prototype.drawTowerStatus = function (x, y, align) {
   let textY = 100;
   let textX = 10;
   let textHeight = 28;
-  let textValueX = 130;
+  let textValueX = 110;
   let fontSize = 17;
   let status = ["Attack", "Range", "Attack Speed", "Bullet Speed"];
   let statusValue = [
-    this._towerData._attack,
-    this._towerData._range,
-    this._towerData._attackSpeed,
+    this._towerData.getBaseAttack,
+    this._towerData.getBaseRange,
+    this._towerData.getBaseAttackSpeed,
     this._towerData._bulletSpeed,
   ];
 
@@ -2801,6 +3003,57 @@ Window_TowerActionButton.prototype.drawTowerStatus = function (x, y, align) {
       textY + i * textHeight,
       150
     );
+  }
+
+  //TODO: need rework window, this is only for test
+  // Draw Buffs
+  let textBuffX = 30;
+  this.statusWindow1.contents.fontSize = fontSize - 6;
+  this.statusWindow1.resetTextColor();
+
+  let statusBuff = [];
+  if (this._towerData.getBuffs(TowerDefenseManager.AURATYPE.ATTACK) != 0) {
+    let _attack = this._towerData.getAttack();
+    statusBuff[0] = {
+      value: _attack,
+      color:
+        this._towerData.getBaseAttack > _attack
+          ? ColorManager.powerDownColor()
+          : ColorManager.powerUpColor(),
+    };
+  }
+  if (this._towerData.getBuffs(TowerDefenseManager.AURATYPE.RANGE) != 0) {
+    let _range = this._towerData.getRange();
+    statusBuff[1] = {
+      value: _range,
+      color:
+        this._towerData.getBaseRange > _range
+          ? ColorManager.powerDownColor()
+          : ColorManager.powerUpColor(),
+    };
+  }
+  if (this._towerData.getBuffs(TowerDefenseManager.AURATYPE.ATTACKSPEED) != 0) {
+    let _aspd = this._towerData.getAttackSpeed();
+    statusBuff[2] = {
+      value: _aspd,
+      color:
+        this._towerData.getBaseAttackSpeed < _aspd
+          ? ColorManager.powerDownColor()
+          : ColorManager.powerUpColor(),
+    };
+  }
+
+  for (let i = 0; i < statusBuff.length; i++) {
+    if (statusBuff[i]) {
+      this.statusWindow1.resetTextColor();
+      this.statusWindow1.changeTextColor(statusBuff[i].color);
+      this.statusWindow1.drawText(
+        "(" + statusBuff[i].value + ")",
+        textX + textValueX + textBuffX,
+        textY + i * textHeight,
+        150
+      );
+    }
   }
   this.statusWindow1.resetTextColor();
   this.statusWindow1.drawText(

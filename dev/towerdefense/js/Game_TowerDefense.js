@@ -9,17 +9,6 @@ Game_TowerDefense.prototype.initialize = function (towerData, mapId) {
   Game_Character.prototype.initialize.call(this);
   this._mapId = mapId;
   this._towerData = towerData;
-  this._bulletData = {
-    damage: {
-      damage: this._towerData._attack,
-      effects: this._towerData._effects,
-    },
-    speed: +this._towerData._bulletSpeed,
-    animationId: this._towerData._bulletAnimationId,
-    characterName: this._towerData._bulletCharacterName,
-    characterIndex: +this._towerData._bulletCharacterIndex,
-    characterIndexY: +this._towerData._bulletCharacterIndexY,
-  };
   this._attackTime = 0;
   this._x = this._towerData._x;
   this._y = this._towerData._y;
@@ -27,6 +16,33 @@ Game_TowerDefense.prototype.initialize = function (towerData, mapId) {
   this._realY = this._towerData._y;
   this._target = null;
   this._destroy = false;
+  this._towerEffectedByAura = [];
+  this.getTowerData().checkGetBuffs();
+  if (this._towerData.getAuras()) {
+    this.addAuraEffects();
+  }
+};
+
+Game_TowerDefense.prototype.addAuraEffects = function () {
+  let towers = $gameMap._events.filter(
+    (event) =>
+      event instanceof Game_TowerDefense &&
+      PIXI.utils.isInRange(
+        event._x,
+        event._y,
+        this._x,
+        this._y,
+        this._towerData.getRange()
+      )
+  );
+  for (const tower of towers) {
+    tower.getTowerData().setBuffs(this._towerData.getAuras());
+    this.addTowerEffectedByAura(tower.getTowerData());
+  }
+};
+
+Game_TowerDefense.prototype.addTowerEffectedByAura = function (tower) {
+  this._towerEffectedByAura.push(tower);
 };
 
 Game_TowerDefense.prototype.getTowerData = function () {
@@ -47,11 +63,21 @@ Game_TowerDefense.prototype.refresh = function () {
 
 Game_TowerDefense.prototype.update = function () {
   this._attackTime--;
-  if (!this._target && $gameMap.ufcEnemies().length > 0) {
+  if (
+    !this._target &&
+    $gameMap.ufcEnemies().length > 0 &&
+    this._towerData._attack > 0
+  ) {
     // Search target
     for (const enemy of $gameMap.ufcEnemies()) {
       if (
-        this.isInTowerRange(enemy._x, enemy._y) &&
+        PIXI.utils.isInRange(
+          enemy._x,
+          enemy._y,
+          this._x,
+          this._y,
+          this._towerData.getRange()
+        ) &&
         !enemy.isDestroyed() &&
         enemy.isSameType(this._towerData._attackType)
       ) {
@@ -61,7 +87,13 @@ Game_TowerDefense.prototype.update = function () {
     }
   } else if (this._target) {
     if (
-      !this.isInTowerRange(this._target.x, this._target.y) ||
+      !PIXI.utils.isInRange(
+        this._target.x,
+        this._target.y,
+        this._x,
+        this._y,
+        this._towerData.getRange()
+      ) ||
       this._target.isDestroyed()
     ) {
       // clear target
@@ -69,30 +101,22 @@ Game_TowerDefense.prototype.update = function () {
     } else {
       // shoot projectile
       if (this._attackTime <= 0) {
-        this._attackTime = this._towerData._attackSpeed;
+        this._attackTime = this._towerData.getAttackSpeed();
         this.attack(this._target);
       }
     }
   }
 };
 
-Game_TowerDefense.prototype.isInTowerRange = function (x, y) {
-  return (
-    x <= this._x + this._towerData._range &&
-    x >= this._x - this._towerData._range &&
-    y <= this._y + this._towerData._range &&
-    y >= this._y - this._towerData._range
-  );
-};
-
 Game_TowerDefense.prototype.attack = function (enemy) {
   let projectileId = $gameMap.ufcProjectiles();
+  // Update bullet
   $gameMap.ufcAddProjectile(
     new Game_ufcProjectile(
       this._x,
       this._y,
       enemy,
-      this._bulletData,
+      this._towerData.getBulletData(),
       projectileId
     )
   );
@@ -105,8 +129,14 @@ Game_TowerDefense.prototype.destroy = function () {
     pitch: 100,
     pan: 0,
   });
-  this._destroy = true;
   $gameMap.ufcDestroyTower(this);
+
+  for (let tower of this._towerEffectedByAura) {
+    tower.resetBuffs();
+    tower.checkGetBuffs();
+  }
+  this._towerEffectedByAura = [];
+  this._destroy = true;
 };
 
 Game_TowerDefense.prototype.isDestroyed = function () {

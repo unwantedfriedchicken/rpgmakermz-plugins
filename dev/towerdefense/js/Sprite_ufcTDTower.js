@@ -19,7 +19,7 @@ Sprite_ufcTDTower.prototype.initMembers = function (ufcTD) {
   this._tilesetId = 0;
   this._upperBody = null;
   this._lowerBody = null;
-  this._range = this._tower.getTowerData()._range;
+  this._range = this._tower.getTowerData().getRange();
 
   let _rangeGraphics = new PIXI.Graphics();
   _rangeGraphics.beginFill(0x17b978, 0.4);
@@ -40,10 +40,14 @@ Sprite_ufcTDTower.prototype.initMembers = function (ufcTD) {
 
   this.addChild(this._rangeGraphics);
   this.setCharacterBitmap();
-  this._rangeVisible = this._towerData._rangeVisible;
   if (this._towerData._placeMode) this.setSelectPosition();
 
-  this.setVisibleRange(this._rangeVisible);
+  this._towerData._event.on(
+    "setRangeVisibility",
+    this.setRangeVisibility,
+    this
+  );
+  this.setRangeVisibility(false);
 };
 
 Sprite_ufcTDTower.prototype.setSelectPosition = function () {
@@ -131,11 +135,20 @@ Sprite_ufcTDTower.prototype.characterBlockY = function () {
   }
 };
 
-Sprite_ufcTDTower.prototype.setVisibleRange = function (visible) {
+Sprite_ufcTDTower.prototype.setRangeVisibility = function (visible) {
   this._rangeGraphics.visible = visible;
 };
 
 Sprite_ufcTDTower.prototype.setPosition = function (x, y) {
   let pos = $gameMap.positionToCanvas(x, y);
   this.move(pos.x, pos.y);
+};
+
+Sprite_ufcTDTower.prototype.destroy = function (options) {
+  this._towerData._event.removeListener(
+    "setRangeVisibility",
+    this.setRangeVisibility,
+    this
+  );
+  Sprite.prototype.destroy.call(this, options);
 };

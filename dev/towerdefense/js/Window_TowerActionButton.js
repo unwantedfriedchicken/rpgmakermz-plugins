@@ -89,6 +89,8 @@ Window_TowerActionButton.prototype.onOk = function () {
 };
 
 Window_TowerActionButton.prototype.close = function () {
+  if (this._towerData) this._towerData.setRangeVisibility(false);
+
   for (const child of this.children) {
     if (child.close) {
       child.close();
@@ -139,6 +141,7 @@ Window_TowerActionButton.prototype.setTower = function (
   this.show();
   this.activate();
   this.select(0);
+  this._towerData.setRangeVisibility(true);
 };
 
 Window_TowerActionButton.prototype.open = function () {
@@ -174,13 +177,13 @@ Window_TowerActionButton.prototype.drawTowerStatus = function (x, y, align) {
   let textY = 100;
   let textX = 10;
   let textHeight = 28;
-  let textValueX = 130;
+  let textValueX = 110;
   let fontSize = 17;
   let status = ["Attack", "Range", "Attack Speed", "Bullet Speed"];
   let statusValue = [
-    this._towerData._attack,
-    this._towerData._range,
-    this._towerData._attackSpeed,
+    this._towerData.getBaseAttack,
+    this._towerData.getBaseRange,
+    this._towerData.getBaseAttackSpeed,
     this._towerData._bulletSpeed,
   ];
 
@@ -204,6 +207,57 @@ Window_TowerActionButton.prototype.drawTowerStatus = function (x, y, align) {
       textY + i * textHeight,
       150
     );
+  }
+
+  //TODO: need rework window, this is only for test
+  // Draw Buffs
+  let textBuffX = 30;
+  this.statusWindow1.contents.fontSize = fontSize - 6;
+  this.statusWindow1.resetTextColor();
+
+  let statusBuff = [];
+  if (this._towerData.getBuffs(TowerDefenseManager.AURATYPE.ATTACK) != 0) {
+    let _attack = this._towerData.getAttack();
+    statusBuff[0] = {
+      value: _attack,
+      color:
+        this._towerData.getBaseAttack > _attack
+          ? ColorManager.powerDownColor()
+          : ColorManager.powerUpColor(),
+    };
+  }
+  if (this._towerData.getBuffs(TowerDefenseManager.AURATYPE.RANGE) != 0) {
+    let _range = this._towerData.getRange();
+    statusBuff[1] = {
+      value: _range,
+      color:
+        this._towerData.getBaseRange > _range
+          ? ColorManager.powerDownColor()
+          : ColorManager.powerUpColor(),
+    };
+  }
+  if (this._towerData.getBuffs(TowerDefenseManager.AURATYPE.ATTACKSPEED) != 0) {
+    let _aspd = this._towerData.getAttackSpeed();
+    statusBuff[2] = {
+      value: _aspd,
+      color:
+        this._towerData.getBaseAttackSpeed < _aspd
+          ? ColorManager.powerDownColor()
+          : ColorManager.powerUpColor(),
+    };
+  }
+
+  for (let i = 0; i < statusBuff.length; i++) {
+    if (statusBuff[i]) {
+      this.statusWindow1.resetTextColor();
+      this.statusWindow1.changeTextColor(statusBuff[i].color);
+      this.statusWindow1.drawText(
+        "(" + statusBuff[i].value + ")",
+        textX + textValueX + textBuffX,
+        textY + i * textHeight,
+        150
+      );
+    }
   }
   this.statusWindow1.resetTextColor();
   this.statusWindow1.drawText(

@@ -90,6 +90,13 @@ PIXI.utils.randomArray = function (array) {
   return array[Math.floor(Math.random() * array.length)];
 };
 
+// x1 y1 is the object that want to be compared with x2 y2 + range
+PIXI.utils.isInRange = function (x1, y1, x2, y2, range) {
+  return (
+    x1 <= x2 + range && x1 >= x2 - range && y1 <= y2 + range && y1 >= y2 - range
+  );
+};
+
 SceneManager.getScene = function () {
   return this._scene;
 };
