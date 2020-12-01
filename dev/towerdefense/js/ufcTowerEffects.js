@@ -5,7 +5,8 @@ const ufcTowerEffects = function () {
 ufcTowerEffects.prototype.initialize = function (data) {
   this._name = data.name;
   this._effect = data.effect;
-  this._duration = +data.duration;
+  this._duration = data.duration;
+  this._chance = data.chance;
   this._curTime = this._duration;
   this._isDone = false;
   this._effectPerSecond = false;
@@ -33,7 +34,7 @@ ufcTowerEffects.prototype.getEffect = function () {
 };
 
 ufcTowerEffects.prototype.getChanceEffect = function () {
-  return this._effect > Math.randomInt(100);
+  return this._chance < 100 ? this._chance > Math.randomInt(100) : true;
 };
 
 ufcTowerEffects.prototype.isDone = function () {

@@ -33,8 +33,9 @@ ufcTowerData.prototype.initialize = function (data) {
       let _effect = effect.split("|");
       this._effects.push({
         name: _effect[0],
-        effect: _effect[1],
-        duration: _effect[2],
+        effect: +_effect[1],
+        duration: +_effect[2],
+        chance: +_effect[3] || 100,
       });
     }
   }

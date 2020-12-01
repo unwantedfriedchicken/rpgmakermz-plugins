@@ -28,6 +28,7 @@ Game_TDEnemy.prototype.initialize = function (enemyName, spawnId) {
   this.setDirection(this._direction);
   this._realMoveSpeed = +this._enemyData.moveSpeed;
   this._moveSpeed = this._realMoveSpeed;
+  this._moveSpeedEffects = {};
   this._isStun = false;
   this._animationPlaying = false;
   this._event = new PIXI.utils.EventEmitter();
@@ -82,17 +83,18 @@ Game_TDEnemy.prototype.updateEffects = function () {
     if (!this._effects[effect].effect) continue;
 
     if (!this._effects[effect].enable) {
+      if (!this._effects[effect].effect.getChanceEffect()) {
+        this._effects[effect].enable = false;
+        this._effects[effect].effect = null;
+        continue;
+      }
       switch (effect) {
         case TowerDefenseManager.EFFECTS.COLD:
-          // Always pick the most effective effect
-          this._moveSpeed = Math.min(
-            this._moveSpeed,
-            Math.max(
-              0.1,
-              (this._realMoveSpeed *
-                (100 - this._effects[effect].effect.getEffect())) /
-                100
-            )
+          this.addMoveSpeedEffect(
+            effect,
+            -this._realMoveSpeed *
+              (this._effects[effect].effect.getEffect() / 100),
+            true
           );
           break;
         case TowerDefenseManager.EFFECTS.POISON:
@@ -101,11 +103,15 @@ Game_TDEnemy.prototype.updateEffects = function () {
           );
           break;
         case TowerDefenseManager.EFFECTS.STUN:
-          if (!this._effects[effect].effect.getChanceEffect()) {
-            this._effects[effect].effect = null;
-            return;
-          }
           this._isStun = true;
+          break;
+        case TowerDefenseManager.EFFECTS.RAGE:
+          this.addMoveSpeedEffect(
+            effect,
+            this._realMoveSpeed *
+              (this._effects[effect].effect.getEffect() / 100),
+            false
+          );
           break;
       }
       this._event.emit("addEffect", effect);
@@ -115,7 +121,8 @@ Game_TDEnemy.prototype.updateEffects = function () {
     if (this._effects[effect].effect.isDone()) {
       switch (effect) {
         case TowerDefenseManager.EFFECTS.COLD:
-          this._moveSpeed = this._realMoveSpeed;
+        case TowerDefenseManager.EFFECTS.RAGE:
+          this.removeMoveSpeedEffect(effect);
           break;
         case TowerDefenseManager.EFFECTS.STUN:
           this._isStun = false;
@@ -126,6 +133,37 @@ Game_TDEnemy.prototype.updateEffects = function () {
       this._event.emit("removeEffect", effect);
     }
   }
+};
+
+Game_TDEnemy.prototype.updateMoveSpeed = function () {
+  if (Object.keys(this._moveSpeedEffects).length >= 0) {
+    let newSpeed = this._realMoveSpeed;
+    for (let speedEffect in this._moveSpeedEffects) {
+      newSpeed += this._moveSpeedEffects[speedEffect];
+    }
+    this._moveSpeed = newSpeed;
+  } else {
+    this._moveSpeed = this._realMoveSpeed;
+  }
+};
+
+Game_TDEnemy.prototype.removeMoveSpeedEffect = function (effect) {
+  delete this._moveSpeedEffects[effect];
+  this.updateMoveSpeed();
+};
+
+Game_TDEnemy.prototype.addMoveSpeedEffect = function (effect, value, isSlow) {
+  if (!this._moveSpeedEffects[effect]) {
+    this._moveSpeedEffects[effect] = value;
+  } else if (
+    (this._moveSpeedEffects[effect] < value && isSlow) ||
+    (this._moveSpeedEffects[effect] > value && !isSlow)
+  ) {
+    this._moveSpeedEffects[effect] = value;
+  } else {
+    return;
+  }
+  this.updateMoveSpeed();
 };
 
 Game_TDEnemy.prototype.distancePerFrame = function () {

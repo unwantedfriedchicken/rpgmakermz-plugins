@@ -2,5 +2,7 @@
 
 ## Version 1.1 - dev
 
+- CHANGE: Add chance parameter to effects, effect parameter is become ( `ID EFFECT | EFFECT | DURATION | CHANCE` ) If `CHANCE` not stated it's automatic become `100`, ex: `cold|80|240|50` -> `ID cold | 80% decrease movement speed | 4s duration | 50% chance`
 - BUGFIX: Effect cold to pick most effective effect
-- ADD: Stun effect, effects -> `stun|80|240` -> ID stun | chance stun | duration stun
+- ADD: Stun effect, effects -> `stun|0|240|80` -> ID stun | NOTHING | duration stun | chance stun
+- ADD: Rage effect, make the enemy walk faster -> `rage|100|240|30` -> `ID rage | 100% increase movement speed | 4s duration | 30% chance`

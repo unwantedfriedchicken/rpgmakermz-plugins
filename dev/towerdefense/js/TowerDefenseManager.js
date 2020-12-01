@@ -30,6 +30,7 @@ TowerDefenseManager.EFFECTS = {
   COLD: "cold",
   POISON: "poison",
   STUN: "stun",
+  RAGE: "rage",
 };
 
 TowerDefenseManager.setLimitAnimation = function (limit) {
