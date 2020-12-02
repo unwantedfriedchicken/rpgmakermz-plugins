@@ -1,12 +1,23 @@
 const NAMEPLUGIN = "UFCTowerDefense";
 const PATHDEST = "../../";
-const DEFAULTTASK = ["concat:source", "concat:globalVar", "concat:help"];
+const DEFAULTTASK = [
+  "concat:source",
+  "concat:plugins",
+  "concat:globalVar",
+  "concat:help",
+];
 
 module.exports = function (grunt) {
   grunt.initConfig({
     pkg: grunt.file.readJSON("package.json"),
     watch: {
-      files: ["js/*.js", "help/*.js", "global/*.js", "addon/*.js"],
+      files: [
+        "js/*.js",
+        "help/*.js",
+        "global/*.js",
+        "addon/*.js",
+        "plugins/*.js",
+      ],
       tasks: DEFAULTTASK,
     },
     // set up first custom task: concat
@@ -19,6 +30,10 @@ module.exports = function (grunt) {
       globalVar: {
         dest: PATHDEST + NAMEPLUGIN + ".js",
         src: ["global/*.js", PATHDEST + NAMEPLUGIN + ".js"],
+      },
+      plugins: {
+        dest: PATHDEST + NAMEPLUGIN + ".js",
+        src: ["plugins/*.js", PATHDEST + NAMEPLUGIN + ".js"],
       },
       options: {
         // string to put between concatenated files
@@ -34,12 +49,6 @@ module.exports = function (grunt) {
           // banner: "(() => { \n 'use strict';\n",
           // footer: "})();",
         },
-      },
-      uglify: {
-        // files to concat together
-        src: ["js/*.js"],
-        // location of result file
-        dest: "../../" + NAMEPLUGIN + ".js",
       },
     },
     uglify: {
