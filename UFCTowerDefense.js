@@ -1748,11 +1748,11 @@ Window_ShopStatus.prototype.drawTowerInfo = function (x, y, align) {
   this.resetTextColor();
   this.drawText("Effect", textX, textY + status.length * textHeight, 150);
 
-  let effectNote = `\\FS[${fontSize - 3}]\n`;
-  if (!towerData.effectsnote) effectNote += "\\C[16]None";
+  let note = `\\FS[${fontSize - 3}]\n`;
+  if (!towerData.note) note += "\\C[16]None";
 
   this.drawTextEx(
-    effectNote + towerData.effectsnote.replace(/\\n/g, "\n"),
+    note + towerData.note,
     textX,
     textY + status.length * textHeight - 5,
     200
@@ -2507,6 +2507,8 @@ TowerDefenseManager.addTowerList = function () {
 TowerDefenseManager.addTower = function (itemid, item) {
   const lines = item.note.split(/[\r\n]+/);
   let tdMode = false;
+  let noteMode = false;
+  let note = "";
   let data = null;
   for (let i = 0; i < lines.length; i++) {
     if (lines[i].match(/<ufcTD>/)) {
@@ -2519,6 +2521,21 @@ TowerDefenseManager.addTower = function (itemid, item) {
     }
 
     if (tdMode) {
+      if (lines[i].match(/<note>/)) {
+        noteMode = true;
+        continue;
+      }
+
+      if (lines[i].match(/<\/note>/)) {
+        noteMode = false;
+        continue;
+      }
+
+      if (noteMode) {
+        note += lines[i] + "\n";
+        continue;
+      }
+
       let dataNote = /<(\w*)(:?)([^>]*)>/g.exec(lines[i]);
       if (dataNote) data[dataNote[1]] = dataNote[3];
     }
@@ -2526,8 +2543,9 @@ TowerDefenseManager.addTower = function (itemid, item) {
   if (data) {
     data.id = itemid;
     data.name = item.name;
+    data.bulletanimationid = item.animationId;
+    data.note = note;
     item.ufcTower = data;
-    item.ufcTower.bulletanimationid = item.animationId;
     if (
       this._cacheSprite.indexOf(item.ufcTower.character) === -1 &&
       item.ufcTower.character
@@ -2624,8 +2642,8 @@ ufcTowerData.prototype.initialize = function (data) {
       });
     }
   }
-  this._effectsNote = data["effectsnote"];
-  this._attackType = data["attacktype"];
+  this._attackType = data["attacktype"] || TowerDefenseManager.ENEMYTYPE.ALL;
+  this._note = data["note"];
   this._buffs = {};
   this.resetBuffs();
   this._x = 0;
@@ -3268,19 +3286,21 @@ Window_TowerActionButton.prototype.drawTowerStatus = function (x, y, align) {
     }
   }
   this.statusWindow1.resetTextColor();
+  this.statusWindow1.contents.fontSize = fontSize;
   this.statusWindow1.drawText(
     "Effect",
     textX,
     textY + status.length * textHeight,
     150
   );
+  this.statusWindow1.resetFontSettings();
 
-  let effectNote = `\\FS[${fontSize - 3}]\n`;
-  if (!this._towerData._effectsNote) effectNote += "\\C[16]None";
+  let note = `\\FS[${fontSize - 3}]\n`;
+  if (!this._towerData._note) note += "\\C[16]None";
 
   this.statusWindow1.setLineHeight(28);
   this.statusWindow1.drawTextEx(
-    effectNote + this._towerData._effectsNote.replace(/\\n/g, "\n"),
+    note + this._towerData._note,
     textX,
     textY + status.length * textHeight + 2,
     200
@@ -3365,12 +3385,12 @@ Window_TowerActionButton.prototype.drawTowerStatus = function (x, y, align) {
       textY + status.length * textHeight,
       150
     );
-    effectNote = `\\FS[${fontSize - 3}]\n`;
-    if (!upgradeTowerData.effectsnote) effectNote += "\\C[16]None";
+    note = `\\FS[${fontSize - 3}]\n`;
+    if (!upgradeTowerData.note) note += "\\C[16]None";
 
     this.statusWindow2.setLineHeight(28);
     this.statusWindow2.drawTextEx(
-      effectNote + upgradeTowerData.effectsnote.replace(/\\n/g, "\n"),
+      note + upgradeTowerData.note,
       textX,
       textY + status.length * textHeight + 2,
       200

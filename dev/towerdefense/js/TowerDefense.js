@@ -93,11 +93,11 @@ Window_ShopStatus.prototype.drawTowerInfo = function (x, y, align) {
   this.resetTextColor();
   this.drawText("Effect", textX, textY + status.length * textHeight, 150);
 
-  let effectNote = `\\FS[${fontSize - 3}]\n`;
-  if (!towerData.effectsnote) effectNote += "\\C[16]None";
+  let note = `\\FS[${fontSize - 3}]\n`;
+  if (!towerData.note) note += "\\C[16]None";
 
   this.drawTextEx(
-    effectNote + towerData.effectsnote.replace(/\\n/g, "\n"),
+    note + towerData.note,
     textX,
     textY + status.length * textHeight - 5,
     200

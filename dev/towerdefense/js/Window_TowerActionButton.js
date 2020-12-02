@@ -260,19 +260,21 @@ Window_TowerActionButton.prototype.drawTowerStatus = function (x, y, align) {
     }
   }
   this.statusWindow1.resetTextColor();
+  this.statusWindow1.contents.fontSize = fontSize;
   this.statusWindow1.drawText(
     "Effect",
     textX,
     textY + status.length * textHeight,
     150
   );
+  this.statusWindow1.resetFontSettings();
 
-  let effectNote = `\\FS[${fontSize - 3}]\n`;
-  if (!this._towerData._effectsNote) effectNote += "\\C[16]None";
+  let note = `\\FS[${fontSize - 3}]\n`;
+  if (!this._towerData._note) note += "\\C[16]None";
 
   this.statusWindow1.setLineHeight(28);
   this.statusWindow1.drawTextEx(
-    effectNote + this._towerData._effectsNote.replace(/\\n/g, "\n"),
+    note + this._towerData._note,
     textX,
     textY + status.length * textHeight + 2,
     200
@@ -357,12 +359,12 @@ Window_TowerActionButton.prototype.drawTowerStatus = function (x, y, align) {
       textY + status.length * textHeight,
       150
     );
-    effectNote = `\\FS[${fontSize - 3}]\n`;
-    if (!upgradeTowerData.effectsnote) effectNote += "\\C[16]None";
+    note = `\\FS[${fontSize - 3}]\n`;
+    if (!upgradeTowerData.note) note += "\\C[16]None";
 
     this.statusWindow2.setLineHeight(28);
     this.statusWindow2.drawTextEx(
-      effectNote + upgradeTowerData.effectsnote.replace(/\\n/g, "\n"),
+      note + upgradeTowerData.note,
       textX,
       textY + status.length * textHeight + 2,
       200

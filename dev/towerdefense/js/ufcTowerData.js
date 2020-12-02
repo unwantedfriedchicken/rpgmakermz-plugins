@@ -51,8 +51,8 @@ ufcTowerData.prototype.initialize = function (data) {
       });
     }
   }
-  this._effectsNote = data["effectsnote"];
-  this._attackType = data["attacktype"];
+  this._attackType = data["attacktype"] || TowerDefenseManager.ENEMYTYPE.ALL;
+  this._note = data["note"];
   this._buffs = {};
   this.resetBuffs();
   this._x = 0;

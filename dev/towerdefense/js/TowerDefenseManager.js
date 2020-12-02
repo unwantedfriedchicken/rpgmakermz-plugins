@@ -317,6 +317,8 @@ TowerDefenseManager.addTowerList = function () {
 TowerDefenseManager.addTower = function (itemid, item) {
   const lines = item.note.split(/[\r\n]+/);
   let tdMode = false;
+  let noteMode = false;
+  let note = "";
   let data = null;
   for (let i = 0; i < lines.length; i++) {
     if (lines[i].match(/<ufcTD>/)) {
@@ -329,6 +331,21 @@ TowerDefenseManager.addTower = function (itemid, item) {
     }
 
     if (tdMode) {
+      if (lines[i].match(/<note>/)) {
+        noteMode = true;
+        continue;
+      }
+
+      if (lines[i].match(/<\/note>/)) {
+        noteMode = false;
+        continue;
+      }
+
+      if (noteMode) {
+        note += lines[i] + "\n";
+        continue;
+      }
+
       let dataNote = /<(\w*)(:?)([^>]*)>/g.exec(lines[i]);
       if (dataNote) data[dataNote[1]] = dataNote[3];
     }
@@ -336,8 +353,9 @@ TowerDefenseManager.addTower = function (itemid, item) {
   if (data) {
     data.id = itemid;
     data.name = item.name;
+    data.bulletanimationid = item.animationId;
+    data.note = note;
     item.ufcTower = data;
-    item.ufcTower.bulletanimationid = item.animationId;
     if (
       this._cacheSprite.indexOf(item.ufcTower.character) === -1 &&
       item.ufcTower.character
