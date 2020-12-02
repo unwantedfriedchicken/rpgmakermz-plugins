@@ -163,9 +163,7 @@
 @arg attack
 @text Attack
 @desc Is enemy attack before get destroy?
-@type select
-@option true
-@option false
+@type boolean
 @default true
 
 @arg attackEventId
@@ -176,8 +174,8 @@
 
 @arg animationId
 @text Death Animation Id
-@desc Give animation when enemy dead, set 0 to no animation
-@type number
+@desc Give animation when enemy dead
+@type animation
 @default 0
 
 @command triggerMove
@@ -311,7 +309,7 @@
 
 @arg attackAnimation
 @text Attack Animation ID
-@type number
+@type animation
 @default 1
 @desc Defines attack Animation when this enemy attack
 

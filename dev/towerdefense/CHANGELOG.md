@@ -9,6 +9,7 @@ Special thanks to [@wrigty12](https://forums.rpgmakerweb.com/index.php?members/w
 - CHANGE: Tower now will display range attack when get selected, range is also updated when get buff range from aura tower
 - CHANGE: Effect now will to pick most effective effect
 - CHANGE: Change all string SE to type `file -> dir/audio/se`
+- Change: Change any animation type from `number` to `animation`
 - ADD: Stun effect, effects -> `stun|0|240|80` -> `ID stun | do nothing | duration stun | chance stun`
 - ADD: Rage effect, make the enemy walk faster -> `rage|100|240|30` -> `ID rage | 100% increase movement speed | 4s duration | 30% chance`
 - ADD: Enemy types, tower can only attack same type or all type. current type is `air | ground | all`. There is new plugin command variable for `Setup Enemy` it is `Enemy Type`. For tower need note `<attacktype:all>` value need lower case. If enemy type is all then any tower attack type can attack it, also same with tower
