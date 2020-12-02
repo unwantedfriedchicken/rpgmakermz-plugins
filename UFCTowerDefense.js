@@ -112,13 +112,13 @@
 @desc Defines enemy type
 
 @arg onlyEnemy
-@parent Only Enemy
+@text Only Enemy
 @type string[]
 @desc Only this enemy will be trigger
 @default []
 
 @arg exceptEnemy
-@parent Except Enemy
+@text Except Enemy
 @type string[]
 @desc This enemy will not get triggered
 @default []
@@ -204,9 +204,9 @@
 
 @arg startSE
 @text Start Wave SE
-@type text
-@default 0
-@desc Start wave sound effect, leave 0 to disable
+@type file
+@dir audio/se/
+@desc Start wave sound effect
 
 @arg startSEVolume
 @text Start Wave SE Volume
@@ -266,6 +266,7 @@
 @arg moveSpeed
 @text Move Speed
 @type number
+@decimals 2
 @default 3.5
 @desc Defines this enemy move speed, can use float number
 
@@ -281,9 +282,25 @@
 @default 1
 @desc Defines attack Animation when this enemy attack
 
+@arg enemyType
+@text Enemy Type
+@type select
+@option All
+@option Air
+@option Ground
+@default All
+@desc Defines enemy type
+
+@arg isThrough
+@text Is Through
+@type boolean
+@default false
+@desc Is this enemy through?
+
 @arg seDead
 @text Dead SE
-@type text
+@type file
+@dir audio/se/
 @default Slash2
 @desc Defines Sound effect when dead
 
@@ -297,16 +314,9 @@
 @text Enemy Scale
 @type number
 @default 1
+@decimals 2
 @desc Defines enemy scale
 
-@arg enemyType
-@text Enemy Type
-@type select
-@option All
-@option Air
-@option Ground
-@default All
-@desc Defines enemy type
 */
 
 var Imported = Imported || {};
@@ -462,6 +472,7 @@ Game_TDEnemy.prototype.initialize = function (enemyName, spawnId) {
   this._moveSpeedEffects = {};
   this._isStun = false;
   this._animationPlaying = false;
+  this._through = this._enemyData.isThrough == "true";
   this._event = new PIXI.utils.EventEmitter();
 };
 
@@ -661,12 +672,13 @@ Game_TDEnemy.prototype.attack = function (eventid) {
 Game_TDEnemy.prototype.attacked = function (damage) {
   this._enemyData.health -= damage.damage;
   if (this._enemyData.health <= 0 && !this._destroy) {
-    AudioManager.playSe({
-      name: this._enemyData.seDead,
-      volume: this._enemyData.seDeadVolume,
-      pitch: 100,
-      pan: 0,
-    });
+    if (this._enemyData.seDead)
+      AudioManager.playSe({
+        name: this._enemyData.seDead,
+        volume: this._enemyData.seDeadVolume,
+        pitch: 100,
+        pan: 0,
+      });
     this.destroy();
     return;
   }
@@ -2806,7 +2818,7 @@ ufcTowerWaveData.prototype.update = function () {
 
   if (!this._start) {
     this._start = true;
-    if (this._startSE != "0") {
+    if (this._startSE) {
       AudioManager.playSe({
         name: this._startSE,
         volume: this._startSEVolume,

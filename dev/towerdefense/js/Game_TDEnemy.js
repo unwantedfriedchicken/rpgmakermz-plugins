@@ -31,6 +31,7 @@ Game_TDEnemy.prototype.initialize = function (enemyName, spawnId) {
   this._moveSpeedEffects = {};
   this._isStun = false;
   this._animationPlaying = false;
+  this._through = this._enemyData.isThrough == "true";
   this._event = new PIXI.utils.EventEmitter();
 };
 
@@ -230,12 +231,13 @@ Game_TDEnemy.prototype.attack = function (eventid) {
 Game_TDEnemy.prototype.attacked = function (damage) {
   this._enemyData.health -= damage.damage;
   if (this._enemyData.health <= 0 && !this._destroy) {
-    AudioManager.playSe({
-      name: this._enemyData.seDead,
-      volume: this._enemyData.seDeadVolume,
-      pitch: 100,
-      pan: 0,
-    });
+    if (this._enemyData.seDead)
+      AudioManager.playSe({
+        name: this._enemyData.seDead,
+        volume: this._enemyData.seDeadVolume,
+        pitch: 100,
+        pan: 0,
+      });
     this.destroy();
     return;
   }

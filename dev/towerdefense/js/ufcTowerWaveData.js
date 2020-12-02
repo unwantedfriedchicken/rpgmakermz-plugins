@@ -27,7 +27,7 @@ ufcTowerWaveData.prototype.update = function () {
 
   if (!this._start) {
     this._start = true;
-    if (this._startSE != "0") {
+    if (this._startSE) {
       AudioManager.playSe({
         name: this._startSE,
         volume: this._startSEVolume,
