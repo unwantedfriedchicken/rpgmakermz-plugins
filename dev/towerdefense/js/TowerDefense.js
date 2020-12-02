@@ -1,3 +1,10 @@
+UFC.PARAMETERS = PluginManager.parameters("UFCTowerDefense");
+
+UFC.DEBUGMODE = {
+  enable: UFC.PARAMETERS["debugMode"] == "true",
+  tickerSpeed: +UFC.PARAMETERS["tickerSpeed"],
+};
+
 PluginManager.registerCommand("UFCTowerDefense", "setupEnemy", function (args) {
   args.characterName = $gameMap._events[this._eventId]._characterName;
   args.characterIndex = $gameMap._events[this._eventId]._characterIndex;

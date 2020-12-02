@@ -4,6 +4,19 @@
 @plugindesc Add Tower Defense Mechanic
 @author Unwanted Fried Chicken
 
+@param debugMode
+@text Debug Mode
+@type boolean
+@desc Enable debug mode?
+@default false
+
+@param tickerSpeed
+@parent debugMode
+@text Thick Speed
+@type number
+@desc Speed multiplier for ticker
+@default 2
+
 @command config
 @text Config Tower Defense
 @desc Configuration

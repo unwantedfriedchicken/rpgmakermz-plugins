@@ -14,6 +14,48 @@ TowerDefenseManager.initialize = function () {
   this._controlBuildingMouse = false;
   this._cacheSprite = [];
   this.addTowerList();
+  if (UFC.DEBUGMODE.enable) this.debugMode();
+};
+
+TowerDefenseManager.debugMode = function () {
+  if (UFC.DEBUGMODE.CONFIG) return;
+  UFC.DEBUGMODE.CONFIG = {
+    showRange: false,
+  };
+  window.addEventListener(
+    "keydown",
+    (e) => {
+      if (e.key == 1) {
+        Graphics.app.ticker.speed = UFC.DEBUGMODE.tickerSpeed;
+      }
+    },
+    false
+  );
+  window.addEventListener(
+    "keyup",
+    (e) => {
+      if (e.key == 1) {
+        Graphics.app.ticker.speed = 1;
+      }
+      if (e.key == 2) {
+        UFC.DEBUGMODE.CONFIG.showRange = !UFC.DEBUGMODE.CONFIG.showRange;
+        $gameMap._events
+          .filter((event) => event instanceof Game_TowerDefense)
+          .forEach((event) =>
+            event
+              .getTowerData()
+              .setRangeVisibility(UFC.DEBUGMODE.CONFIG.showRange)
+          );
+      }
+      if (e.key == 3) {
+        $gameVariables.setValue(this._towerHealthVarId, 99999);
+        $gameMap.updateHealthHud();
+        $gameParty.gainGold(99999999);
+        $gameMap.updateGoldHud();
+      }
+    },
+    false
+  );
 };
 
 TowerDefenseManager.AURATYPEMODE = {
