@@ -5,9 +5,6 @@ function TowerDefenseManager() {
 TowerDefenseManager.initialize = function () {
   this._HUDGold = false;
   this._HUDHealth = false;
-  this._towerHealthVarId = 0;
-  this._towerHealthMaxVarId = 0;
-  this._gameoverSwitchId = 0;
   this._state = TowerDefenseManager.STATE.IDLE;
   this._selectedUFCTD = null;
   this._limitAnimation = 0;
@@ -49,7 +46,7 @@ TowerDefenseManager.debugMode = function () {
           );
       }
       if (e.key == 3) {
-        $gameVariables.setValue(this._towerHealthVarId, 99999);
+        $gameVariables.setValue(UFC.UFCTD.CONFIG.healthVarId, 99999);
         $gameMap.updateHealthHud();
         $gameParty.gainGold(99999999);
         $gameMap.updateGoldHud();
@@ -103,10 +100,10 @@ TowerDefenseManager.setLimitAnimation = function (limit) {
 
 TowerDefenseManager.attackTower = function (damage) {
   let _curHealth = this.getHUDHealthValue;
-  $gameVariables.setValue(this._towerHealthVarId, _curHealth - damage);
+  $gameVariables.setValue(UFC.UFCTD.CONFIG.healthVarId, _curHealth - damage);
 
   if (_curHealth - damage <= 0) {
-    $gameSwitches.setValue(this._gameoverSwitchId, true);
+    $gameSwitches.setValue(UFC.UFCTD.CONFIG.gameOverSwitchId, true);
   }
 
   $gameMap.updateHealthHud();
@@ -142,12 +139,7 @@ TowerDefenseManager.config = function (args) {
     this.setLimitAnimation(+args["limitAnimation"]);
   }
 
-  this._towerHealthVarId = +args["towerHealthVarId"];
-  this._towerHealthMaxVarId = +args["towerMaxHealthVarId"];
   $gameMap.updateHealthHud();
-
-  this._gameoverSwitchId = +args["gameoverSwitchId"];
-
   $gameMap.ufcCalcGrid();
 
   this.cacheImage();
@@ -298,13 +290,13 @@ Object.defineProperty(TowerDefenseManager, "getHUDHealth", {
 
 Object.defineProperty(TowerDefenseManager, "getHUDHealthValue", {
   get: function () {
-    return $gameVariables.value(this._towerHealthVarId);
+    return $gameVariables.value(UFC.UFCTD.CONFIG.healthVarId);
   },
 });
 
 Object.defineProperty(TowerDefenseManager, "getHUDHealthMaxValue", {
   get: function () {
-    return $gameVariables.value(this._towerHealthMaxVarId);
+    return $gameVariables.value(UFC.UFCTD.CONFIG.healthMaxVarId);
   },
 });
 

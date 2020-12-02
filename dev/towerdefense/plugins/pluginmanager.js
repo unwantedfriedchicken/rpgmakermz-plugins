@@ -1,5 +1,12 @@
 UFC.UFCTD.PARAMETERS = PluginManager.parameters("UFCTowerDefense");
 
+UFC.UFCTD.CONFIG = {
+  limitAnimation: +UFC.UFCTD.PARAMETERS["setting.limitAnimation"],
+  healthVarId: +UFC.UFCTD.PARAMETERS["setting.towerHealthVarId"],
+  healthMaxVarId: +UFC.UFCTD.PARAMETERS["setting.towerMaxHealthVarId"],
+  gameOverSwitchId: +UFC.UFCTD.PARAMETERS["setting.gameoverSwitchId"],
+};
+
 UFC.UFCTD.TOWERSETTINGS = {
   attackRangeOpacity: UFC.UFCTD.PARAMETERS["attackRangeOpacity"],
   auraRangeOpacity: UFC.UFCTD.PARAMETERS["auraRangeOpacity"],

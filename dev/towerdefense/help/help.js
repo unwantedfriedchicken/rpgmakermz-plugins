@@ -4,6 +4,26 @@
 @plugindesc Add Tower Defense Mechanic
 @author Unwanted Fried Chicken
 
+@param setting.limitAnimation
+@text Limit Animation
+@desc If frame rate become low because so many effect try limit the animation
+@type number
+
+@param setting.towerHealthVarId
+@text Tower Health variable ID
+@desc This health of the tower set to your variable id
+@type variable
+
+@param setting.towerMaxHealthVarId
+@text Tower Max Health variable ID
+@desc This Max health of the tower set to your variable id
+@type variable
+
+@param setting.gameoverSwitchId
+@text Game Over Switch Id
+@desc When health <= 0 this switch will change to ON
+@type switch
+
 @param towerSettings
 @text Tower Settings
 
@@ -71,30 +91,6 @@
 @text Can't place in this terrain
 @desc Set place where building can't be set with terrain tag. multiple tag use , to seprate
 @type text
-@default 0
-
-@arg limitAnimation
-@text Limit Animation
-@desc If frame rate become low because so many effect try limit the animation
-@type number
-@default 0
-
-@arg towerHealthVarId
-@text Tower Health variable ID
-@desc This health of the tower set to your variable id
-@type number
-@default 0
-
-@arg towerMaxHealthVarId
-@text Tower Max Health variable ID
-@desc This Max health of the tower set to your variable id
-@type number
-@default 0
-
-@arg gameoverSwitchId
-@text Game Over Switch Id
-@desc When health <= 0 this switch will change to ON
-@type number
 @default 0
 
 @command showHealthBar
