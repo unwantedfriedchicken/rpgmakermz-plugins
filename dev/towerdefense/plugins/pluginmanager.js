@@ -8,12 +8,14 @@ UFC.UFCTD.CONFIG = {
 };
 
 UFC.UFCTD.TOWERSETTINGS = {
-  attackRangeOpacity: UFC.UFCTD.PARAMETERS["attackRangeOpacity"],
-  auraRangeOpacity: UFC.UFCTD.PARAMETERS["auraRangeOpacity"],
+  attackRangeOpacity: +UFC.UFCTD.PARAMETERS["attackRangeOpacity"],
+  auraRangeOpacity: +UFC.UFCTD.PARAMETERS["auraRangeOpacity"],
   attackRangeColor: PIXI.utils.string2hex(
     UFC.UFCTD.PARAMETERS["attackRangeColor"]
   ),
   auraRangeColor: PIXI.utils.string2hex(UFC.UFCTD.PARAMETERS["auraRangeColor"]),
+  gridColor: UFC.UFCTD.PARAMETERS["gridColor"],
+  gridColorOpacity: +UFC.UFCTD.PARAMETERS["gridColorOpacity"] * 255,
 };
 
 UFC.UFCTD.DEBUGMODE = {

@@ -8,7 +8,7 @@ Sprite_ufcGrid.prototype.constructor = Sprite_ufcGrid;
 Sprite_ufcGrid.prototype.initialize = function (data) {
   Sprite.prototype.initialize.call(this, data._bitmap);
   this._data = data;
-  this.opacity = 60;
+  this.opacity = UFC.UFCTD.TOWERSETTINGS.gridColorOpacity;
   this.z = 20;
   this._data._event.on("showGrid", this.setVisible, this);
   this.setVisible(false);

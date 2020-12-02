@@ -27,6 +27,13 @@
 @param towerSettings
 @text Tower Settings
 
+@param attackRangeColor
+@parent towerSettings
+@text Attack Range Color
+@type text
+@desc Set the color of towers' Attack Range. Default = #17b978
+@default #17b978
+
 @param attackRangeOpacity
 @parent towerSettings
 @text Attack Range Opcaity
@@ -34,13 +41,6 @@
 @desc Set the opacity of towers' Attack Range
 @decimals 1
 @default 0.4
-
-@param attackRangeColor
-@parent towerSettings
-@text Attack Range Color
-@type text
-@desc Set the color of towers' Attack Range. Default = #17b978
-@default #17b978
 
 @param auraRangeColor
 @parent towerSettings
@@ -54,6 +54,21 @@
 @text Aura Range Opcaity
 @type number
 @desc Set the opacity of towers' Attack Range
+@decimals 1
+@default 0.4
+
+@param gridColor
+@parent towerSettings
+@text Grid Color
+@type text
+@desc Set the color of grid. Default = #61FFB4
+@default #61FFB4
+
+@param gridColorOpacity
+@parent towerSettings
+@text Grid Color Opcaity
+@type number
+@desc Set the opacity of grid 
 @decimals 1
 @default 0.4
 

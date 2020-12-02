@@ -11,7 +11,7 @@ Data_ufcGrid.prototype.initialize = function () {
     $gameMap.height() * $gameMap.tileHeight()
   );
   this._lineSize = 4;
-  this._gridColor = "#61FFB4";
+  this._gridColor = UFC.UFCTD.TOWERSETTINGS.gridColor;
   this._updateEventFreq = 60;
   this._updateEventTime = 0;
 };

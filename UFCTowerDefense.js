@@ -27,6 +27,13 @@
 @param towerSettings
 @text Tower Settings
 
+@param attackRangeColor
+@parent towerSettings
+@text Attack Range Color
+@type text
+@desc Set the color of towers' Attack Range. Default = #17b978
+@default #17b978
+
 @param attackRangeOpacity
 @parent towerSettings
 @text Attack Range Opcaity
@@ -34,13 +41,6 @@
 @desc Set the opacity of towers' Attack Range
 @decimals 1
 @default 0.4
-
-@param attackRangeColor
-@parent towerSettings
-@text Attack Range Color
-@type text
-@desc Set the color of towers' Attack Range. Default = #17b978
-@default #17b978
 
 @param auraRangeColor
 @parent towerSettings
@@ -54,6 +54,21 @@
 @text Aura Range Opcaity
 @type number
 @desc Set the opacity of towers' Attack Range
+@decimals 1
+@default 0.4
+
+@param gridColor
+@parent towerSettings
+@text Grid Color
+@type text
+@desc Set the color of grid. Default = #61FFB4
+@default #61FFB4
+
+@param gridColorOpacity
+@parent towerSettings
+@text Grid Color Opcaity
+@type number
+@desc Set the opacity of grid 
 @decimals 1
 @default 0.4
 
@@ -368,12 +383,14 @@ UFC.UFCTD.CONFIG = {
 };
 
 UFC.UFCTD.TOWERSETTINGS = {
-  attackRangeOpacity: UFC.UFCTD.PARAMETERS["attackRangeOpacity"],
-  auraRangeOpacity: UFC.UFCTD.PARAMETERS["auraRangeOpacity"],
+  attackRangeOpacity: +UFC.UFCTD.PARAMETERS["attackRangeOpacity"],
+  auraRangeOpacity: +UFC.UFCTD.PARAMETERS["auraRangeOpacity"],
   attackRangeColor: PIXI.utils.string2hex(
     UFC.UFCTD.PARAMETERS["attackRangeColor"]
   ),
   auraRangeColor: PIXI.utils.string2hex(UFC.UFCTD.PARAMETERS["auraRangeColor"]),
+  gridColor: UFC.UFCTD.PARAMETERS["gridColor"],
+  gridColorOpacity: +UFC.UFCTD.PARAMETERS["gridColorOpacity"] * 255,
 };
 
 UFC.UFCTD.DEBUGMODE = {
@@ -496,7 +513,7 @@ Data_ufcGrid.prototype.initialize = function () {
     $gameMap.height() * $gameMap.tileHeight()
   );
   this._lineSize = 4;
-  this._gridColor = "#61FFB4";
+  this._gridColor = UFC.UFCTD.TOWERSETTINGS.gridColor;
   this._updateEventFreq = 60;
   this._updateEventTime = 0;
 };
@@ -1107,7 +1124,7 @@ Sprite_ufcGrid.prototype.constructor = Sprite_ufcGrid;
 Sprite_ufcGrid.prototype.initialize = function (data) {
   Sprite.prototype.initialize.call(this, data._bitmap);
   this._data = data;
-  this.opacity = 60;
+  this.opacity = UFC.UFCTD.TOWERSETTINGS.gridColorOpacity;
   this.z = 20;
   this._data._event.on("showGrid", this.setVisible, this);
   this.setVisible(false);

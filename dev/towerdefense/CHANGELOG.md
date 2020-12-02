@@ -28,4 +28,4 @@ for \C[3]4s
 - ADD: Debug option in parameter when debug mode `hold 1` to multiplier ticker speed so the game become more faster. `press 2` to show all tower range. `press 3` to cheat gold and crystal hp, `press 4` to limit animation
 - ADD: Trigger Config, make trigger only for specific enemy, ex: event have `Trigger Move Enemy` and if you also add `Trigger Config` you can set if the enemy only move if confition in config meet. Order checking trigger config is **ExceptEnemy** -> **OnlyEnemy** -> **EnemyType**
 - ADD: add `Is Through` option to `Setup Enemy` default is `false`
-- ADD: Add customization `Opacity & Color` for attack range & aura in plugin setting parameters. Thanks [@wrigty12](https://forums.rpgmakerweb.com/index.php?members/wrigty12.25770/)
+- ADD: Add customization `Opacity & Color` for `attack range, aura range, grid` in plugin setting parameters. Thanks [@wrigty12](https://forums.rpgmakerweb.com/index.php?members/wrigty12.25770/)
