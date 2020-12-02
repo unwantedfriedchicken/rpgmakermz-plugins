@@ -66,7 +66,7 @@ Game_TowerDefense.prototype.update = function () {
   if (
     !this._target &&
     $gameMap.ufcEnemies().length > 0 &&
-    this._towerData._attack > 0
+    this._towerData.getBaseAttack > 0
   ) {
     // Search target
     for (const enemy of $gameMap.ufcEnemies()) {

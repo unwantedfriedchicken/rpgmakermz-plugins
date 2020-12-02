@@ -17,6 +17,13 @@
 @desc Speed multiplier for ticker
 @default 2
 
+@param limitAnimation
+@parent debugMode
+@text Limit Animation
+@type number
+@desc Limit Animation
+@default 5
+
 @command config
 @text Config Tower Defense
 @desc Configuration
@@ -90,6 +97,31 @@
 @desc This will limit animation, set 0 to unlimited animation
 @type number
 @default 0
+
+@command triggerConfig
+@text Trigger Config
+@desc Trigger for specific config
+
+@arg enemyType
+@text Enemy Type
+@type select
+@option All
+@option Air
+@option Ground
+@default All
+@desc Defines enemy type
+
+@arg onlyEnemy
+@parent Only Enemy
+@type string[]
+@desc Only this enemy will be trigger
+@default []
+
+@arg exceptEnemy
+@parent Except Enemy
+@type string[]
+@desc This enemy will not get triggered
+@default []
 
 @command triggerDestroy
 @text Trigger Destroy Enemy

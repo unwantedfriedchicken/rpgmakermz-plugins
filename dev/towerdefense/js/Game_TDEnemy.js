@@ -61,6 +61,34 @@ Game_TDEnemy.prototype.refresh = function () {
   return false;
 };
 
+Game_TDEnemy.prototype.checkTriggerConfig = function (config) {
+  if (!config) return true;
+
+  if (
+    config.exceptEnemy.includes(this._enemyData.id) &&
+    config.exceptEnemy.length > 0
+  ) {
+    return false;
+  }
+
+  if (
+    !config.onlyEnemy.includes(this._enemyData.id) &&
+    config.onlyEnemy.length > 0
+  ) {
+    return false;
+  }
+
+  if (
+    config.enemyType === TowerDefenseManager.ENEMYTYPE.ALL ||
+    config.enemyType === this._enemyData.enemyType ||
+    this._enemyData.enemyType === TowerDefenseManager.ENEMYTYPE.ALL
+  ) {
+    return true;
+  }
+
+  return false;
+};
+
 Game_TDEnemy.prototype.update = function () {
   Game_Character.prototype.update.call(this);
 
@@ -72,16 +100,18 @@ Game_TDEnemy.prototype.update = function () {
       this._y
     );
     if (getTrigger) {
-      for (let trigger in getTrigger) {
-        switch (trigger) {
-          case TowerDefenseManager.TRIGGERTYPE.DIRECTION:
-            this.setDirection(
-              TowerDefenseManager.convertDirection(getTrigger[trigger])
-            );
-            break;
-          case TowerDefenseManager.TRIGGERTYPE.DESTROY:
-            this.triggerDestroy(getTrigger[trigger]);
-            return;
+      if (this.checkTriggerConfig(getTrigger.config)) {
+        for (let trigger in getTrigger) {
+          switch (trigger) {
+            case TowerDefenseManager.TRIGGERTYPE.DIRECTION:
+              this.setDirection(
+                TowerDefenseManager.convertDirection(getTrigger[trigger])
+              );
+              break;
+            case TowerDefenseManager.TRIGGERTYPE.DESTROY:
+              this.triggerDestroy(getTrigger[trigger]);
+              return;
+          }
         }
       }
     }

@@ -1,8 +1,9 @@
-UFC.PARAMETERS = PluginManager.parameters("UFCTowerDefense");
+UFC.UFCTD.PARAMETERS = PluginManager.parameters("UFCTowerDefense");
 
-UFC.DEBUGMODE = {
-  enable: UFC.PARAMETERS["debugMode"] == "true",
-  tickerSpeed: +UFC.PARAMETERS["tickerSpeed"],
+UFC.UFCTD.DEBUGMODE = {
+  enable: UFC.UFCTD.PARAMETERS["debugMode"] == "true",
+  tickerSpeed: +UFC.UFCTD.PARAMETERS["tickerSpeed"],
+  limitAnimation: +UFC.UFCTD.PARAMETERS["limitAnimation"],
 };
 
 PluginManager.registerCommand("UFCTowerDefense", "setupEnemy", function (args) {
@@ -84,6 +85,23 @@ PluginManager.registerCommand(
         attack: args["attack"] == "true",
         attackEventId: args["attackEventId"],
         animationId: args["animationId"],
+      }
+    );
+  }
+);
+
+PluginManager.registerCommand(
+  "UFCTowerDefense",
+  "triggerConfig",
+  function (args) {
+    TowerDefenseManager.addDBTrigger(
+      this._mapId,
+      this._eventId,
+      TowerDefenseManager.TRIGGERTYPE.CONFIG,
+      {
+        enemyType: args["enemyType"].toLowerCase(),
+        onlyEnemy: JSON.parse(args["onlyEnemy"]),
+        exceptEnemy: JSON.parse(args["exceptEnemy"]),
       }
     );
   }

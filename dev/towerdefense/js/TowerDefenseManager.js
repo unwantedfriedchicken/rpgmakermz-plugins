@@ -14,19 +14,19 @@ TowerDefenseManager.initialize = function () {
   this._controlBuildingMouse = false;
   this._cacheSprite = [];
   this.addTowerList();
-  if (UFC.DEBUGMODE.enable) this.debugMode();
+  if (UFC.UFCTD.DEBUGMODE.enable) this.debugMode();
 };
 
 TowerDefenseManager.debugMode = function () {
-  if (UFC.DEBUGMODE.CONFIG) return;
-  UFC.DEBUGMODE.CONFIG = {
+  if (UFC.UFCTD.DEBUGMODE.CONFIG) return;
+  UFC.UFCTD.DEBUGMODE.CONFIG = {
     showRange: false,
   };
   window.addEventListener(
     "keydown",
     (e) => {
       if (e.key == 1) {
-        Graphics.app.ticker.speed = UFC.DEBUGMODE.tickerSpeed;
+        Graphics.app.ticker.speed = UFC.UFCTD.DEBUGMODE.tickerSpeed;
       }
     },
     false
@@ -38,13 +38,14 @@ TowerDefenseManager.debugMode = function () {
         Graphics.app.ticker.speed = 1;
       }
       if (e.key == 2) {
-        UFC.DEBUGMODE.CONFIG.showRange = !UFC.DEBUGMODE.CONFIG.showRange;
+        UFC.UFCTD.DEBUGMODE.CONFIG.showRange = !UFC.UFCTD.DEBUGMODE.CONFIG
+          .showRange;
         $gameMap._events
           .filter((event) => event instanceof Game_TowerDefense)
           .forEach((event) =>
             event
               .getTowerData()
-              .setRangeVisibility(UFC.DEBUGMODE.CONFIG.showRange)
+              .setRangeVisibility(UFC.UFCTD.DEBUGMODE.CONFIG.showRange)
           );
       }
       if (e.key == 3) {
@@ -52,6 +53,9 @@ TowerDefenseManager.debugMode = function () {
         $gameMap.updateHealthHud();
         $gameParty.gainGold(99999999);
         $gameMap.updateGoldHud();
+      }
+      if (e.key == 4) {
+        this.setLimitAnimation(UFC.UFCTD.DEBUGMODE.limitAnimation);
       }
     },
     false
@@ -78,6 +82,7 @@ TowerDefenseManager.ENEMYTYPE = {
 TowerDefenseManager.TRIGGERTYPE = {
   DESTROY: "destroy",
   DIRECTION: "direction",
+  CONFIG: "config",
 };
 
 TowerDefenseManager.STATE = {

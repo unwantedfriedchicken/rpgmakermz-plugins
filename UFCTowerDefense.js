@@ -17,6 +17,13 @@
 @desc Speed multiplier for ticker
 @default 2
 
+@param limitAnimation
+@parent debugMode
+@text Limit Animation
+@type number
+@desc Limit Animation
+@default 5
+
 @command config
 @text Config Tower Defense
 @desc Configuration
@@ -90,6 +97,31 @@
 @desc This will limit animation, set 0 to unlimited animation
 @type number
 @default 0
+
+@command triggerConfig
+@text Trigger Config
+@desc Trigger for specific config
+
+@arg enemyType
+@text Enemy Type
+@type select
+@option All
+@option Air
+@option Ground
+@default All
+@desc Defines enemy type
+
+@arg onlyEnemy
+@parent Only Enemy
+@type string[]
+@desc Only this enemy will be trigger
+@default []
+
+@arg exceptEnemy
+@parent Except Enemy
+@type string[]
+@desc This enemy will not get triggered
+@default []
 
 @command triggerDestroy
 @text Trigger Destroy Enemy
@@ -460,6 +492,34 @@ Game_TDEnemy.prototype.refresh = function () {
   return false;
 };
 
+Game_TDEnemy.prototype.checkTriggerConfig = function (config) {
+  if (!config) return true;
+
+  if (
+    config.exceptEnemy.includes(this._enemyData.id) &&
+    config.exceptEnemy.length > 0
+  ) {
+    return false;
+  }
+
+  if (
+    !config.onlyEnemy.includes(this._enemyData.id) &&
+    config.onlyEnemy.length > 0
+  ) {
+    return false;
+  }
+
+  if (
+    config.enemyType === TowerDefenseManager.ENEMYTYPE.ALL ||
+    config.enemyType === this._enemyData.enemyType ||
+    this._enemyData.enemyType === TowerDefenseManager.ENEMYTYPE.ALL
+  ) {
+    return true;
+  }
+
+  return false;
+};
+
 Game_TDEnemy.prototype.update = function () {
   Game_Character.prototype.update.call(this);
 
@@ -471,16 +531,18 @@ Game_TDEnemy.prototype.update = function () {
       this._y
     );
     if (getTrigger) {
-      for (let trigger in getTrigger) {
-        switch (trigger) {
-          case TowerDefenseManager.TRIGGERTYPE.DIRECTION:
-            this.setDirection(
-              TowerDefenseManager.convertDirection(getTrigger[trigger])
-            );
-            break;
-          case TowerDefenseManager.TRIGGERTYPE.DESTROY:
-            this.triggerDestroy(getTrigger[trigger]);
-            return;
+      if (this.checkTriggerConfig(getTrigger.config)) {
+        for (let trigger in getTrigger) {
+          switch (trigger) {
+            case TowerDefenseManager.TRIGGERTYPE.DIRECTION:
+              this.setDirection(
+                TowerDefenseManager.convertDirection(getTrigger[trigger])
+              );
+              break;
+            case TowerDefenseManager.TRIGGERTYPE.DESTROY:
+              this.triggerDestroy(getTrigger[trigger]);
+              return;
+          }
         }
       }
     }
@@ -707,7 +769,7 @@ Game_TowerDefense.prototype.update = function () {
   if (
     !this._target &&
     $gameMap.ufcEnemies().length > 0 &&
-    this._towerData._attack > 0
+    this._towerData.getBaseAttack > 0
   ) {
     // Search target
     for (const enemy of $gameMap.ufcEnemies()) {
@@ -1421,11 +1483,12 @@ Sprite_ufcTDTower.prototype.destroy = function (options) {
   Sprite.prototype.destroy.call(this, options);
 };
 
-UFC.PARAMETERS = PluginManager.parameters("UFCTowerDefense");
+UFC.UFCTD.PARAMETERS = PluginManager.parameters("UFCTowerDefense");
 
-UFC.DEBUGMODE = {
-  enable: UFC.PARAMETERS["debugMode"] == "true",
-  tickerSpeed: +UFC.PARAMETERS["tickerSpeed"],
+UFC.UFCTD.DEBUGMODE = {
+  enable: UFC.UFCTD.PARAMETERS["debugMode"] == "true",
+  tickerSpeed: +UFC.UFCTD.PARAMETERS["tickerSpeed"],
+  limitAnimation: +UFC.UFCTD.PARAMETERS["limitAnimation"],
 };
 
 PluginManager.registerCommand("UFCTowerDefense", "setupEnemy", function (args) {
@@ -1507,6 +1570,23 @@ PluginManager.registerCommand(
         attack: args["attack"] == "true",
         attackEventId: args["attackEventId"],
         animationId: args["animationId"],
+      }
+    );
+  }
+);
+
+PluginManager.registerCommand(
+  "UFCTowerDefense",
+  "triggerConfig",
+  function (args) {
+    TowerDefenseManager.addDBTrigger(
+      this._mapId,
+      this._eventId,
+      TowerDefenseManager.TRIGGERTYPE.CONFIG,
+      {
+        enemyType: args["enemyType"].toLowerCase(),
+        onlyEnemy: JSON.parse(args["onlyEnemy"]),
+        exceptEnemy: JSON.parse(args["exceptEnemy"]),
       }
     );
   }
@@ -2063,19 +2143,19 @@ TowerDefenseManager.initialize = function () {
   this._controlBuildingMouse = false;
   this._cacheSprite = [];
   this.addTowerList();
-  if (UFC.DEBUGMODE.enable) this.debugMode();
+  if (UFC.UFCTD.DEBUGMODE.enable) this.debugMode();
 };
 
 TowerDefenseManager.debugMode = function () {
-  if (UFC.DEBUGMODE.CONFIG) return;
-  UFC.DEBUGMODE.CONFIG = {
+  if (UFC.UFCTD.DEBUGMODE.CONFIG) return;
+  UFC.UFCTD.DEBUGMODE.CONFIG = {
     showRange: false,
   };
   window.addEventListener(
     "keydown",
     (e) => {
       if (e.key == 1) {
-        Graphics.app.ticker.speed = UFC.DEBUGMODE.tickerSpeed;
+        Graphics.app.ticker.speed = UFC.UFCTD.DEBUGMODE.tickerSpeed;
       }
     },
     false
@@ -2087,13 +2167,14 @@ TowerDefenseManager.debugMode = function () {
         Graphics.app.ticker.speed = 1;
       }
       if (e.key == 2) {
-        UFC.DEBUGMODE.CONFIG.showRange = !UFC.DEBUGMODE.CONFIG.showRange;
+        UFC.UFCTD.DEBUGMODE.CONFIG.showRange = !UFC.UFCTD.DEBUGMODE.CONFIG
+          .showRange;
         $gameMap._events
           .filter((event) => event instanceof Game_TowerDefense)
           .forEach((event) =>
             event
               .getTowerData()
-              .setRangeVisibility(UFC.DEBUGMODE.CONFIG.showRange)
+              .setRangeVisibility(UFC.UFCTD.DEBUGMODE.CONFIG.showRange)
           );
       }
       if (e.key == 3) {
@@ -2101,6 +2182,9 @@ TowerDefenseManager.debugMode = function () {
         $gameMap.updateHealthHud();
         $gameParty.gainGold(99999999);
         $gameMap.updateGoldHud();
+      }
+      if (e.key == 4) {
+        this.setLimitAnimation(UFC.UFCTD.DEBUGMODE.limitAnimation);
       }
     },
     false
@@ -2127,6 +2211,7 @@ TowerDefenseManager.ENEMYTYPE = {
 TowerDefenseManager.TRIGGERTYPE = {
   DESTROY: "destroy",
   DIRECTION: "direction",
+  CONFIG: "config",
 };
 
 TowerDefenseManager.STATE = {
