@@ -18,7 +18,7 @@ Game_TowerDefense.prototype.initialize = function (towerData, mapId) {
   this._destroy = false;
   this._towerEffectedByAura = [];
   this.getTowerData().checkGetBuffs();
-  if (this._towerData.getAuras()) {
+  if (this._towerData.isHaveAura()) {
     this.addAuraEffects();
   }
 };

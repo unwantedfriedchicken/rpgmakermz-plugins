@@ -4,6 +4,39 @@
 @plugindesc Add Tower Defense Mechanic
 @author Unwanted Fried Chicken
 
+@param towerSettings
+@text Tower Settings
+
+@param attackRangeOpacity
+@parent towerSettings
+@text Attack Range Opcaity
+@type number
+@desc Set the opacity of towers' Attack Range
+@decimals 1
+@default 0.4
+
+@param attackRangeColor
+@parent towerSettings
+@text Attack Range Color
+@type text
+@desc Set the color of towers' Attack Range. Default = #17b978
+@default #17b978
+
+@param auraRangeColor
+@parent towerSettings
+@text Aura Range Color
+@type text
+@desc Set the color of aura towers' Aura Range. Default = #17b978
+@default #17b978
+
+@param auraRangeOpacity
+@parent towerSettings
+@text Aura Range Opcaity
+@type number
+@desc Set the opacity of towers' Attack Range
+@decimals 1
+@default 0.4
+
 @param debugMode
 @text Debug Mode
 @type boolean

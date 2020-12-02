@@ -1,5 +1,14 @@
 UFC.UFCTD.PARAMETERS = PluginManager.parameters("UFCTowerDefense");
 
+UFC.UFCTD.TOWERSETTINGS = {
+  attackRangeOpacity: UFC.UFCTD.PARAMETERS["attackRangeOpacity"],
+  auraRangeOpacity: UFC.UFCTD.PARAMETERS["auraRangeOpacity"],
+  attackRangeColor: PIXI.utils.string2hex(
+    UFC.UFCTD.PARAMETERS["attackRangeColor"]
+  ),
+  auraRangeColor: PIXI.utils.string2hex(UFC.UFCTD.PARAMETERS["auraRangeColor"]),
+};
+
 UFC.UFCTD.DEBUGMODE = {
   enable: UFC.UFCTD.PARAMETERS["debugMode"] == "true",
   tickerSpeed: +UFC.UFCTD.PARAMETERS["tickerSpeed"],

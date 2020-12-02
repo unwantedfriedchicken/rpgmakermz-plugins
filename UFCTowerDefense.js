@@ -4,6 +4,39 @@
 @plugindesc Add Tower Defense Mechanic
 @author Unwanted Fried Chicken
 
+@param towerSettings
+@text Tower Settings
+
+@param attackRangeOpacity
+@parent towerSettings
+@text Attack Range Opcaity
+@type number
+@desc Set the opacity of towers' Attack Range
+@decimals 1
+@default 0.4
+
+@param attackRangeColor
+@parent towerSettings
+@text Attack Range Color
+@type text
+@desc Set the color of towers' Attack Range. Default = #17b978
+@default #17b978
+
+@param auraRangeColor
+@parent towerSettings
+@text Aura Range Color
+@type text
+@desc Set the color of aura towers' Aura Range. Default = #17b978
+@default #17b978
+
+@param auraRangeOpacity
+@parent towerSettings
+@text Aura Range Opcaity
+@type number
+@desc Set the opacity of towers' Attack Range
+@decimals 1
+@default 0.4
+
 @param debugMode
 @text Debug Mode
 @type boolean
@@ -733,7 +766,7 @@ Game_TowerDefense.prototype.initialize = function (towerData, mapId) {
   this._destroy = false;
   this._towerEffectedByAura = [];
   this.getTowerData().checkGetBuffs();
-  if (this._towerData.getAuras()) {
+  if (this._towerData.isHaveAura()) {
     this.addAuraEffects();
   }
 };
@@ -1364,7 +1397,16 @@ Sprite_ufcTDTower.prototype.initMembers = function (ufcTD) {
   this._range = this._tower.getTowerData().getRange();
 
   let _rangeGraphics = new PIXI.Graphics();
-  _rangeGraphics.beginFill(0x17b978, 0.4);
+  if (this._towerData.isHaveAura())
+    _rangeGraphics.beginFill(
+      UFC.UFCTD.TOWERSETTINGS.auraRangeColor,
+      UFC.UFCTD.TOWERSETTINGS.auraRangeOpacity
+    );
+  else
+    _rangeGraphics.beginFill(
+      UFC.UFCTD.TOWERSETTINGS.attackRangeColor,
+      UFC.UFCTD.TOWERSETTINGS.attackRangeOpacity
+    );
   _rangeGraphics.drawRect(
     0,
     0,
@@ -1496,6 +1538,15 @@ Sprite_ufcTDTower.prototype.destroy = function (options) {
 };
 
 UFC.UFCTD.PARAMETERS = PluginManager.parameters("UFCTowerDefense");
+
+UFC.UFCTD.TOWERSETTINGS = {
+  attackRangeOpacity: UFC.UFCTD.PARAMETERS["attackRangeOpacity"],
+  auraRangeOpacity: UFC.UFCTD.PARAMETERS["auraRangeOpacity"],
+  attackRangeColor: PIXI.utils.string2hex(
+    UFC.UFCTD.PARAMETERS["attackRangeColor"]
+  ),
+  auraRangeColor: PIXI.utils.string2hex(UFC.UFCTD.PARAMETERS["auraRangeColor"]),
+};
 
 UFC.UFCTD.DEBUGMODE = {
   enable: UFC.UFCTD.PARAMETERS["debugMode"] == "true",
@@ -2672,14 +2723,18 @@ ufcTowerData.prototype.setPlaceMode = function (mode) {
 };
 
 ufcTowerData.prototype.getAuras = function () {
-  return this._auras.length > 0 ? this._auras : false;
+  return this._auras;
+};
+
+ufcTowerData.prototype.isHaveAura = function () {
+  return this._auras.length > 0;
 };
 
 ufcTowerData.prototype.checkGetBuffs = function () {
   let towers = $gameMap._events.filter(
     (event) =>
       event instanceof Game_TowerDefense &&
-      event.getTowerData().getAuras() &&
+      event.getTowerData().isHaveAura() &&
       PIXI.utils.isInRange(
         this._x,
         this._y,

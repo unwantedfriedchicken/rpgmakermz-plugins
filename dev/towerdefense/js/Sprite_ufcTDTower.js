@@ -22,7 +22,16 @@ Sprite_ufcTDTower.prototype.initMembers = function (ufcTD) {
   this._range = this._tower.getTowerData().getRange();
 
   let _rangeGraphics = new PIXI.Graphics();
-  _rangeGraphics.beginFill(0x17b978, 0.4);
+  if (this._towerData.isHaveAura())
+    _rangeGraphics.beginFill(
+      UFC.UFCTD.TOWERSETTINGS.auraRangeColor,
+      UFC.UFCTD.TOWERSETTINGS.auraRangeOpacity
+    );
+  else
+    _rangeGraphics.beginFill(
+      UFC.UFCTD.TOWERSETTINGS.attackRangeColor,
+      UFC.UFCTD.TOWERSETTINGS.attackRangeOpacity
+    );
   _rangeGraphics.drawRect(
     0,
     0,

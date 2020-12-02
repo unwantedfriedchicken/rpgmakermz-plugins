@@ -148,14 +148,18 @@ ufcTowerData.prototype.setPlaceMode = function (mode) {
 };
 
 ufcTowerData.prototype.getAuras = function () {
-  return this._auras.length > 0 ? this._auras : false;
+  return this._auras;
+};
+
+ufcTowerData.prototype.isHaveAura = function () {
+  return this._auras.length > 0;
 };
 
 ufcTowerData.prototype.checkGetBuffs = function () {
   let towers = $gameMap._events.filter(
     (event) =>
       event instanceof Game_TowerDefense &&
-      event.getTowerData().getAuras() &&
+      event.getTowerData().isHaveAura() &&
       PIXI.utils.isInRange(
         this._x,
         this._y,
