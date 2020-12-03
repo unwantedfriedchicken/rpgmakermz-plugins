@@ -134,7 +134,9 @@ Game_Player.prototype.triggerButtonAction = function () {
     TowerDefenseManager.getState == TowerDefenseManager.STATE.BUILD &&
     !this.getGuideAction().isBlocked()
   ) {
-    TowerDefenseManager.placeTower();
+    // Doublecheck incase using mouse
+    this.getGuideAction().updateBlocked(true);
+    if (!this.getGuideAction().isBlocked()) TowerDefenseManager.placeTower();
     return true;
   }
 

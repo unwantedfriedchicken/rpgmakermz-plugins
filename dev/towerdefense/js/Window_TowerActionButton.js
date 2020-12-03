@@ -98,6 +98,7 @@ Window_TowerActionButton.prototype.close = function () {
   }
   Window_HorzCommand.prototype.close.call(this);
   $gameMessage.setWindowTower(false);
+  UFC.UFCTD.HUDGUI.ITEMSLOT.open();
 };
 
 Window_TowerActionButton.prototype.setTower = function (
@@ -142,6 +143,7 @@ Window_TowerActionButton.prototype.setTower = function (
   this.activate();
   this.select(0);
   this._towerData.setRangeVisibility(true);
+  UFC.UFCTD.HUDGUI.ITEMSLOT.close();
 };
 
 Window_TowerActionButton.prototype.open = function () {
