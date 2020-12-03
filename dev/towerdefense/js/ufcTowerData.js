@@ -159,6 +159,7 @@ ufcTowerData.prototype.checkGetBuffs = function () {
   let towers = $gameMap._events.filter(
     (event) =>
       event instanceof Game_TowerDefense &&
+      event.getTowerData() !== this &&
       event.getTowerData().isHaveAura() &&
       PIXI.utils.isInRange(
         this._x,

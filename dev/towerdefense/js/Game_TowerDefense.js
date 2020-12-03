@@ -27,6 +27,7 @@ Game_TowerDefense.prototype.addAuraEffects = function () {
   let towers = $gameMap._events.filter(
     (event) =>
       event instanceof Game_TowerDefense &&
+      event !== this &&
       PIXI.utils.isInRange(
         event._x,
         event._y,

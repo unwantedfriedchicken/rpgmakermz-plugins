@@ -20,7 +20,18 @@ Sprite_ufcTDTower.prototype.initMembers = function (ufcTD) {
   this._upperBody = null;
   this._lowerBody = null;
   this._range = this._tower.getTowerData().getRange();
+  this.resetRangeGraphics();
+  this.setCharacterBitmap();
+  if (this._towerData._placeMode) this.setSelectPosition();
 
+  this._towerData._event.on(
+    "setRangeVisibility",
+    this.setRangeVisibility,
+    this
+  );
+};
+
+Sprite_ufcTDTower.prototype.resetRangeGraphics = function () {
   let _rangeGraphics = new PIXI.Graphics();
   if (this._towerData.isHaveAura())
     _rangeGraphics.beginFill(
@@ -39,24 +50,18 @@ Sprite_ufcTDTower.prototype.initMembers = function (ufcTD) {
     (this._range * 2 + 1) * $gameMap.tileHeight()
   );
   _rangeGraphics.endFill();
-
   let rangeSprite = Graphics.app.renderer.generateTexture(_rangeGraphics);
-  this._rangeGraphics = new PIXI.Sprite(rangeSprite);
-  this._rangeGraphics.anchor.x = 0.5;
-  this._rangeGraphics.anchor.y = 0.5;
-  this._rangeGraphics.x = 0;
-  this._rangeGraphics.y = -$gameMap.tileHeight() / 2;
-
-  this.addChild(this._rangeGraphics);
-  this.setCharacterBitmap();
-  if (this._towerData._placeMode) this.setSelectPosition();
-
-  this._towerData._event.on(
-    "setRangeVisibility",
-    this.setRangeVisibility,
-    this
-  );
-  this.setRangeVisibility(false);
+  if (!this._rangeGraphics) {
+    this._rangeGraphics = new PIXI.Sprite(rangeSprite);
+    this._rangeGraphics.anchor.x = 0.5;
+    this._rangeGraphics.anchor.y = 0.5;
+    this._rangeGraphics.x = 0;
+    this._rangeGraphics.y = -$gameMap.tileHeight() / 2;
+    this.addChild(this._rangeGraphics);
+  } else {
+    this._rangeGraphics.texture = rangeSprite;
+  }
+  _rangeGraphics.destroy();
 };
 
 Sprite_ufcTDTower.prototype.setSelectPosition = function () {
@@ -145,6 +150,10 @@ Sprite_ufcTDTower.prototype.characterBlockY = function () {
 };
 
 Sprite_ufcTDTower.prototype.setRangeVisibility = function (visible) {
+  if (visible) {
+    this._range = this._tower.getTowerData().getRange();
+    this.resetRangeGraphics();
+  }
   this._rangeGraphics.visible = visible;
 };
 
