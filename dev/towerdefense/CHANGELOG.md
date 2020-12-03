@@ -4,6 +4,7 @@
 
 Special thanks to [@wrigty12](https://forums.rpgmakerweb.com/index.php?members/wrigty12.25770/), [@estriole](https://forums.rpgmakerweb.com/index.php?members/estriole.2487/) for their inputs!
 
+- BUGFIX: Fix sometimes tower can be placed to blocked area when map scrolled
 - CHANGE: Add chance parameter to effects, effect parameter is become ( `ID EFFECT | EFFECT | DURATION | CHANCE` ) If `CHANCE` not stated it's automatic become `100`, ex: `cold|80|240|50` -> `ID cold | 80% decrease movement speed | 4s duration | 50% chance`
 - CHANGE: If tower base attack 0, the tower will stop/never searching enemy, it's usefull if want make pure auras tower
 - CHANGE: Tower now will display range attack when get selected, range is also updated when get buff range from aura tower

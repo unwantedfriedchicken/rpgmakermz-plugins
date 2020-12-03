@@ -301,8 +301,8 @@ GuideAction.prototype.onPointerMove = function (e) {
   }
 };
 
-GuideAction.prototype.updateBlocked = function () {
-  if (this.isMouseMode) {
+GuideAction.prototype.updateBlocked = function (doubleCheck = false) {
+  if (this.isMouseMode && !doubleCheck) {
     if (!this.canPassMouse(this._x, this._y)) {
       if (!this.isBlocked()) {
         this.setBlocked(true);
@@ -311,6 +311,7 @@ GuideAction.prototype.updateBlocked = function () {
       this.setBlocked(false);
     }
   } else {
+    if (doubleCheck) this.getPosition();
     if (!this.canPass(this._x, this._y, this._d)) {
       if (!this.isBlocked()) {
         this.setBlocked(true);

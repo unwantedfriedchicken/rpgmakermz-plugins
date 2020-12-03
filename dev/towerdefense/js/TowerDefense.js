@@ -173,11 +173,13 @@ Game_Player.prototype.executeMove = function () {
       this.turnTowardCharacter({ x: destX, y: destY });
       this.getGuideAction().updateBlocked();
       if (!this.getGuideAction().isBlocked()) {
-        TowerDefenseManager.placeTower();
+        // Double check incase the map is scrolled
+        this.getGuideAction().updateBlocked(true);
+        if (!this.getGuideAction().isBlocked())
+          TowerDefenseManager.placeTower();
         $gameTemp.clearDestination();
-      } else {
-        this.getGuideAction().clearTrigger();
       }
+      this.getGuideAction().clearTrigger();
       return;
     }
   }
