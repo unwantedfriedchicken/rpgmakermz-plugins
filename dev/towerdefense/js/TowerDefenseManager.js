@@ -182,7 +182,8 @@ TowerDefenseManager.clearSelect = function () {
   this._selectedUFCTD = null;
   $gameSystem.enableMenu();
   $gamePlayer.getGuideAction().setActive(false);
-  $gamePlayer.getGuideActionGraphics().removeChildAt(0);
+  if ($gamePlayer.getGuideActionGraphics().children.length > 0)
+    $gamePlayer.getGuideActionGraphics().removeChildAt(0);
   $gameMap.ufcGetGrid().setVisible(false);
 };
 
@@ -343,8 +344,10 @@ TowerDefenseManager.addTower = function (itemid, item) {
     }
   }
   if (data) {
+    data.istowerdata = true;
     data.id = itemid;
     data.name = item.name;
+    data.iconindex = item.iconIndex;
     data.bulletanimationid = item.animationId;
     data.note = note;
     item.ufcTower = data;

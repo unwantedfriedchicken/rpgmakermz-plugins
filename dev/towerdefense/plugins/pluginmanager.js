@@ -1,10 +1,22 @@
 UFC.UFCTD.PARAMETERS = PluginManager.parameters("UFCTowerDefense");
 
 UFC.UFCTD.CONFIG = {
-  limitAnimation: +UFC.UFCTD.PARAMETERS["setting.limitAnimation"],
-  healthVarId: +UFC.UFCTD.PARAMETERS["setting.towerHealthVarId"],
-  healthMaxVarId: +UFC.UFCTD.PARAMETERS["setting.towerMaxHealthVarId"],
-  gameOverSwitchId: +UFC.UFCTD.PARAMETERS["setting.gameoverSwitchId"],
+  limitAnimation: +UFC.UFCTD.PARAMETERS["setting_limitAnimation"],
+  healthVarId: +UFC.UFCTD.PARAMETERS["setting_towerHealthVarId"],
+  healthMaxVarId: +UFC.UFCTD.PARAMETERS["setting_towerMaxHealthVarId"],
+  gameOverSwitchId: +UFC.UFCTD.PARAMETERS["setting_gameoverSwitchId"],
+};
+
+UFC.UFCTD.HUDGUI = {
+  SETTINGS: {
+    itemSize: +UFC.UFCTD.PARAMETERS["gui_itemBackpackSlotSize"],
+    itemCol: +UFC.UFCTD.PARAMETERS["gui_itemBackpackSlotCol"],
+    itemWindowType: +UFC.UFCTD.PARAMETERS["gui_itemBackpackBackgroundType"],
+    itemNumSize: +UFC.UFCTD.PARAMETERS["gui_itemBackpackNumSize"],
+  },
+  MESSAGE: {
+    isHoverHUDItem: false,
+  },
 };
 
 UFC.UFCTD.TOWERSETTINGS = {

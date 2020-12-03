@@ -4,25 +4,56 @@
 @plugindesc Add Tower Defense Mechanic
 @author Unwanted Fried Chicken
 
-@param setting.limitAnimation
+@param setting_limitAnimation
 @text Limit Animation
 @desc If frame rate become low because so many effect try limit the animation
 @type number
 
-@param setting.towerHealthVarId
+@param setting_towerHealthVarId
 @text Tower Health variable ID
 @desc This health of the tower set to your variable id
 @type variable
 
-@param setting.towerMaxHealthVarId
+@param setting_towerMaxHealthVarId
 @text Tower Max Health variable ID
 @desc This Max health of the tower set to your variable id
 @type variable
 
-@param setting.gameoverSwitchId
+@param setting_gameoverSwitchId
 @text Game Over Switch Id
 @desc When health <= 0 this switch will change to ON
 @type switch
+
+@param hudguiSettings
+@text HUD/GUI Settings
+
+@param gui_itemBackpackSlotSize
+@parent hudguiSettings
+@text Item Size
+@type number
+@desc Set the size of the item backpack slot
+@default 64
+
+@param gui_itemBackpackSlotCol
+@parent hudguiSettings
+@text Item Display Number
+@type number
+@desc Set the number item that display in backpack
+@default 12
+
+@param gui_itemBackpackBackgroundType
+@parent hudguiSettings
+@text Item Background Type
+@type number
+@desc Background type for window item, 0 = default, 1 = dim, 2 = nothing
+@default 0
+
+@param gui_itemBackpackNumSize
+@parent hudguiSettings
+@text Item Ammount Size
+@type number
+@desc Size of the numsize item
+@default 24
 
 @param towerSettings
 @text Tower Settings
@@ -376,10 +407,22 @@ var $dataTDTrigger = $dataTDTrigger || {};
 UFC.UFCTD.PARAMETERS = PluginManager.parameters("UFCTowerDefense");
 
 UFC.UFCTD.CONFIG = {
-  limitAnimation: +UFC.UFCTD.PARAMETERS["setting.limitAnimation"],
-  healthVarId: +UFC.UFCTD.PARAMETERS["setting.towerHealthVarId"],
-  healthMaxVarId: +UFC.UFCTD.PARAMETERS["setting.towerMaxHealthVarId"],
-  gameOverSwitchId: +UFC.UFCTD.PARAMETERS["setting.gameoverSwitchId"],
+  limitAnimation: +UFC.UFCTD.PARAMETERS["setting_limitAnimation"],
+  healthVarId: +UFC.UFCTD.PARAMETERS["setting_towerHealthVarId"],
+  healthMaxVarId: +UFC.UFCTD.PARAMETERS["setting_towerMaxHealthVarId"],
+  gameOverSwitchId: +UFC.UFCTD.PARAMETERS["setting_gameoverSwitchId"],
+};
+
+UFC.UFCTD.HUDGUI = {
+  SETTINGS: {
+    itemSize: +UFC.UFCTD.PARAMETERS["gui_itemBackpackSlotSize"],
+    itemCol: +UFC.UFCTD.PARAMETERS["gui_itemBackpackSlotCol"],
+    itemWindowType: +UFC.UFCTD.PARAMETERS["gui_itemBackpackBackgroundType"],
+    itemNumSize: +UFC.UFCTD.PARAMETERS["gui_itemBackpackNumSize"],
+  },
+  MESSAGE: {
+    isHoverHUDItem: false,
+  },
 };
 
 UFC.UFCTD.TOWERSETTINGS = {
@@ -1688,6 +1731,10 @@ PIXI.utils.isInRange = function (x1, y1, x2, y2, range) {
   );
 };
 
+PIXI.utils.lerp = function (v0, v1, t) {
+  return (1 - t) * v0 + t * v1;
+};
+
 SceneManager.getScene = function () {
   return this._scene;
 };
@@ -1906,8 +1953,14 @@ Game_Player.prototype.checkEventTower = function (x, y) {
 // const _Scene_Boot_loadSystemImages = Scene_Boot.prototype.loadSystemImages;
 // Scene_Boot.prototype.loadSystemImages = function () {
 //   _Scene_Boot_loadSystemImages.call(this);
-//   ImageManager.loadSystem("TDSet");
+//   ImageManager.loadSystem("TDSheets");
 // };
+
+UFC.UFCTD.ALIAS._Scene_Map_onMapTouch = Scene_Map.prototype.onMapTouch;
+Scene_Map.prototype.onMapTouch = function () {
+  if (UFC.UFCTD.HUDGUI.MESSAGE.isHoverHUDItem) return;
+  return UFC.UFCTD.ALIAS._Scene_Map_onMapTouch.call(this);
+};
 
 UFC.UFCTD.ALIAS._Scene_Map_updateCallMenu = Scene_Map.prototype.updateCallMenu;
 Scene_Map.prototype.updateCallMenu = function () {
@@ -1925,6 +1978,8 @@ UFC.UFCTD.ALIAS._Scene_Map_createAllWindows =
   Scene_Map.prototype.createAllWindows;
 Scene_Map.prototype.createAllWindows = function () {
   UFC.UFCTD.ALIAS._Scene_Map_createAllWindows.call(this);
+  UFC.UFCTD.HUDGUI.ITEMSLOT = new Window_GUIItemSlot();
+  this.addWindow(UFC.UFCTD.HUDGUI.ITEMSLOT);
   this.createGoldWindow();
   this.createTowerActionButtonWindow();
   this.createTDHealth();
@@ -1959,15 +2014,6 @@ Scene_Map.prototype.getTowerAction = function () {
   return this._towerActionButton;
 };
 // ----------------------------------- End HUD -------------------------
-
-UFC.UFCTD.ALIAS._Scene_ItemBase_applyItem = Scene_ItemBase.prototype.applyItem;
-Scene_ItemBase.prototype.applyItem = function () {
-  UFC.UFCTD.ALIAS._Scene_ItemBase_applyItem.apply(this, arguments);
-  if (this.item().ufcTower) {
-    TowerDefenseManager.selectTower(this.item().ufcTower);
-    SceneManager.goto(Scene_Map);
-  }
-};
 
 // Change Gold
 UFC.UFCTD.ALIAS._Game_Interpreter_command125 =
@@ -2159,6 +2205,12 @@ Game_Map.prototype.updateProjectile = function () {
   }
 };
 
+UFC.UFCTD.ALIAS._Game_Map_refresh = Game_Map.prototype.refresh;
+Game_Map.prototype.refresh = function () {
+  if (UFC.UFCTD.HUDGUI.ITEMSLOT) UFC.UFCTD.HUDGUI.ITEMSLOT.refresh();
+  UFC.UFCTD.ALIAS._Game_Map_refresh.call(this);
+};
+
 Spriteset_Map.prototype.checkLimitAnimation = function () {
   return (
     this._animationSprites.length > TowerDefenseManager.getLimitAnimation &&
@@ -2206,6 +2258,24 @@ Spriteset_Map.prototype.createCharacters = function () {
   if (TowerDefenseManager.getState != TowerDefenseManager.STATE.IDLE) {
     TowerDefenseManager.selectTowerMode();
   }
+};
+
+UFC.UFCTD.ALIAS._Game_Party_initAllItems = Game_Party.prototype.initAllItems;
+Game_Party.prototype.initAllItems = function () {
+  UFC.UFCTD.ALIAS._Game_Party_initAllItems.call(this);
+  this._towers = {};
+};
+
+UFC.UFCTD.ALIAS._Game_Party_itemContainer = Game_Party.prototype.itemContainer;
+Game_Party.prototype.itemContainer = function (item) {
+  if (item && (item.ufcTower || item.istowerdata)) {
+    return this._towers;
+  }
+  return UFC.UFCTD.ALIAS._Game_Party_itemContainer.call(this, item);
+};
+
+Game_Party.prototype.towers = function () {
+  return Object.keys(this._towers).map((id) => $dataItems[id].ufcTower);
 };
 
 function TowerDefenseManager() {
@@ -2392,7 +2462,8 @@ TowerDefenseManager.clearSelect = function () {
   this._selectedUFCTD = null;
   $gameSystem.enableMenu();
   $gamePlayer.getGuideAction().setActive(false);
-  $gamePlayer.getGuideActionGraphics().removeChildAt(0);
+  if ($gamePlayer.getGuideActionGraphics().children.length > 0)
+    $gamePlayer.getGuideActionGraphics().removeChildAt(0);
   $gameMap.ufcGetGrid().setVisible(false);
 };
 
@@ -2553,8 +2624,10 @@ TowerDefenseManager.addTower = function (itemid, item) {
     }
   }
   if (data) {
+    data.istowerdata = true;
     data.id = itemid;
     data.name = item.name;
+    data.iconindex = item.iconIndex;
     data.bulletanimationid = item.animationId;
     data.note = note;
     item.ufcTower = data;
@@ -2971,6 +3044,237 @@ Window_BaseExtend.prototype.drawTextEx = function (text, x, y, width, align) {
   const textState = this.createTextState(text, x, y, width);
   this.processAllText(textState);
   return textState.outputWidth;
+};
+
+const Window_GUIItemSlot = function () {
+  this.initialize(...arguments);
+};
+
+Window_GUIItemSlot.prototype = Object.create(Window_Command.prototype);
+Window_GUIItemSlot.prototype.constructor = Window_GUIItemSlot;
+
+Window_GUIItemSlot.prototype.initialize = function () {
+  let width =
+    UFC.UFCTD.HUDGUI.SETTINGS.itemSize * this.maxCols() +
+    $gameSystem.windowPadding() * 2;
+  let rect = new Rectangle(
+    Graphics.boxWidth / 2 - width / 2,
+    Graphics.boxHeight,
+    width,
+    this.itemHeight() + $gameSystem.windowPadding() * 2
+  );
+  rect.y -= rect.height;
+  Window_Command.prototype.initialize.call(this, rect);
+  this._selectKeyboard = false;
+  this._towers = [];
+
+  this.setBackgroundType(UFC.UFCTD.HUDGUI.SETTINGS.itemWindowType);
+
+  this.refresh();
+};
+
+Window_GUIItemSlot.prototype.callOkHandler = function () {
+  this.activate();
+  let tower = this._towers[this.index()];
+  if (!tower) return;
+  $gameParty.gainItem($dataItems[tower.id], -1);
+  TowerDefenseManager.clearSelect();
+  TowerDefenseManager.selectTower(tower);
+  TowerDefenseManager.selectTowerMode();
+};
+
+Window_GUIItemSlot.prototype.onOk = function () {};
+
+Window_GUIItemSlot.prototype.processCursorMove = function () {
+  if (!this._selectKeyboard) return;
+  Window_Command.prototype.processCursorMove.call(this);
+};
+
+Window_GUIItemSlot.prototype.drawAllItems = function () {
+  const topIndex = this.topIndex();
+  for (let i = 0; i < this.maxVisibleItems(); i++) {
+    const index = topIndex + i;
+    if (index < this.maxItems()) {
+      this.drawItemBackground(index);
+      this.drawItem(index);
+    }
+  }
+};
+
+Window_GUIItemSlot.prototype.drawItemBackground = function (index) {
+  const rect = this.itemRect(index);
+  this.drawBackgroundRect(rect);
+  if (this.commandName(index)) {
+    let scale = 0.8;
+    let size = rect.width * scale;
+    this.drawIcon(
+      this.commandIconIndex(index),
+      rect.x + (rect.width - size) / 2,
+      rect.y + (rect.width - size) / 2,
+      size,
+      size
+    );
+  }
+};
+
+Window_GUIItemSlot.prototype.drawItem = function (index) {
+  const itemRect = this.itemRect(index);
+  const rect = this.itemLineRect(index);
+  const align = this.itemTextAlign();
+  this.resetTextColor();
+  this.changePaintOpacity(this.isCommandEnabled(index));
+  this.contents.fontSize = 12;
+  this.drawText(
+    this.commandName(index),
+    rect.x,
+    itemRect.height - 28,
+    rect.width,
+    align
+  );
+  const numItem = this.commandNumItem(index);
+  if (numItem > 1) {
+    let numSizeRect = new Rectangle(
+      itemRect.x,
+      itemRect.y,
+      UFC.UFCTD.HUDGUI.SETTINGS.itemNumSize,
+      UFC.UFCTD.HUDGUI.SETTINGS.itemNumSize
+    );
+    numSizeRect.x += itemRect.width - numSizeRect.width;
+    this.drawNumItem(numSizeRect, numItem);
+  }
+};
+
+Window_GUIItemSlot.prototype.drawIcon = function (
+  iconIndex,
+  x,
+  y,
+  width,
+  height
+) {
+  const bitmap = ImageManager.loadSystem("IconSet");
+  const pw = ImageManager.iconWidth;
+  const ph = ImageManager.iconHeight;
+  const sx = (iconIndex % 16) * pw;
+  const sy = Math.floor(iconIndex / 16) * ph;
+  this.contentsBack.blt(bitmap, sx, sy, pw, ph, x, y, width, height);
+};
+
+Window_GUIItemSlot.prototype.drawNumItem = function (rect, numItem) {
+  const c1 = "rgba(0, 0, 0, .6)";
+  const x = rect.x;
+  const y = rect.y;
+  const w = rect.width;
+  const h = rect.height;
+  this.contentsBack.fillRect(x, y, w, h, c1);
+  this.contentsBack.strokeRect(x, y, w, h, c1);
+  this.contentsBack.fontSize = Math.floor(w * 0.9);
+  this.contentsBack.drawText(
+    numItem,
+    x,
+    y,
+    rect.width,
+    rect.height + this.rowSpacing() / 2,
+    "center"
+  );
+  this.resetFontSettings();
+};
+
+Window_GUIItemSlot.prototype.maxCols = function () {
+  return UFC.UFCTD.HUDGUI.SETTINGS.itemCol;
+};
+
+Window_Command.prototype.commandNumItem = function (index) {
+  return this._list[index].numItem;
+};
+
+Window_Command.prototype.commandIconIndex = function (index) {
+  return this._list[index].iconIndex;
+};
+
+Window_GUIItemSlot.prototype.processTouch = function () {
+  Window_Command.prototype.processTouch.call(this);
+  if (this.isTouchedInsideFrame()) {
+    UFC.UFCTD.HUDGUI.MESSAGE.isHoverHUDItem = true;
+  } else {
+    UFC.UFCTD.HUDGUI.MESSAGE.isHoverHUDItem = false;
+    this.select(-1);
+  }
+};
+
+Window_GUIItemSlot.prototype.onTouchSelect = function (trigger) {
+  this._doubleTouch = false;
+  if (this.isCursorMovable()) {
+    const lastIndex = this.index();
+    const hitIndex = this.hitIndex();
+    if (hitIndex >= 0) {
+      if (hitIndex === this.index()) {
+        this._doubleTouch = true;
+      }
+      this.select(hitIndex);
+    }
+    if (this.index() !== lastIndex) {
+      this.playCursorSound();
+    }
+  }
+};
+
+Window_GUIItemSlot.prototype.isTouchInWindow = function () {
+  const touchPos = new Point(TouchInput.x, TouchInput.y);
+  const localPos = this.worldTransform.applyInverse(touchPos);
+  if (this.innerRect.contains(localPos.x, localPos.y)) {
+  }
+};
+
+Window_GUIItemSlot.prototype.addCommand = function (
+  name,
+  iconIndex,
+  numItem = 1,
+  enabled = true,
+  callback = null
+) {
+  this._list.push({
+    name: name,
+    iconIndex: iconIndex,
+    callback: callback,
+    numItem: numItem,
+    symbol: null,
+    enabled: enabled,
+    ext: null,
+  });
+};
+
+Window_GUIItemSlot.prototype.itemHeight = function () {
+  return UFC.UFCTD.HUDGUI.SETTINGS.itemSize;
+};
+
+Window_GUIItemSlot.prototype.itemWidth = function () {
+  return UFC.UFCTD.HUDGUI.SETTINGS.itemSize;
+};
+
+Window_GUIItemSlot.prototype.refresh = function () {
+  Window_Command.prototype.refresh.call(this);
+  this.clearCommandList();
+  this.select(-1);
+  this.makeCommandTowers();
+  this.drawAllItems();
+};
+
+Window_GUIItemSlot.prototype.makeCommandTowers = function () {
+  this._towers = $gameParty.towers();
+  let length =
+    this._towers.length < this.maxCols() ? this.maxCols() : this._towers.length;
+  for (let i = 0; i < length; i++) {
+    if (this._towers[i]) {
+      this.addCommand(
+        this._towers[i].name,
+        this._towers[i].iconindex,
+        $gameParty.numItems(this._towers[i]),
+        true
+      );
+    } else {
+      this.addCommand("", 0, 0, true);
+    }
+  }
 };
 
 function Window_TDHealth() {

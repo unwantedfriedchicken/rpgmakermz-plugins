@@ -13,6 +13,10 @@ PIXI.utils.isInRange = function (x1, y1, x2, y2, range) {
   );
 };
 
+PIXI.utils.lerp = function (v0, v1, t) {
+  return (1 - t) * v0 + t * v1;
+};
+
 SceneManager.getScene = function () {
   return this._scene;
 };
@@ -231,8 +235,14 @@ Game_Player.prototype.checkEventTower = function (x, y) {
 // const _Scene_Boot_loadSystemImages = Scene_Boot.prototype.loadSystemImages;
 // Scene_Boot.prototype.loadSystemImages = function () {
 //   _Scene_Boot_loadSystemImages.call(this);
-//   ImageManager.loadSystem("TDSet");
+//   ImageManager.loadSystem("TDSheets");
 // };
+
+UFC.UFCTD.ALIAS._Scene_Map_onMapTouch = Scene_Map.prototype.onMapTouch;
+Scene_Map.prototype.onMapTouch = function () {
+  if (UFC.UFCTD.HUDGUI.MESSAGE.isHoverHUDItem) return;
+  return UFC.UFCTD.ALIAS._Scene_Map_onMapTouch.call(this);
+};
 
 UFC.UFCTD.ALIAS._Scene_Map_updateCallMenu = Scene_Map.prototype.updateCallMenu;
 Scene_Map.prototype.updateCallMenu = function () {
@@ -250,6 +260,8 @@ UFC.UFCTD.ALIAS._Scene_Map_createAllWindows =
   Scene_Map.prototype.createAllWindows;
 Scene_Map.prototype.createAllWindows = function () {
   UFC.UFCTD.ALIAS._Scene_Map_createAllWindows.call(this);
+  UFC.UFCTD.HUDGUI.ITEMSLOT = new Window_GUIItemSlot();
+  this.addWindow(UFC.UFCTD.HUDGUI.ITEMSLOT);
   this.createGoldWindow();
   this.createTowerActionButtonWindow();
   this.createTDHealth();
@@ -284,15 +296,6 @@ Scene_Map.prototype.getTowerAction = function () {
   return this._towerActionButton;
 };
 // ----------------------------------- End HUD -------------------------
-
-UFC.UFCTD.ALIAS._Scene_ItemBase_applyItem = Scene_ItemBase.prototype.applyItem;
-Scene_ItemBase.prototype.applyItem = function () {
-  UFC.UFCTD.ALIAS._Scene_ItemBase_applyItem.apply(this, arguments);
-  if (this.item().ufcTower) {
-    TowerDefenseManager.selectTower(this.item().ufcTower);
-    SceneManager.goto(Scene_Map);
-  }
-};
 
 // Change Gold
 UFC.UFCTD.ALIAS._Game_Interpreter_command125 =
@@ -484,6 +487,12 @@ Game_Map.prototype.updateProjectile = function () {
   }
 };
 
+UFC.UFCTD.ALIAS._Game_Map_refresh = Game_Map.prototype.refresh;
+Game_Map.prototype.refresh = function () {
+  if (UFC.UFCTD.HUDGUI.ITEMSLOT) UFC.UFCTD.HUDGUI.ITEMSLOT.refresh();
+  UFC.UFCTD.ALIAS._Game_Map_refresh.call(this);
+};
+
 Spriteset_Map.prototype.checkLimitAnimation = function () {
   return (
     this._animationSprites.length > TowerDefenseManager.getLimitAnimation &&
@@ -531,4 +540,22 @@ Spriteset_Map.prototype.createCharacters = function () {
   if (TowerDefenseManager.getState != TowerDefenseManager.STATE.IDLE) {
     TowerDefenseManager.selectTowerMode();
   }
+};
+
+UFC.UFCTD.ALIAS._Game_Party_initAllItems = Game_Party.prototype.initAllItems;
+Game_Party.prototype.initAllItems = function () {
+  UFC.UFCTD.ALIAS._Game_Party_initAllItems.call(this);
+  this._towers = {};
+};
+
+UFC.UFCTD.ALIAS._Game_Party_itemContainer = Game_Party.prototype.itemContainer;
+Game_Party.prototype.itemContainer = function (item) {
+  if (item && (item.ufcTower || item.istowerdata)) {
+    return this._towers;
+  }
+  return UFC.UFCTD.ALIAS._Game_Party_itemContainer.call(this, item);
+};
+
+Game_Party.prototype.towers = function () {
+  return Object.keys(this._towers).map((id) => $dataItems[id].ufcTower);
 };

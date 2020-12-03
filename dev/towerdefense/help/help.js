@@ -4,25 +4,56 @@
 @plugindesc Add Tower Defense Mechanic
 @author Unwanted Fried Chicken
 
-@param setting.limitAnimation
+@param setting_limitAnimation
 @text Limit Animation
 @desc If frame rate become low because so many effect try limit the animation
 @type number
 
-@param setting.towerHealthVarId
+@param setting_towerHealthVarId
 @text Tower Health variable ID
 @desc This health of the tower set to your variable id
 @type variable
 
-@param setting.towerMaxHealthVarId
+@param setting_towerMaxHealthVarId
 @text Tower Max Health variable ID
 @desc This Max health of the tower set to your variable id
 @type variable
 
-@param setting.gameoverSwitchId
+@param setting_gameoverSwitchId
 @text Game Over Switch Id
 @desc When health <= 0 this switch will change to ON
 @type switch
+
+@param hudguiSettings
+@text HUD/GUI Settings
+
+@param gui_itemBackpackSlotSize
+@parent hudguiSettings
+@text Item Size
+@type number
+@desc Set the size of the item backpack slot
+@default 64
+
+@param gui_itemBackpackSlotCol
+@parent hudguiSettings
+@text Item Display Number
+@type number
+@desc Set the number item that display in backpack
+@default 12
+
+@param gui_itemBackpackBackgroundType
+@parent hudguiSettings
+@text Item Background Type
+@type number
+@desc Background type for window item, 0 = default, 1 = dim, 2 = nothing
+@default 0
+
+@param gui_itemBackpackNumSize
+@parent hudguiSettings
+@text Item Ammount Size
+@type number
+@desc Size of the numsize item
+@default 24
 
 @param towerSettings
 @text Tower Settings
