@@ -35,3 +35,8 @@ Window_BaseExtend.prototype.drawTextEx = function (text, x, y, width, align) {
   this.processAllText(textState);
   return textState.outputWidth;
 };
+
+Window_BaseExtend.prototype.clear = function () {
+  this.contents.clear();
+  this.contentsBack.clear();
+};

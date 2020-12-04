@@ -264,14 +264,30 @@ UFC.UFCTD.ALIAS._Scene_Map_createAllWindows =
   Scene_Map.prototype.createAllWindows;
 Scene_Map.prototype.createAllWindows = function () {
   UFC.UFCTD.ALIAS._Scene_Map_createAllWindows.call(this);
-  UFC.UFCTD.HUDGUI.ITEMSLOT = new Window_GUIItemSlot();
-  this.addWindow(UFC.UFCTD.HUDGUI.ITEMSLOT);
+  this.createHUDTD();
+
   this.createGoldWindow();
-  this.createTowerActionButtonWindow();
   this.createTDHealth();
 };
 
 // ----------------------------------- HUD --------------------------------
+Scene_Map.prototype.createHUDTD = function () {
+  UFC.UFCTD.HUDGUI.ITEMSLOT = new Window_GUIItemSlot();
+  this.addWindow(UFC.UFCTD.HUDGUI.ITEMSLOT);
+  let action = {
+    width: 300,
+    height: 240,
+  };
+  UFC.UFCTD.HUDGUI.TOWERACTION = new Window_TDAction(
+    new Rectangle(
+      360,
+      Graphics.boxHeight - action.height,
+      action.width,
+      action.height
+    )
+  );
+  this.addWindow(UFC.UFCTD.HUDGUI.TOWERACTION);
+};
 Scene_Map.prototype.createTDHealth = function () {
   let windowWidth = 200;
   this._TDHealthWindow = new Window_TDHealth(
@@ -289,16 +305,6 @@ Scene_Map.prototype.createGoldWindow = function () {
   this._goldWindow.visible = TowerDefenseManager.getHUDGold;
 };
 
-Scene_Map.prototype.createTowerActionButtonWindow = function () {
-  this._towerActionButton = new Window_TowerActionButton(
-    new Rectangle(100, Graphics.boxHeight - 200, Graphics.boxWidth - 200, 200)
-  );
-  this.addWindow(this._towerActionButton);
-};
-
-Scene_Map.prototype.getTowerAction = function () {
-  return this._towerActionButton;
-};
 // ----------------------------------- End HUD -------------------------
 
 // Change Gold
@@ -363,10 +369,6 @@ Game_Map.prototype.updateHealthHud = function () {
 
 Game_Map.prototype.ufcGetTowerDefenseList = function () {
   return this._towerDefenseList;
-};
-
-Game_Map.prototype.ufcTowerAction = function (towerData) {
-  SceneManager.getScene().getTowerAction().setTower(towerData);
 };
 
 // _characterSprites is used by rpgmaker engine to play animation

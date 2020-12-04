@@ -142,6 +142,9 @@ TowerDefenseManager.config = function (args) {
   $gameMap.updateHealthHud();
   $gameMap.ufcCalcGrid();
 
+  // Disable Open Menu
+  $gameSystem.disableMenu();
+
   this.cacheImage();
 };
 
@@ -154,33 +157,32 @@ TowerDefenseManager.cacheImage = function () {
 };
 
 TowerDefenseManager.actionTower = function (towerData, callback) {
-  SceneManager.getScene().getTowerAction().setTower(towerData, callback);
+  UFC.UFCTD.HUDGUI.TOWERACTION.setTower(towerData, callback);
 };
 
 TowerDefenseManager.selectTower = function (towerData) {
   this._state = TowerDefenseManager.STATE.BUILD;
   this._selectedUFCTD = new ufcTowerData(towerData);
   this._selectedUFCTD.setPlaceMode(true);
-  // Disable Open Menu
-  $gameSystem.disableMenu();
 };
 
-TowerDefenseManager.cancelSelect = function () {
+TowerDefenseManager.cancelSelect = function (sfx = true) {
   $gameParty.gainItem($dataItems[this._selectedUFCTD._id], 1);
   // SFX
-  AudioManager.playSe({
-    name: "Cancel1",
-    volume: 100,
-    pitch: 100,
-    pan: 0,
-  });
+  if (sfx)
+    AudioManager.playSe({
+      name: "Cancel1",
+      volume: 100,
+      pitch: 100,
+      pan: 0,
+    });
   this.clearSelect();
+  UFC.UFCTD.HUDGUI.ITEMSLOT.open();
 };
 
 TowerDefenseManager.clearSelect = function () {
   this._state = TowerDefenseManager.STATE.IDLE;
   this._selectedUFCTD = null;
-  $gameSystem.enableMenu();
   $gamePlayer.getGuideAction().setActive(false);
   if ($gamePlayer.getGuideActionGraphics().children.length > 0)
     $gamePlayer.getGuideActionGraphics().removeChildAt(0);
@@ -196,6 +198,7 @@ TowerDefenseManager.selectTowerMode = function () {
 
   $gamePlayer.getGuideActionGraphics().addChild(selectedTower);
   $gameMap.ufcGetGrid().setVisible(true);
+  UFC.UFCTD.HUDGUI.ITEMSLOT.close();
 };
 
 TowerDefenseManager.getSelectedTowerData = function () {
@@ -253,6 +256,8 @@ TowerDefenseManager.placeTower = function () {
   this._selectedUFCTD.setPlaceMode(false);
   $gameMap.ufcAddTower(this._selectedUFCTD);
   this._selectedUFCTD.setRangeVisibility(false);
+
+  UFC.UFCTD.HUDGUI.ITEMSLOT.open();
 
   this.clearSelect();
 

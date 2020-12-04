@@ -1,5 +1,6 @@
 const NAMEPLUGIN = "UFCTowerDefense";
-const PATHDEST = "../../";
+const NAMEFOLDER = "towerdefense/";
+const PATHDEST = "../";
 const DEFAULTTASK = [
   "concat:source",
   "concat:plugins",
@@ -12,11 +13,11 @@ module.exports = function (grunt) {
     pkg: grunt.file.readJSON("package.json"),
     watch: {
       files: [
-        "js/*.js",
-        "help/*.js",
-        "global/*.js",
-        "addon/*.js",
-        "plugins/*.js",
+        NAMEFOLDER + "js/*.js",
+        NAMEFOLDER + "help/*.js",
+        NAMEFOLDER + "global/*.js",
+        NAMEFOLDER + "addon/*.js",
+        NAMEFOLDER + "plugins/*.js",
       ],
       tasks: DEFAULTTASK,
     },
@@ -25,15 +26,15 @@ module.exports = function (grunt) {
     concat: {
       help: {
         dest: PATHDEST + NAMEPLUGIN + ".js",
-        src: ["help/help.js", PATHDEST + NAMEPLUGIN + ".js"],
+        src: [NAMEFOLDER + "help/help.js", PATHDEST + NAMEPLUGIN + ".js"],
       },
       globalVar: {
         dest: PATHDEST + NAMEPLUGIN + ".js",
-        src: ["global/*.js", PATHDEST + NAMEPLUGIN + ".js"],
+        src: [NAMEFOLDER + "global/*.js", PATHDEST + NAMEPLUGIN + ".js"],
       },
       plugins: {
         dest: PATHDEST + NAMEPLUGIN + ".js",
-        src: ["plugins/*.js", PATHDEST + NAMEPLUGIN + ".js"],
+        src: [NAMEFOLDER + "plugins/*.js", PATHDEST + NAMEPLUGIN + ".js"],
       },
       options: {
         // string to put between concatenated files
@@ -41,10 +42,8 @@ module.exports = function (grunt) {
         //separator: ';'
       },
       source: {
-        // files to concat together
-        src: ["js/*.js"],
-        // location of result file
         dest: PATHDEST + NAMEPLUGIN + ".js",
+        src: [NAMEFOLDER + "js/*.js"],
         options: {
           // banner: "(() => { \n 'use strict';\n",
           // footer: "})();",
@@ -57,13 +56,13 @@ module.exports = function (grunt) {
           '/*! <%= pkg.name %> <%= grunt.template.today("yyyy-mm-dd") %> */\n',
       },
       build: {
-        src: PATHDEST + NAMEPLUGIN + ".js",
         dest: PATHDEST + NAMEPLUGIN + ".min.js",
+        src: PATHDEST + NAMEPLUGIN + ".js",
       },
 
       buildwAddon: {
-        src: ["addon/*.js", PATHDEST + NAMEPLUGIN + ".js"],
         dest: PATHDEST + NAMEPLUGIN + ".min.js",
+        src: [NAMEFOLDER + "addon/*.js", PATHDEST + NAMEPLUGIN + ".js"],
       },
     },
   });

@@ -1617,6 +1617,7 @@ Sprite_ufcTDTower.prototype.resetRangeGraphics = function () {
     this._rangeGraphics.texture = rangeSprite;
   }
   _rangeGraphics.destroy();
+  this._rangeGraphics.visible = false;
 };
 
 Sprite_ufcTDTower.prototype.setSelectPosition = function () {
@@ -1705,8 +1706,9 @@ Sprite_ufcTDTower.prototype.characterBlockY = function () {
 };
 
 Sprite_ufcTDTower.prototype.setRangeVisibility = function (visible) {
-  if (visible) {
-    this._range = this._tower.getTowerData().getRange();
+  let _range = this._tower.getTowerData().getRange();
+  if (visible && this._range != _range) {
+    this._range = _range;
     this.resetRangeGraphics();
   }
   this._rangeGraphics.visible = visible;
@@ -1992,14 +1994,30 @@ UFC.UFCTD.ALIAS._Scene_Map_createAllWindows =
   Scene_Map.prototype.createAllWindows;
 Scene_Map.prototype.createAllWindows = function () {
   UFC.UFCTD.ALIAS._Scene_Map_createAllWindows.call(this);
-  UFC.UFCTD.HUDGUI.ITEMSLOT = new Window_GUIItemSlot();
-  this.addWindow(UFC.UFCTD.HUDGUI.ITEMSLOT);
+  this.createHUDTD();
+
   this.createGoldWindow();
-  this.createTowerActionButtonWindow();
   this.createTDHealth();
 };
 
 // ----------------------------------- HUD --------------------------------
+Scene_Map.prototype.createHUDTD = function () {
+  UFC.UFCTD.HUDGUI.ITEMSLOT = new Window_GUIItemSlot();
+  this.addWindow(UFC.UFCTD.HUDGUI.ITEMSLOT);
+  let action = {
+    width: 300,
+    height: 240,
+  };
+  UFC.UFCTD.HUDGUI.TOWERACTION = new Window_TDAction(
+    new Rectangle(
+      360,
+      Graphics.boxHeight - action.height,
+      action.width,
+      action.height
+    )
+  );
+  this.addWindow(UFC.UFCTD.HUDGUI.TOWERACTION);
+};
 Scene_Map.prototype.createTDHealth = function () {
   let windowWidth = 200;
   this._TDHealthWindow = new Window_TDHealth(
@@ -2017,16 +2035,6 @@ Scene_Map.prototype.createGoldWindow = function () {
   this._goldWindow.visible = TowerDefenseManager.getHUDGold;
 };
 
-Scene_Map.prototype.createTowerActionButtonWindow = function () {
-  this._towerActionButton = new Window_TowerActionButton(
-    new Rectangle(100, Graphics.boxHeight - 200, Graphics.boxWidth - 200, 200)
-  );
-  this.addWindow(this._towerActionButton);
-};
-
-Scene_Map.prototype.getTowerAction = function () {
-  return this._towerActionButton;
-};
 // ----------------------------------- End HUD -------------------------
 
 // Change Gold
@@ -2091,10 +2099,6 @@ Game_Map.prototype.updateHealthHud = function () {
 
 Game_Map.prototype.ufcGetTowerDefenseList = function () {
   return this._towerDefenseList;
-};
-
-Game_Map.prototype.ufcTowerAction = function (towerData) {
-  SceneManager.getScene().getTowerAction().setTower(towerData);
 };
 
 // _characterSprites is used by rpgmaker engine to play animation
@@ -2436,6 +2440,9 @@ TowerDefenseManager.config = function (args) {
   $gameMap.updateHealthHud();
   $gameMap.ufcCalcGrid();
 
+  // Disable Open Menu
+  $gameSystem.disableMenu();
+
   this.cacheImage();
 };
 
@@ -2448,33 +2455,32 @@ TowerDefenseManager.cacheImage = function () {
 };
 
 TowerDefenseManager.actionTower = function (towerData, callback) {
-  SceneManager.getScene().getTowerAction().setTower(towerData, callback);
+  UFC.UFCTD.HUDGUI.TOWERACTION.setTower(towerData, callback);
 };
 
 TowerDefenseManager.selectTower = function (towerData) {
   this._state = TowerDefenseManager.STATE.BUILD;
   this._selectedUFCTD = new ufcTowerData(towerData);
   this._selectedUFCTD.setPlaceMode(true);
-  // Disable Open Menu
-  $gameSystem.disableMenu();
 };
 
-TowerDefenseManager.cancelSelect = function () {
+TowerDefenseManager.cancelSelect = function (sfx = true) {
   $gameParty.gainItem($dataItems[this._selectedUFCTD._id], 1);
   // SFX
-  AudioManager.playSe({
-    name: "Cancel1",
-    volume: 100,
-    pitch: 100,
-    pan: 0,
-  });
+  if (sfx)
+    AudioManager.playSe({
+      name: "Cancel1",
+      volume: 100,
+      pitch: 100,
+      pan: 0,
+    });
   this.clearSelect();
+  UFC.UFCTD.HUDGUI.ITEMSLOT.open();
 };
 
 TowerDefenseManager.clearSelect = function () {
   this._state = TowerDefenseManager.STATE.IDLE;
   this._selectedUFCTD = null;
-  $gameSystem.enableMenu();
   $gamePlayer.getGuideAction().setActive(false);
   if ($gamePlayer.getGuideActionGraphics().children.length > 0)
     $gamePlayer.getGuideActionGraphics().removeChildAt(0);
@@ -2490,6 +2496,7 @@ TowerDefenseManager.selectTowerMode = function () {
 
   $gamePlayer.getGuideActionGraphics().addChild(selectedTower);
   $gameMap.ufcGetGrid().setVisible(true);
+  UFC.UFCTD.HUDGUI.ITEMSLOT.close();
 };
 
 TowerDefenseManager.getSelectedTowerData = function () {
@@ -2547,6 +2554,8 @@ TowerDefenseManager.placeTower = function () {
   this._selectedUFCTD.setPlaceMode(false);
   $gameMap.ufcAddTower(this._selectedUFCTD);
   this._selectedUFCTD.setRangeVisibility(false);
+
+  UFC.UFCTD.HUDGUI.ITEMSLOT.open();
 
   this.clearSelect();
 
@@ -2705,12 +2714,27 @@ ufcTowerData.prototype.initialize = function (data) {
   this._bulletCharacterName = data["bulletspritename"];
   this._bulletCharacterIndex = data["bulletspriteindex"];
   this._bulletCharacterIndexY = data["bulletspriteindexy"];
-  this._upgradeId = data["upgradeid"];
-  if (this._upgradeId != "?" && data["upgradeprice"] == "?") {
-    this._upgradePrice = $dataItems[this._upgradeId].price;
-  } else {
-    this._upgradePrice = data["upgradeprice"];
+  this._upgrade = [];
+  let listUpgrade = Object.keys(data).filter(
+    (item) => item.slice(0, 7) == "upgrade"
+  );
+  if (listUpgrade.length > 0) {
+    listUpgrade.forEach((item) => {
+      let _data = data[item].split("|");
+      let _price = 0;
+      if (_data.length == 1) {
+        _price = $dataItems[_data[0]].price;
+      } else {
+        _price = +_data[1];
+      }
+
+      this._upgrade.push({
+        id: +_data[0],
+        price: _price,
+      });
+    });
   }
+
   if (data["sellprice"] == "?") {
     this._sellPrice = $dataItems[this._id].price / 2;
   } else {
@@ -2843,6 +2867,10 @@ ufcTowerData.prototype.getAuras = function () {
 
 ufcTowerData.prototype.isHaveAura = function () {
   return this._auras.length > 0;
+};
+
+ufcTowerData.prototype.isHaveUpgrade = function () {
+  return this._upgrade.length > 0;
 };
 
 ufcTowerData.prototype.checkGetBuffs = function () {
@@ -3061,6 +3089,11 @@ Window_BaseExtend.prototype.drawTextEx = function (text, x, y, width, align) {
   return textState.outputWidth;
 };
 
+Window_BaseExtend.prototype.clear = function () {
+  this.contents.clear();
+  this.contentsBack.clear();
+};
+
 const Window_GUIItemSlot = function () {
   this.initialize(...arguments);
 };
@@ -3092,15 +3125,43 @@ Window_GUIItemSlot.prototype.callOkHandler = function () {
   this.activate();
   let tower = this._towers[this.index()];
   if (!tower) return;
+  $gamePlayer.getGuideAction().resetParent();
   $gameParty.gainItem($dataItems[tower.id], -1);
   TowerDefenseManager.clearSelect();
   TowerDefenseManager.selectTower(tower);
   TowerDefenseManager.selectTowerMode();
+  this._selectKeyboard = false;
+  $gameMessage.setWindowTower(false);
 };
 
-Window_GUIItemSlot.prototype.onOk = function () {};
+Window_GUIItemSlot.prototype.activeKeyboard = function () {
+  $gameMessage.setWindowTower(true);
+  this._selectKeyboard = true;
+  this.activate();
+  this.select(0);
+};
+
+Window_GUIItemSlot.prototype.deactiveKeyboard = function () {
+  this._selectKeyboard = false;
+  $gameMessage.setWindowTower(false);
+  this.select(-1);
+  this.deactivate();
+};
 
 Window_GUIItemSlot.prototype.processCursorMove = function () {
+  if (this.isCancelTriggered() && this._selectKeyboard) {
+    this.deactiveKeyboard();
+    return;
+  }
+
+  if (
+    this.isCancelTriggered() &&
+    !this._selectKeyboard &&
+    TowerDefenseManager.getState != TowerDefenseManager.STATE.BUILD
+  ) {
+    this.activeKeyboard();
+  }
+
   if (!this._selectKeyboard) return;
   Window_Command.prototype.processCursorMove.call(this);
 };
@@ -3210,9 +3271,12 @@ Window_GUIItemSlot.prototype.processTouch = function () {
   Window_Command.prototype.processTouch.call(this);
   if (this.isTouchedInsideFrame()) {
     UFC.UFCTD.HUDGUI.MESSAGE.isHoverHUDItem = true;
+    this.activate();
   } else {
+    if (this._selectKeyboard) return;
     UFC.UFCTD.HUDGUI.MESSAGE.isHoverHUDItem = false;
     this.select(-1);
+    this.deactivate();
   }
 };
 
@@ -3292,6 +3356,636 @@ Window_GUIItemSlot.prototype.makeCommandTowers = function () {
   }
 };
 
+function Window_TDAction() {
+  this.initialize(...arguments);
+}
+
+Window_TDAction.prototype = Object.create(Window_Command.prototype);
+Window_TDAction.prototype.constructor = Window_TDAction;
+
+Window_TDAction.prototype.initialize = function (rect) {
+  Window_Command.prototype.initialize.call(this, rect);
+  this._lineHeight = Window_Command.prototype.lineHeight();
+  this._defaultLineHeight = this._lineHeight;
+  this._towerData = null;
+  this._towerDataDestroyCallback = null;
+  this._selected = false;
+  this.setBackgroundType(0);
+
+  // this.setHandler("ok", this.onOk.bind(this));
+  this.setHandler("cancel", this.onCancel.bind(this));
+
+  let statusWidth = this.x;
+  let statusHeight = 240;
+  this.status = new Window_TDStatus(
+    new Rectangle(
+      -statusWidth,
+      this.height - statusHeight,
+      statusWidth,
+      statusHeight
+    )
+  );
+  this.addChild(this.status);
+
+  let upgradeWidth = 250;
+  let upgradeHeight = this.height;
+  this.upgradeWindow = new Window_TDActionUpgrade(
+    new Rectangle(
+      this.width,
+      this.height - upgradeHeight,
+      upgradeWidth,
+      upgradeHeight
+    )
+  );
+  this.addChild(this.upgradeWindow);
+
+  this.upgradeWindow.on("upgradeTower", this.upgradeTower, this);
+  this.upgradeWindow.on("selectUpgradeWindow", this.selectUpgradeWindow, this);
+
+  this.hide();
+  this.close();
+};
+
+Window_TDAction.prototype.colSpacing = function () {
+  return this.rowSpacing();
+};
+
+Window_TDAction.prototype.maxCols = function () {
+  return 2;
+};
+
+Window_TDAction.prototype.itemHeight = function () {
+  let item = 3;
+  return this.height / item - (item - 1) * this.rowSpacing();
+};
+
+Window_TDAction.prototype.selectUpgradeWindow = function (isSelect) {
+  if (isSelect) this.deactivate();
+  else this.activate();
+  this.select(1);
+};
+
+Window_TDAction.prototype.upgradeTower = function (upgradeIndex) {
+  AudioManager.playSe({
+    name: "Coin",
+    volume: 80,
+    pitch: 100,
+    pan: 0,
+  });
+  $gameParty.gainGold(-+this._towerData._upgrade[upgradeIndex].price);
+  $gameMap.updateGoldHud();
+  // Upgrade
+  $gamePlayer.getGuideAction().resetParent();
+  TowerDefenseManager.selectTower(
+    $dataItems[this._towerData._upgrade[upgradeIndex].id].ufcTower
+  );
+  TowerDefenseManager.selectTowerMode();
+  TowerDefenseManager.placeTower();
+  this._towerDataDestroyCallback();
+  this.close();
+};
+
+Window_TDAction.prototype.callOkHandler = function () {
+  switch (this.index()) {
+    // Move
+    case 0:
+      $gamePlayer.getGuideAction().resetParent();
+      TowerDefenseManager.selectTower($dataItems[this._towerData._id].ufcTower);
+      TowerDefenseManager.selectTowerMode();
+      this._towerDataDestroyCallback();
+      break;
+    // Upgrade
+    case 1:
+      if (this._towerData.isHaveUpgrade()) {
+        this._selected = true;
+        this.upgradeWindow._selected = true;
+        this.upgradeWindow.activate();
+        this.upgradeWindow.refreshStatus(0);
+        this.upgradeWindow.select(0);
+
+        this.deactivate();
+        return;
+      }
+      break;
+    // Pickup
+    case 2:
+      TowerDefenseManager.selectTower($dataItems[this._towerData._id].ufcTower);
+      TowerDefenseManager.cancelSelect(false);
+      this._towerDataDestroyCallback();
+      break;
+    // Sell
+    case 3:
+      AudioManager.playSe({
+        name: "Coin",
+        volume: 80,
+        pitch: 100,
+        pan: 0,
+      });
+      $gameParty.gainGold(+this._towerData._sellPrice);
+      $gameMap.updateGoldHud();
+      this._towerDataDestroyCallback();
+      UFC.UFCTD.HUDGUI.ITEMSLOT.open();
+      break;
+    // Cancel
+    case 4:
+      UFC.UFCTD.HUDGUI.ITEMSLOT.open();
+      break;
+  }
+  this.close();
+};
+
+Window_TDAction.prototype.close = function () {
+  if (this._towerData) this._towerData.setRangeVisibility(false);
+
+  for (const child of this.children) {
+    if (child.close) {
+      child.close();
+    }
+  }
+  Window_Command.prototype.close.call(this);
+  $gameMessage.setWindowTower(false);
+};
+
+Window_TDAction.prototype.setTower = function (ufcTowerData, callback) {
+  this._towerData = ufcTowerData;
+  this._towerDataDestroyCallback = callback;
+  this.refresh();
+  this.addCommand("\\FS[20]Move", 0, true);
+
+  let isThereAnUpgrade = false;
+  let upgradeText = "\\FS[20]\\C[7]Upgrade";
+  if (this._towerData.isHaveUpgrade()) {
+    isThereAnUpgrade = true;
+    upgradeText = "\\FS[20]Upgrade";
+  }
+  this.addCommand(upgradeText, 2, isThereAnUpgrade);
+  this.addCommand("\\FS[20]Pickup", 4, true);
+  this.addCommand(
+    "\\FS[16]Sell\\FS\n\\FS[20]" +
+      "\\C[14]" +
+      this._towerData._sellPrice +
+      "\\C " +
+      TextManager.currencyUnit,
+    1
+  );
+  this.addCommand("Cancel", 3, true);
+  this.drawAllItems();
+  this.open();
+  this.show();
+  this.activate();
+  this.select(0);
+  this.status.drawDefaultStatus(this._towerData);
+  this.status.open();
+  if (isThereAnUpgrade) {
+    this.upgradeWindow.setUpgrade(this._towerData._upgrade);
+  }
+  this._towerData.setRangeVisibility(true);
+  UFC.UFCTD.HUDGUI.ITEMSLOT.close();
+};
+
+Window_TDAction.prototype.cursorDown = function (wrap) {
+  if (this.index() === this.maxItems() - this.maxCols() && wrap) {
+    this.smoothSelect(this.maxItems() - 1);
+  } else {
+    Window_Command.prototype.cursorDown.call(this, wrap);
+  }
+};
+
+Window_TDAction.prototype.itemRect = function (index) {
+  let rect = Window_Command.prototype.itemRect.call(this, index);
+  if (index === this.maxItems() - 1) {
+    rect.width *= 2;
+    rect.width += this.colSpacing();
+  }
+  return rect;
+};
+
+Window_TDAction.prototype.open = function () {
+  SoundManager.playOk();
+  Window_Command.prototype.open.call(this);
+};
+
+Window_TDAction.prototype.onCancel = function () {
+  UFC.UFCTD.HUDGUI.ITEMSLOT.open();
+  this.close();
+};
+
+Window_TDAction.prototype.addCommand = function (
+  name,
+  icon,
+  enabled = true,
+  callback = null
+) {
+  this._list.push({
+    name: name,
+    icon: icon,
+    callback: callback,
+    symbol: null,
+    enabled: enabled,
+    ext: null,
+  });
+};
+
+Window_TDAction.prototype.drawIconTD = function (index, x, y, align) {
+  const bitmap = ImageManager.loadSystem("TDSet");
+  const pw = 48;
+  const ph = 48;
+  if (align == "center") {
+    x += this.itemWidth() / 2;
+    x -= pw / 2;
+  } else if (align == "right") {
+    let _x = x;
+    x = this.itemWidth();
+    x -= pw;
+    x -= _x;
+  }
+  const sx = (index % pw) * pw;
+  const sy = Math.floor(index / ph) * ph;
+  this.contents.blt(bitmap, sx, sy, pw, ph, x, y, pw * 0.8, ph * 0.8);
+};
+
+Window_TDAction.prototype.drawTextEx = function (text, x, y, width, align) {
+  if (align == "center") {
+    let textWidth = this.textSizeEx(text).width;
+    x += this.itemWidth() / 2;
+    x -= textWidth / 2;
+    x -= this.itemPadding() * 2;
+  }
+  this.resetFontSettings();
+  const textState = this.createTextState(text, x, y, width);
+  this.processAllText(textState);
+
+  return textState.outputWidth;
+};
+
+Window_TDAction.prototype.drawItem = function (index) {
+  const rect = this.itemLineRect(index);
+  this.resetTextColor();
+  // this.changePaintOpacity(this.isCommandEnabled(index));
+  this.drawIconTD(this._list[index].icon, rect.x, rect.y);
+  let textY = rect.y;
+  if (index == 3) {
+    this.setLineHeight(24);
+    textY -= 5;
+  }
+  this.drawTextEx(this.commandName(index), rect.x + 48, textY, 200);
+  if (index == 3) {
+    this.resetLineHeight();
+  }
+};
+
+// Enable sound when cursor hover the button
+Window_TDAction.prototype.onTouchSelect = function (trigger) {
+  this._doubleTouch = false;
+  if (this.isCursorMovable()) {
+    const lastIndex = this.index();
+    const hitIndex = this.hitIndex();
+    if (hitIndex >= 0) {
+      if (hitIndex === this.index()) {
+        this._doubleTouch = true;
+      }
+      this.select(hitIndex);
+    }
+    if (this.index() !== lastIndex) {
+      this.playCursorSound();
+    }
+  }
+};
+
+Window_TDAction.prototype.processTouch = function () {
+  Window_Command.prototype.processTouch.call(this);
+  if (this.isTouchedInsideFrame() && !this.active && !this._selected) {
+    this.activate();
+  }
+};
+
+Window_TDAction.prototype.update = function () {
+  Window_Command.prototype.update.call(this);
+  // this.updateChildren();
+};
+
+Window_TDAction.prototype.updateChildren = function () {
+  for (const child of this.children) {
+    if (child.update) {
+      child.update();
+    }
+  }
+};
+
+Window_TDAction.prototype.refresh = function () {
+  for (const child of this.children) {
+    if (child.contents) {
+      child.contents.clear();
+    }
+  }
+  Window_Command.prototype.refresh.call(this);
+};
+
+Window_TDAction.prototype.lineHeight = function () {
+  return this._lineHeight;
+};
+
+Window_TDAction.prototype.setLineHeight = function (lineheight) {
+  this._lineHeight = lineheight;
+};
+
+Window_TDAction.prototype.resetLineHeight = function () {
+  this._lineHeight = this._defaultLineHeight;
+};
+
+Window_TDAction.prototype.destroy = function () {
+  this.upgradeWindow.removeListener("upgradeTower", this.upgradeTower);
+  this.upgradeWindow.removeListener(
+    "selectUpgradeWindow",
+    this.selectUpgradeWindow
+  );
+  Window_Command.prototype.destroy.call(this);
+};
+
+function Window_TDActionUpgrade() {
+  this.initialize(...arguments);
+}
+
+Window_TDActionUpgrade.prototype = Object.create(Window_Command.prototype);
+Window_TDActionUpgrade.prototype.constructor = Window_TDActionUpgrade;
+
+Window_TDActionUpgrade.prototype.initialize = function (rect) {
+  Window_Command.prototype.initialize.call(this, rect);
+  this._tmpIndex = 0;
+  this._lineHeight = Window_Command.prototype.lineHeight();
+  this._selected = false;
+  this._defaultLineHeight = this._lineHeight;
+  this._upgradeData = [];
+  let titleHeight = 60;
+  this._title = new Window_BaseExtend(
+    new Rectangle(0, -titleHeight, this.width, titleHeight)
+  );
+  this._title.setBackgroundType(2);
+  this.addChild(this._title);
+
+  let statusWidth = 360;
+  let statusHeight = 240;
+  this.status = new Window_TDStatus(
+    new Rectangle(this.width, 0, statusWidth, statusHeight)
+  );
+  this.addChild(this.status);
+
+  this.setHandler("cancel", this.onCancel.bind(this));
+
+  this.setBackgroundType(0);
+};
+
+Window_TDActionUpgrade.prototype.onCancel = function () {
+  this._selected = false;
+  this.windowHovered(false, true);
+};
+
+Window_TDActionUpgrade.prototype.maxCols = function () {
+  return 1;
+};
+
+Window_TDActionUpgrade.prototype.itemHeight = function () {
+  let item = 3;
+  return this.height / item - (item - 1) * this.rowSpacing();
+};
+
+Window_TDActionUpgrade.prototype.close = function () {
+  for (const child of this.children) {
+    if (child.close) {
+      child.close();
+    }
+  }
+  Window_Command.prototype.close.call(this);
+};
+
+Window_TDActionUpgrade.prototype.callOkHandler = function () {
+  let upgradeData = this._upgradeData[this.index()];
+  if ($gameParty.gold() >= upgradeData.price) {
+    this.emit("upgradeTower", this.index());
+    this._selected = false;
+    this.deactivate();
+  } else {
+    SoundManager.playBuzzer();
+  }
+};
+
+Window_TDActionUpgrade.prototype.setUpgrade = function (upgradeData) {
+  this.refresh();
+  this._title.clear();
+  this._upgradeData = [];
+  this.setLineHeight(28);
+  upgradeData.forEach((item) => {
+    let upgradeData = {
+      data: $dataItems[item.id].ufcTower,
+      price: item.price,
+    };
+    this.addCommand(
+      "\\FS[20]" +
+        upgradeData.data.name +
+        "\n\\C[14]" +
+        upgradeData.price +
+        "\\C " +
+        TextManager.currencyUnit,
+      upgradeData.data.character,
+      upgradeData.data.characterindex,
+      true
+    );
+    this._upgradeData.push(upgradeData);
+  });
+  this.drawTitle();
+  this.drawAllItems();
+  this.open();
+  this.status.open();
+  this.deactivate();
+  this.select(-1);
+};
+
+Window_TDActionUpgrade.prototype.drawTitle = function () {
+  const c1 = ColorManager.itemBackColor1();
+  const c2 = ColorManager.itemBackColor2();
+  let pad = 2;
+  let w = this.contentsWidth() - pad;
+  let h = this._title.contents.fontSize + 10;
+  this._title.contentsBack.gradientFillRect(0, 0, w, h, c1, c2, true);
+  this._title.drawText("UPGRADE", 0, 0, w, "center");
+  this._title.open();
+  this._title.show();
+};
+
+Window_TDActionUpgrade.prototype.processTouch = function () {
+  Window_Command.prototype.processTouch.call(this);
+  if (this.isClosed()) return;
+  if ((this.isTouchedInsideFrame() || this._selected) && !this.active) {
+    this.windowHovered(true);
+  } else if (!this.isTouchedInsideFrame() && !this._selected && this.active) {
+    this.windowHovered(false);
+  }
+};
+
+Window_TDActionUpgrade.prototype.windowHovered = function (
+  isHovered,
+  emit = true
+) {
+  if (isHovered) {
+    this.activate();
+    this.refreshStatus(0);
+    this._selected = false;
+  } else {
+    this.deactivate();
+    this.select(-1);
+  }
+  if (emit) this.emit("selectUpgradeWindow", isHovered);
+};
+
+Window_TDActionUpgrade.prototype.open = function () {
+  SoundManager.playOk();
+  Window_Command.prototype.open.call(this);
+};
+
+Window_TDActionUpgrade.prototype.addCommand = function (
+  name,
+  character,
+  characterIndex,
+  enabled = true,
+  callback = null
+) {
+  this._list.push({
+    name: name,
+    character: character,
+    characterIndex: characterIndex,
+    callback: callback,
+    symbol: null,
+    enabled: enabled,
+    ext: null,
+  });
+};
+
+Window_TDActionUpgrade.prototype.drawCharacter = function (
+  character,
+  characterIndex,
+  x,
+  y
+) {
+  let characterImage = ImageManager.loadCharacter(character);
+  let pw = characterImage.width / 12;
+  let ph = characterImage.height / 8;
+  let sx = ((characterIndex % 4) * 3 + 1) * pw;
+  let sy = (Math.floor(characterIndex / 4) * 4 + 0) * ph;
+  let scale = 0.8;
+
+  this.contents.blt(
+    characterImage,
+    sx,
+    sy,
+    pw,
+    ph,
+    x,
+    y,
+    pw * scale,
+    ph * scale
+  );
+};
+
+Window_TDActionUpgrade.prototype.drawTextEx = function (
+  text,
+  x,
+  y,
+  width,
+  align
+) {
+  if (align == "center") {
+    let textWidth = this.textSizeEx(text).width;
+    x += this.itemWidth() / 2;
+    x -= textWidth / 2;
+    x -= this.itemPadding() * 2;
+  }
+  this.resetFontSettings();
+  const textState = this.createTextState(text, x, y, width);
+  this.processAllText(textState);
+
+  return textState.outputWidth;
+};
+
+Window_TDActionUpgrade.prototype.drawItem = function (index) {
+  const rect = this.itemLineRect(index);
+  this.resetTextColor();
+  this.drawCharacter(
+    this._list[index].character,
+    this._list[index].characterIndex,
+    rect.x,
+    rect.y
+  );
+  let textY = rect.y - 10;
+  this.drawTextEx(this.commandName(index), rect.x + 48, textY, 200);
+};
+
+// Enable sound when cursor hover the button
+Window_TDActionUpgrade.prototype.onTouchSelect = function (trigger) {
+  this._doubleTouch = false;
+  if (this.isCursorMovable()) {
+    const lastIndex = this.index();
+    const hitIndex = this.hitIndex();
+    if (hitIndex >= 0) {
+      if (hitIndex === this.index()) {
+        this._doubleTouch = true;
+      }
+      this.select(hitIndex);
+    }
+    if (this.index() !== lastIndex) {
+      this.playCursorSound();
+    }
+  }
+};
+
+Window_TDActionUpgrade.prototype.refreshStatus = function (index) {
+  this.status.drawDefaultStatus(
+    new ufcTowerData(this._upgradeData[index].data)
+  );
+};
+
+Window_TDActionUpgrade.prototype.select = function (index) {
+  if (this._tmpIndex !== index && index !== -1 && this.status) {
+    this._tmpIndex = index;
+    this.refreshStatus(index);
+  }
+  Window_Command.prototype.select.call(this, index);
+};
+
+Window_TDActionUpgrade.prototype.update = function () {
+  Window_Command.prototype.update.call(this);
+  this.updateChildren();
+};
+
+Window_TDActionUpgrade.prototype.updateChildren = function () {
+  for (const child of this.children) {
+    if (child.update) {
+      child.update();
+    }
+  }
+};
+
+Window_TDActionUpgrade.prototype.refresh = function () {
+  for (const child of this.children) {
+    if (child.contents) {
+      child.contents.clear();
+      child.contentsBack.clear();
+    }
+  }
+  Window_Command.prototype.refresh.call(this);
+};
+
+Window_TDActionUpgrade.prototype.lineHeight = function () {
+  return this._lineHeight;
+};
+
+Window_TDActionUpgrade.prototype.setLineHeight = function (lineheight) {
+  this._lineHeight = lineheight;
+};
+
+Window_TDActionUpgrade.prototype.resetLineHeight = function () {
+  this._lineHeight = this._defaultLineHeight;
+};
+
 function Window_TDHealth() {
   this.initialize(...arguments);
 }
@@ -3355,173 +4049,31 @@ Window_TDHealth.prototype.open = function () {
   Window_Selectable.prototype.open.call(this);
 };
 
-function Window_TowerActionButton() {
+function Window_TDStatus() {
   this.initialize(...arguments);
 }
 
-Window_TowerActionButton.prototype = Object.create(
-  Window_HorzCommand.prototype
-);
-Window_TowerActionButton.prototype.constructor = Window_TowerActionButton;
+Window_TDStatus.prototype = Object.create(Window_BaseExtend.prototype);
+Window_TDStatus.prototype.constructor = Window_TDStatus;
 
-Window_TowerActionButton.prototype.initialize = function (rect) {
-  Window_HorzCommand.prototype.initialize.call(this, rect);
-  this._towerData = null;
-  this._towerDataDestroyCallback = null;
-  this.setBackgroundType(0);
-
-  this.setHandler("ok", this.onOk.bind(this));
-  this.setHandler("cancel", this.onCancel.bind(this));
-
-  this.statusWindow1 = new Window_BaseExtend(
-    new Rectangle(0, -rect.height - 130, 200, rect.height + 130)
-  );
-  this.addChild(this.statusWindow1);
-
-  this.statusWindow2 = new Window_BaseExtend(
-    new Rectangle(
-      this.statusWindow1.width,
-      -this.statusWindow1.height,
-      this.statusWindow1.width,
-      this.statusWindow1.height
-    )
-  );
-
-  this.addChild(this.statusWindow2);
-
-  this.hide();
-  this.close();
+Window_TDStatus.prototype.initialize = function (rect) {
+  Window_BaseExtend.prototype.initialize.call(this, rect);
 };
 
-Window_TowerActionButton.prototype.onOk = function () {
-  switch (this.index()) {
-    // Move
-    case 0:
-      $gamePlayer.getGuideAction().resetParent();
-      TowerDefenseManager.selectTower($dataItems[this._towerData._id].ufcTower);
-      TowerDefenseManager.selectTowerMode();
-      this._towerDataDestroyCallback();
-      break;
-    // Upgrade
-    case 1:
-      if (this._towerData._upgradeId != "?") {
-        if ($gameParty.gold() >= this._towerData._upgradePrice) {
-          AudioManager.playSe({
-            name: "Coin",
-            volume: 80,
-            pitch: 100,
-            pan: 0,
-          });
-          $gameParty.gainGold(-+this._towerData._upgradePrice);
-          $gameMap.updateGoldHud();
-          // Upgrade
-          $gamePlayer.getGuideAction().resetParent();
-          TowerDefenseManager.selectTower(
-            $dataItems[this._towerData._upgradeId].ufcTower
-          );
-          TowerDefenseManager.selectTowerMode();
-          TowerDefenseManager.placeTower();
-          this._towerDataDestroyCallback();
-        } else {
-          SoundManager.playBuzzer();
-          this.activate();
-          return;
-        }
-      }
-      break;
-    // Sell
-    case 2:
-      AudioManager.playSe({
-        name: "Coin",
-        volume: 80,
-        pitch: 100,
-        pan: 0,
-      });
-      $gameParty.gainGold(+this._towerData._sellPrice);
-      $gameMap.updateGoldHud();
-      this._towerDataDestroyCallback();
-      break;
-  }
-  this.close();
-};
-
-Window_TowerActionButton.prototype.close = function () {
-  if (this._towerData) this._towerData.setRangeVisibility(false);
-
-  for (const child of this.children) {
-    if (child.close) {
-      child.close();
-    }
-  }
-  Window_HorzCommand.prototype.close.call(this);
-  $gameMessage.setWindowTower(false);
-  UFC.UFCTD.HUDGUI.ITEMSLOT.open();
-};
-
-Window_TowerActionButton.prototype.setTower = function (
-  ufcTowerData,
-  callback
-) {
-  this._towerData = ufcTowerData;
-  this._towerDataDestroyCallback = callback;
-  this.refresh();
-  this.addCommand("MOVE", 0, true);
-
-  if (this._towerData._upgradeId != "?") {
-    this.addCommand(
-      "Upgrade " +
-        "\\C[14]" +
-        this._towerData._upgradePrice +
-        "\\C " +
-        TextManager.currencyUnit,
-      2,
-      true
-    );
-    this.statusWindow2.show();
-  } else {
-    this.addCommand("Upgrade", 2, false);
-    // hide upgrade window
-    this.statusWindow2.hide();
-  }
-  this.addCommand(
-    "Sell " +
-      "\\C[14]" +
-      this._towerData._sellPrice +
-      "\\C " +
-      TextManager.currencyUnit,
-    1
-  );
-  this.addCommand("Cancel", 3, true);
-  this.drawAllItems();
-  this.drawTowerStatus(0, 0, "center");
-  this.open();
-  this.statusWindow1.open();
-  this.show();
-  this.activate();
-  this.select(0);
-  this._towerData.setRangeVisibility(true);
-  UFC.UFCTD.HUDGUI.ITEMSLOT.close();
-};
-
-Window_TowerActionButton.prototype.open = function () {
-  SoundManager.playOk();
-  Window_HorzCommand.prototype.open.call(this);
-};
-
-Window_TowerActionButton.prototype.drawTowerStatus = function (x, y, align) {
-  let characterImage = ImageManager.loadCharacter(this._towerData._character);
-  let characterIndex = this._towerData._characterIndex;
+Window_TDStatus.prototype.drawDefaultStatus = function (towerData) {
+  this.contents.clear();
+  this.contentsBack.clear();
+  let x = 0;
+  let y = 0;
+  let characterImage = ImageManager.loadCharacter(towerData._character);
+  let characterIndex = towerData._characterIndex;
   let pw = characterImage.width / 12;
   let ph = characterImage.height / 8;
   let sx = ((characterIndex % 4) * 3 + 1) * pw;
   let sy = (Math.floor(characterIndex / 4) * 4 + 0) * ph;
-  let scale = 1.5;
-  if (align == "center") {
-    x += this.statusWindow1.width / 2;
-    x -= (pw * scale) / 2;
-    x -= this.statusWindow1.itemPadding();
-  }
-  this.statusWindow1.contents.blt(
+  let scale = 1.6;
+
+  this.contents.blt(
     characterImage,
     sx,
     sy,
@@ -3532,327 +4084,128 @@ Window_TowerActionButton.prototype.drawTowerStatus = function (x, y, align) {
     pw * scale,
     ph * scale
   );
+  let xCharacter = pw * scale;
+  this.contents.fontSize = 23;
+  const c1 = ColorManager.itemBackColor1();
+  const c2 = ColorManager.itemBackColor2();
+  let pad = 2;
+  let statusX = xCharacter + pad / 2;
+  let w = this.contentsWidth() - xCharacter - pad;
+  let h = this.contents.fontSize + 10;
+  this.contentsBack.gradientFillRect(statusX, 0, w, h, c1, c2, true);
+  this.drawText(towerData._name, statusX, 0, w, "center");
 
-  let textY = 100;
-  let textX = 10;
-  let textHeight = 28;
-  let textValueX = 110;
-  let fontSize = 17;
-  let status = ["Attack", "Range", "Attack Speed", "Bullet Speed"];
+  // let textY = ph * scale + 30;
+  let textY = h;
+  let textX = statusX;
+  let textX2 = 110;
+  let textXValue = 20;
+  let textHeight = 24;
+  let status = ["Attack", "Range", "ASPD", "BSPD"];
   let statusValue = [
-    this._towerData.getBaseAttack,
-    this._towerData.getBaseRange,
-    this._towerData.getBaseAttackSpeed,
-    this._towerData._bulletSpeed,
+    towerData.getBaseAttack,
+    towerData.getBaseRange,
+    towerData.getBaseAttackSpeed,
+    towerData._bulletSpeed,
   ];
+  this.contents.fontSize = 14;
 
-  this.statusWindow1.contents.fontSize = fontSize + 3;
-  this.statusWindow1.drawText(
-    this._towerData._name,
-    textX,
-    ph + 20,
-    150,
-    "center"
-  );
-
-  this.statusWindow1.contents.fontSize = fontSize;
   for (let i = 0; i < status.length; i++) {
-    this.statusWindow1.resetTextColor();
-    this.statusWindow1.drawText(status[i], textX, textY + i * textHeight, 150);
-    this.statusWindow1.changeTextColor(ColorManager.systemColor());
-    this.statusWindow1.drawText(
-      statusValue[i],
-      textX + textValueX,
-      textY + i * textHeight,
-      150
+    this.drawText(
+      status[i],
+      textX + (i % 2) * (textXValue + textX2),
+      textY + Math.floor(i / 2) * textHeight,
+      100
     );
   }
 
-  //TODO: need rework window, this is only for test
-  // Draw Buffs
-  let textBuffX = 30;
-  this.statusWindow1.contents.fontSize = fontSize - 6;
-  this.statusWindow1.resetTextColor();
+  this.changeTextColor(ColorManager.systemColor());
+  for (let i = 0; i < statusValue.length; i++) {
+    this.drawText(
+      statusValue[i],
+      textX + (i % 2) * (textXValue + textX2),
+      textY + Math.floor(i / 2) * textHeight,
+      80,
+      "right"
+    );
+  }
+  this.resetTextColor();
 
   let statusBuff = [];
-  if (this._towerData.getBuffs(TowerDefenseManager.AURATYPE.ATTACK) != 0) {
-    let _attack = this._towerData.getAttack();
-    statusBuff[0] = {
-      value: _attack,
-      color:
-        this._towerData.getBaseAttack > _attack
-          ? ColorManager.powerDownColor()
-          : ColorManager.powerUpColor(),
-    };
+  let buffSymbol = "+";
+  let buffColor = ColorManager.powerUpColor();
+  let buffValue = towerData.getBuffs(TowerDefenseManager.AURATYPE.ATTACK);
+  if (towerData.getAttack() < towerData.getBaseAttack) {
+    buffColor = ColorManager.powerDownColor();
+    buffSymbol = "";
   }
-  if (this._towerData.getBuffs(TowerDefenseManager.AURATYPE.RANGE) != 0) {
-    let _range = this._towerData.getRange();
-    statusBuff[1] = {
-      value: _range,
-      color:
-        this._towerData.getBaseRange > _range
-          ? ColorManager.powerDownColor()
-          : ColorManager.powerUpColor(),
-    };
+  statusBuff[0] = {
+    value: buffSymbol + buffValue,
+    color: buffColor,
+  };
+
+  buffValue = towerData.getBuffs(TowerDefenseManager.AURATYPE.RANGE);
+  if (towerData.getRange() < towerData.getBaseRange) {
+    buffColor = ColorManager.powerDownColor();
+    buffSymbol = "";
   }
-  if (this._towerData.getBuffs(TowerDefenseManager.AURATYPE.ATTACKSPEED) != 0) {
-    let _aspd = this._towerData.getAttackSpeed();
-    statusBuff[2] = {
-      value: _aspd,
-      color:
-        this._towerData.getBaseAttackSpeed < _aspd
-          ? ColorManager.powerDownColor()
-          : ColorManager.powerUpColor(),
-    };
+  statusBuff[1] = {
+    value: buffSymbol + buffValue,
+    color: buffColor,
+  };
+
+  buffValue = towerData.getBuffs(TowerDefenseManager.AURATYPE.ATTACKSPEED);
+  if (towerData.getAttackSpeed() > towerData.getBaseAttackSpeed) {
+    buffColor = ColorManager.powerDownColor();
+    buffSymbol = "+";
+  } else {
+    buffSymbol = "-";
   }
+  statusBuff[2] = {
+    value: buffSymbol + Math.abs(buffValue),
+    color: buffColor,
+  };
 
   for (let i = 0; i < statusBuff.length; i++) {
-    if (statusBuff[i]) {
-      this.statusWindow1.resetTextColor();
-      this.statusWindow1.changeTextColor(statusBuff[i].color);
-      this.statusWindow1.drawText(
-        "(" + statusBuff[i].value + ")",
-        textX + textValueX + textBuffX,
-        textY + i * textHeight,
+    if (statusBuff[i].value != 0) {
+      this.resetTextColor();
+      this.changeTextColor(statusBuff[i].color);
+      this.drawText(
+        statusBuff[i].value,
+        textX + 88 + (i % 2) * (textXValue + textX2),
+        textY + Math.floor(i / 2) * textHeight,
         150
       );
     }
-  }
-  this.statusWindow1.resetTextColor();
-  this.statusWindow1.contents.fontSize = fontSize;
-  this.statusWindow1.drawText(
-    "Effect",
-    textX,
-    textY + status.length * textHeight,
-    150
-  );
-  this.statusWindow1.resetFontSettings();
-
-  let note = `\\FS[${fontSize - 3}]\n`;
-  if (!this._towerData._note) note += "\\C[16]None";
-
-  this.statusWindow1.setLineHeight(28);
-  this.statusWindow1.drawTextEx(
-    note + this._towerData._note,
-    textX,
-    textY + status.length * textHeight + 2,
-    200
-  );
-  this.statusWindow1.resetLineHeight();
-
-  this.statusWindow1.resetFontSettings();
-
-  if (this._towerData._upgradeId != "?") {
-    let upgradeTowerData = $dataItems[this._towerData._upgradeId].ufcTower;
-    characterImage = ImageManager.loadCharacter(upgradeTowerData.character);
-    characterIndex = upgradeTowerData.characterindex;
-    pw = characterImage.width / 12;
-    ph = characterImage.height / 8;
-    sx = ((characterIndex % 4) * 3 + 1) * pw;
-    sy = (Math.floor(characterIndex / 4) * 4 + 0) * ph;
-    this.statusWindow2.contents.blt(
-      characterImage,
-      sx,
-      sy,
-      pw,
-      ph,
-      x - 8,
-      y,
-      pw * scale,
-      ph * scale
-    );
-
-    let statusValue2 = [
-      +upgradeTowerData.attack,
-      +upgradeTowerData.range,
-      +upgradeTowerData.attackspeed,
-      +upgradeTowerData.bulletspeed,
-    ];
-
-    this.statusWindow2.contents.fontSize = fontSize + 3;
-    this.statusWindow2.changeTextColor(ColorManager.powerUpColor());
-    this.statusWindow2.drawText("UPGRADE", textX, -10, 150, "center");
-
-    this.statusWindow2.resetTextColor();
-    this.statusWindow2.drawText(
-      upgradeTowerData.name,
-      textX,
-      ph + 20,
-      150,
-      "center"
-    );
-
-    this.statusWindow2.contents.fontSize = fontSize;
-    for (let i = 0; i < status.length; i++) {
-      this.statusWindow2.resetTextColor();
-      this.statusWindow2.drawText(
-        status[i],
-        textX,
-        textY + i * textHeight,
-        150
-      );
-      this.statusWindow2.changeTextColor(ColorManager.systemColor());
-      if (statusValue[i] > statusValue2[i]) {
-        this.statusWindow2.changeTextColor(ColorManager.powerDownColor());
-        if (i == 2) {
-          this.statusWindow2.changeTextColor(ColorManager.powerUpColor());
-        }
-      } else if (statusValue[i] < statusValue2[i]) {
-        this.statusWindow2.changeTextColor(ColorManager.powerUpColor());
-        if (i == 2) {
-          this.statusWindow2.changeTextColor(ColorManager.powerDownColor());
-        }
-      }
-      this.statusWindow2.drawText(
-        statusValue2[i],
-        textX + textValueX,
-        textY + i * textHeight,
-        150
-      );
-    }
-
-    this.statusWindow2.resetTextColor();
-    this.statusWindow2.drawText(
-      "Effect",
-      textX,
-      textY + status.length * textHeight,
-      150
-    );
-    note = `\\FS[${fontSize - 3}]\n`;
-    if (!upgradeTowerData.note) note += "\\C[16]None";
-
-    this.statusWindow2.setLineHeight(28);
-    this.statusWindow2.drawTextEx(
-      note + upgradeTowerData.note,
-      textX,
-      textY + status.length * textHeight + 2,
-      200
-    );
-    this.statusWindow2.resetLineHeight();
-    this.statusWindow2.resetFontSettings();
-    this.statusWindow2.open();
-  }
-};
-
-Window_TowerActionButton.prototype.setMoveCallback = function (callback) {
-  this._list[0].callback = callback;
-};
-
-Window_TowerActionButton.prototype.onCancel = function () {
-  this.close();
-};
-
-Window_TowerActionButton.prototype.addCommand = function (
-  name,
-  icon,
-  enabled = true,
-  callback = null
-) {
-  this._list.push({
-    name: name,
-    icon: icon,
-    callback: callback,
-    symbol: null,
-    enabled: enabled,
-    ext: null,
-  });
-};
-
-Window_TowerActionButton.prototype.drawIconTD = function (index, x, y, align) {
-  const bitmap = ImageManager.loadSystem("TDSet");
-  const pw = 72;
-  const ph = 72;
-  if (align == "center") {
-    x += this.itemWidth() / 2;
-    x -= pw / 2;
-  } else if (align == "right") {
-    let _x = x;
-    x = this.itemWidth();
-    x -= pw;
-    x -= _x;
-  }
-  const sx = (index % pw) * pw;
-  const sy = Math.floor(index / ph) * ph;
-  this.contents.blt(bitmap, sx, sy, pw, ph, x, y);
-};
-
-Window_TowerActionButton.prototype.drawTextEx = function (
-  text,
-  x,
-  y,
-  width,
-  align
-) {
-  if (align == "center") {
-    let textWidth = this.textSizeEx(text).width;
-    x += this.itemWidth() / 2;
-    x -= textWidth / 2;
-    x -= this.itemPadding() * 2;
   }
   this.resetFontSettings();
-  const textState = this.createTextState(text, x, y, width);
-  this.processAllText(textState);
 
-  return textState.outputWidth;
-};
+  //Background Note
+  let characterY = ph * scale;
+  this.contents.fontSize = 18;
+  this.drawText("Note", 0, characterY, 100);
 
-Window_TowerActionButton.prototype.drawItem = function (index) {
-  const rect = this.itemLineRect(index);
-  const align = this.itemTextAlign();
-  this.resetTextColor();
-  this.changePaintOpacity(this.isCommandEnabled(index));
-  this.drawIconTD(
-    this._list[index].icon,
-    rect.x - this.itemPadding() * 2,
-    rect.y - 30,
-    align
+  this.contentsBack.gradientFillRect(
+    0,
+    characterY + 30,
+    this.contentsWidth(),
+    this.contentsHeight() - characterY,
+    c1,
+    c2,
+    true
   );
-  this.drawTextEx(this.commandName(index), rect.x, rect.y + 50, 200, align);
-};
 
-// Enable sound when cursor hover the button
-Window_TowerActionButton.prototype.onTouchSelect = function (trigger) {
-  this._doubleTouch = false;
-  if (this.isCursorMovable()) {
-    const lastIndex = this.index();
-    const hitIndex = this.hitIndex();
-    if (hitIndex >= 0) {
-      if (hitIndex === this.index()) {
-        this._doubleTouch = true;
-      }
-      this.select(hitIndex);
-    }
-    if (this.index() !== lastIndex) {
-      this.playCursorSound();
-    }
-  }
-};
+  this.setLineHeight(32);
+  let note = `\\FS[${this.contents.fontSize - 3}]\n`;
+  if (!towerData._note) note += "\\C[16]None";
 
-Window_TowerActionButton.prototype.update = function () {
-  Window_HorzCommand.prototype.update.call(this);
-  this.updateChildren();
-};
+  this.drawTextEx(
+    note + towerData._note,
+    5,
+    characterY + 5,
+    this.contentsWidth()
+  );
+  this.resetLineHeight();
 
-Window_TowerActionButton.prototype.updateChildren = function () {
-  for (const child of this.children) {
-    if (child.update) {
-      child.update();
-    }
-  }
-};
-Window_TowerActionButton.prototype.refresh = function () {
-  for (const child of this.children) {
-    if (child.contents) {
-      child.contents.clear();
-    }
-  }
-  Window_HorzCommand.prototype.refresh.call(this);
-};
-
-Window_TowerActionButton.prototype.itemHeight = function () {
-  return this.height - 24;
-};
-
-Window_TowerActionButton.prototype.colSpacing = function () {
-  return 20;
+  this.resetFontSettings();
 };

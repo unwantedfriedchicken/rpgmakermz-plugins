@@ -15,12 +15,27 @@ ufcTowerData.prototype.initialize = function (data) {
   this._bulletCharacterName = data["bulletspritename"];
   this._bulletCharacterIndex = data["bulletspriteindex"];
   this._bulletCharacterIndexY = data["bulletspriteindexy"];
-  this._upgradeId = data["upgradeid"];
-  if (this._upgradeId != "?" && data["upgradeprice"] == "?") {
-    this._upgradePrice = $dataItems[this._upgradeId].price;
-  } else {
-    this._upgradePrice = data["upgradeprice"];
+  this._upgrade = [];
+  let listUpgrade = Object.keys(data).filter(
+    (item) => item.slice(0, 7) == "upgrade"
+  );
+  if (listUpgrade.length > 0) {
+    listUpgrade.forEach((item) => {
+      let _data = data[item].split("|");
+      let _price = 0;
+      if (_data.length == 1) {
+        _price = $dataItems[_data[0]].price;
+      } else {
+        _price = +_data[1];
+      }
+
+      this._upgrade.push({
+        id: +_data[0],
+        price: _price,
+      });
+    });
   }
+
   if (data["sellprice"] == "?") {
     this._sellPrice = $dataItems[this._id].price / 2;
   } else {
@@ -153,6 +168,10 @@ ufcTowerData.prototype.getAuras = function () {
 
 ufcTowerData.prototype.isHaveAura = function () {
   return this._auras.length > 0;
+};
+
+ufcTowerData.prototype.isHaveUpgrade = function () {
+  return this._upgrade.length > 0;
 };
 
 ufcTowerData.prototype.checkGetBuffs = function () {

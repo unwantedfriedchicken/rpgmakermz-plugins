@@ -24,6 +24,8 @@ for \C[3]4s
 - CHANGE: Change `HealthVariable, HealthMaxVariable, GameOverSwitch, LimitAnimation` location from `plugin command` to `plugin settings`
 - CHANGE: Change how tower get stored, now get seprated with normal item
 - CHANGE: Placing tower now using backpack gui
+- CHANGE: Tower Action GUI & add `pickup` option
+- CHANGE: Change upgrade system, now using `<upgrade:ID|UPGRADE PRICE>` price is optional if not stated price is using price in DB, and now can use have multiple upgrade, for multiple upgrade add number in upgrade ex: `<upgrade2:23><upgrade3:ID>` you can have as many upgrade you want just add number infront of upgrade
 - ADD: Stun effect, effects -> `stun|0|240|80` -> `ID stun | do nothing | duration stun | chance stun`
 - ADD: Rage effect, make the enemy walk faster -> `rage|100|240|30` -> `ID rage | 100% increase movement speed | 4s duration | 30% chance`
 - ADD: Enemy types, tower can only attack same type or all type. current type is `air | ground | all`. There is new plugin command variable for `Setup Enemy` it is `Enemy Type`. For tower need note `<attacktype:all>` value need lower case. If enemy type is all then any tower attack type can attack it, also same with tower

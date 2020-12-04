@@ -62,6 +62,7 @@ Sprite_ufcTDTower.prototype.resetRangeGraphics = function () {
     this._rangeGraphics.texture = rangeSprite;
   }
   _rangeGraphics.destroy();
+  this._rangeGraphics.visible = false;
 };
 
 Sprite_ufcTDTower.prototype.setSelectPosition = function () {
@@ -150,8 +151,9 @@ Sprite_ufcTDTower.prototype.characterBlockY = function () {
 };
 
 Sprite_ufcTDTower.prototype.setRangeVisibility = function (visible) {
-  if (visible) {
-    this._range = this._tower.getTowerData().getRange();
+  let _range = this._tower.getTowerData().getRange();
+  if (visible && this._range != _range) {
+    this._range = _range;
     this.resetRangeGraphics();
   }
   this._rangeGraphics.visible = visible;

@@ -29,15 +29,43 @@ Window_GUIItemSlot.prototype.callOkHandler = function () {
   this.activate();
   let tower = this._towers[this.index()];
   if (!tower) return;
+  $gamePlayer.getGuideAction().resetParent();
   $gameParty.gainItem($dataItems[tower.id], -1);
   TowerDefenseManager.clearSelect();
   TowerDefenseManager.selectTower(tower);
   TowerDefenseManager.selectTowerMode();
+  this._selectKeyboard = false;
+  $gameMessage.setWindowTower(false);
 };
 
-Window_GUIItemSlot.prototype.onOk = function () {};
+Window_GUIItemSlot.prototype.activeKeyboard = function () {
+  $gameMessage.setWindowTower(true);
+  this._selectKeyboard = true;
+  this.activate();
+  this.select(0);
+};
+
+Window_GUIItemSlot.prototype.deactiveKeyboard = function () {
+  this._selectKeyboard = false;
+  $gameMessage.setWindowTower(false);
+  this.select(-1);
+  this.deactivate();
+};
 
 Window_GUIItemSlot.prototype.processCursorMove = function () {
+  if (this.isCancelTriggered() && this._selectKeyboard) {
+    this.deactiveKeyboard();
+    return;
+  }
+
+  if (
+    this.isCancelTriggered() &&
+    !this._selectKeyboard &&
+    TowerDefenseManager.getState != TowerDefenseManager.STATE.BUILD
+  ) {
+    this.activeKeyboard();
+  }
+
   if (!this._selectKeyboard) return;
   Window_Command.prototype.processCursorMove.call(this);
 };
@@ -147,9 +175,12 @@ Window_GUIItemSlot.prototype.processTouch = function () {
   Window_Command.prototype.processTouch.call(this);
   if (this.isTouchedInsideFrame()) {
     UFC.UFCTD.HUDGUI.MESSAGE.isHoverHUDItem = true;
+    this.activate();
   } else {
+    if (this._selectKeyboard) return;
     UFC.UFCTD.HUDGUI.MESSAGE.isHoverHUDItem = false;
     this.select(-1);
+    this.deactivate();
   }
 };
 
