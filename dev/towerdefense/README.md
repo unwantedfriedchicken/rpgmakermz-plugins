@@ -101,7 +101,7 @@ you can delete any **optional** note
 
 > > **AURA TYPE MODE**
 > >
-> > > **fixed** : add fixed value to other tower
+> > > **fixed** : add fixed value to other tower  
 > > > **percentage** : add percentage from the target tower
 
 > **Example**  
