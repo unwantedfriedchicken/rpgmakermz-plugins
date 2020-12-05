@@ -236,7 +236,7 @@ Window_GUIItemSlot.prototype.itemWidth = function () {
 
 Window_GUIItemSlot.prototype.update = function () {
   Window_Command.prototype.update.call(this);
-  if (TowerDefenseManager.getGUIItemSlot) {
+  if (TowerDefenseManager.getGUIItemSlot && !this._selectKeyboard) {
     if ($gameMessage.isBusy() && this.visible) {
       this.close();
       this.visible = false;
