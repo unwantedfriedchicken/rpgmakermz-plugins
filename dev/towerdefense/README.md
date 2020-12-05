@@ -52,7 +52,7 @@ you can delete any **optional** note
 **attackspeed** : Attack speed of the tower  
 **bulletspeed** : Bullet speed when go to the target, don't make it too fast since it will become like orbit, if you want make seem like fast just make it invisible  
 **bulletspritename** : Sprite name in Character folder, this is using standard character sprite with seperator X by 3 sprite but Y by 1  
-**bulletspriteindex** : X index from bulletspritename
+**bulletspriteindex** : X index from bulletspritename  
 **bulletspriteindexy** : Y index from bulletspritename  
 **range** : Range of the tower  
 **character** : Character name in character folder
