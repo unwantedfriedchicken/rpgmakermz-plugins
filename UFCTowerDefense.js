@@ -3391,6 +3391,19 @@ Window_GUIItemSlot.prototype.itemWidth = function () {
   return UFC.UFCTD.HUDGUI.SETTINGS.itemSize;
 };
 
+Window_GUIItemSlot.prototype.update = function () {
+  Window_Command.prototype.update.call(this);
+  if (TowerDefenseManager.getGUIItemSlot) {
+    if ($gameMessage.isBusy() && this.visible) {
+      this.close();
+      this.visible = false;
+    } else if (!$gameMessage.isBusy() && !this.visible) {
+      this.open();
+      this.visible = true;
+    }
+  }
+};
+
 Window_GUIItemSlot.prototype.refresh = function () {
   Window_Command.prototype.refresh.call(this);
   this.clearCommandList();
