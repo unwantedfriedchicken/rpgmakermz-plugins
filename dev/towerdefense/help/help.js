@@ -3,6 +3,28 @@
 
 @plugindesc Add Tower Defense Mechanic
 @author Unwanted Fried Chicken
+@url https://unwantedfriedchicken.itch.io
+
+@help
+Author: UnwantedFriedChicken
+Version: 1.1
+Itch.io : https://unwantedfriedchicken.itch.io
+Github : https://github.com/unwantedfriedchicken/rpgmakermz-plugins/
+
+This plugin add tower defense mechanic for more detail explaination checkout the documentation
+
+Documentation
+https://github.com/unwantedfriedchicken/rpgmakermz-plugins/blob/master/dev/towerdefense/README.md
+
+Changelog
+https://github.com/unwantedfriedchicken/rpgmakermz-plugins/blob/master/dev/towerdefense/CHANGELOG.md
+
+Found bug? report the bug here:
+https://forums.rpgmakerweb.com/index.php?threads/ufc-tower-defense.130384/
+https://github.com/unwantedfriedchicken/rpgmakermz-plugins/issues
+
+Need support or want private convo? I can easly reachout by email
+unwantedfriedchicken<at>gmail.com
 
 @param setting_crystalName
 @text Crystal Name
