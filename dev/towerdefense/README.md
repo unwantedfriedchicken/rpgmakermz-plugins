@@ -34,6 +34,7 @@ for demo check https://unwantedfriedchicken.itch.io/adventurer-guild-the-barrier
 <character:Actor3>
 <characterindex:3>
 <attacktype:all>
+<upgrade:67|200>
 <sellprice:30>
 <effects:cold|60|300>
 <auras:attack|6|fixed>
@@ -59,6 +60,20 @@ you can delete any **optional** note
 **characterindex** : Index of the character 0 ~ 7  
 **attacktype** : What monster type that this tower can attack the mode is  
 `all | air | ground` all mean the tower can attack any types  
+**upgrade** (optional) : Upgrade id for the tower, you can add multiple upgrade, for multiple upgrade add number in upgrade ex: `<upgrade2:23><upgrade3:34>` you can have many upgrade you want
+
+> `ID TOWER | UPGRADE PRICE (OPTIONAL)`
+>
+> > **ID TOWER**  
+> > Id of the upgrade tower
+
+> > **PRICE**  
+> > Price for upgrade the tower, if not stated price is using price in DB
+
+> **Example**  
+> `<upgrade:23><upgrade2:34|200>`  
+> Have 2 upgrade from this tower and the second upgrade price is 200
+
 **note** : Note when tower is selected / in upgrade  
 **sellprice** (optional) : if you want custom sellprice set here otherwise the sell price is half of the price item  
 **effects** (optional) : the effect this tower can inflict to the enemy, for multiple effects use , seprator.
