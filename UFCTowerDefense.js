@@ -2902,7 +2902,7 @@ ufcTowerData.prototype.setBuffs = function (buffs) {
   for (const buff of buffs) {
     let be = buff.effect;
     if (buff.type === TowerDefenseManager.AURATYPEMODE.PERCENTAGE) {
-      be = this.getBaseValWithAuraType(buff.name) * (be / 100);
+      be = Math.floor(this.getBaseValWithAuraType(buff.name) * (be / 100));
     }
 
     if (this._buffs[buff.name] === 0) {
