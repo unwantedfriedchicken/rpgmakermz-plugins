@@ -4,6 +4,12 @@
 @plugindesc Add Tower Defense Mechanic
 @author Unwanted Fried Chicken
 
+@param setting_crystalName
+@text Crystal Name
+@desc Name of the crystal/gate
+@type string
+@default Crystal Health
+
 @param setting_limitAnimation
 @text Limit Animation
 @desc If frame rate become low because so many effect try limit the animation
@@ -129,39 +135,15 @@
 
 @arg onlyTerrain
 @text Place building terrain
-@desc Set place building terrain tag, if set 0 then building can be placed anywhere except where player can't pass. multiple tag use , to seprate
-@type text
-@default 0
+@desc Set place building only in this terrain tag, If empty building can be placed anywhere
+@type number[]
+@default []
 
 @arg exceptTerrain
 @text Can't place in this terrain
-@desc Set place where building can't be set with terrain tag. multiple tag use , to seprate
-@type text
-@default 0
-
-@command showHealthBar
-@text Show Health HUD
-@desc Show Health HUD
-
-@arg show
-@text Show
-@desc Show Health Hud
-@type boolean
-@default true
-
-@command showGold
-@text Show Gold HUD
-@desc Show Gold HUD
-
-@arg show
-@text Show
-@desc Show Gold Hud
-@type boolean
-@default true
-
-@command updateHealthHud
-@text Update Health Hud
-@desc Update Health Hud To Current Variable Value
+@desc Set place where building can't be set with this terrain tag.
+@type number[]
+@default []
 
 @command limitAnimation
 @text Limit Animation
@@ -390,6 +372,39 @@
 @decimals 2
 @desc Defines enemy scale
 
+@command showGUIItemSlot
+@text Show Item Slot GUI
+@desc Show Item Slot GUI
+
+@arg show
+@text Show
+@desc Show Item Slot GUI
+@type boolean
+@default true
+
+@command showHealthBar
+@text Show Health HUD
+@desc Show Health HUD
+
+@arg show
+@text Show
+@desc Show Health Hud
+@type boolean
+@default true
+
+@command showGold
+@text Show Gold HUD
+@desc Show Gold HUD
+
+@arg show
+@text Show
+@desc Show Gold Hud
+@type boolean
+@default true
+
+@command updateHealthHud
+@text Update Health Hud
+@desc Update Health Hud To Current Variable Value
 */
 
 var Imported = Imported || {};
@@ -411,6 +426,7 @@ UFC.UFCTD.CONFIG = {
   healthVarId: +UFC.UFCTD.PARAMETERS["setting_towerHealthVarId"],
   healthMaxVarId: +UFC.UFCTD.PARAMETERS["setting_towerMaxHealthVarId"],
   gameOverSwitchId: +UFC.UFCTD.PARAMETERS["setting_gameoverSwitchId"],
+  crystalName: UFC.UFCTD.PARAMETERS["setting_crystalName"],
 };
 
 UFC.UFCTD.HUDGUI = {
@@ -459,6 +475,14 @@ PluginManager.registerCommand("UFCTowerDefense", "setSpawn", function (args) {
     args
   );
 });
+
+PluginManager.registerCommand(
+  "UFCTowerDefense",
+  "showGUIItemSlot",
+  function (args) {
+    TowerDefenseManager.showGUIItemSlot(args);
+  }
+);
 
 PluginManager.registerCommand("UFCTowerDefense", "showGold", function (args) {
   TowerDefenseManager.showHUDTDGold(args);
@@ -1995,7 +2019,6 @@ UFC.UFCTD.ALIAS._Scene_Map_createAllWindows =
 Scene_Map.prototype.createAllWindows = function () {
   UFC.UFCTD.ALIAS._Scene_Map_createAllWindows.call(this);
   this.createHUDTD();
-
   this.createGoldWindow();
   this.createTDHealth();
 };
@@ -2008,6 +2031,7 @@ Scene_Map.prototype.createHUDTD = function () {
     width: 300,
     height: 240,
   };
+  UFC.UFCTD.HUDGUI.ITEMSLOT.visible = TowerDefenseManager.getGUIItemSlot;
   UFC.UFCTD.HUDGUI.TOWERACTION = new Window_TDAction(
     new Rectangle(
       360,
@@ -2017,6 +2041,12 @@ Scene_Map.prototype.createHUDTD = function () {
     )
   );
   this.addWindow(UFC.UFCTD.HUDGUI.TOWERACTION);
+
+  UFC.UFCTD.HUDGUI.GOLDWINDOW = new Window_TDGold(
+    new Rectangle(0, 0, 200, this.calcWindowHeight(1, true))
+  );
+  this.addWindow(UFC.UFCTD.HUDGUI.GOLDWINDOW);
+  UFC.UFCTD.HUDGUI.GOLDWINDOW.visible = TowerDefenseManager.getHUDGold;
 };
 Scene_Map.prototype.createTDHealth = function () {
   let windowWidth = 200;
@@ -2025,14 +2055,6 @@ Scene_Map.prototype.createTDHealth = function () {
   );
   this.addWindow(this._TDHealthWindow);
   this._TDHealthWindow.visible = TowerDefenseManager.getHUDHealth;
-};
-
-Scene_Map.prototype.createGoldWindow = function () {
-  this._goldWindow = new Window_Gold(
-    new Rectangle(0, 0, 200, this.calcWindowHeight(1, true))
-  );
-  this.addWindow(this._goldWindow);
-  this._goldWindow.visible = TowerDefenseManager.getHUDGold;
 };
 
 // ----------------------------------- End HUD -------------------------
@@ -2090,7 +2112,7 @@ Game_Map.prototype.ufcCalcGrid = function () {
 };
 
 Game_Map.prototype.updateGoldHud = function () {
-  SceneManager.getScene()._goldWindow.refresh();
+  UFC.UFCTD.HUDGUI.GOLDWINDOW.refresh();
 };
 
 Game_Map.prototype.updateHealthHud = function () {
@@ -2303,6 +2325,7 @@ function TowerDefenseManager() {
 TowerDefenseManager.initialize = function () {
   this._HUDGold = false;
   this._HUDHealth = false;
+  this._GUIItemSlot = false;
   this._state = TowerDefenseManager.STATE.IDLE;
   this._selectedUFCTD = null;
   this._limitAnimation = 0;
@@ -2412,9 +2435,16 @@ TowerDefenseManager.requestAnimation = function (targets, animation) {
     $gameTemp.requestAnimation(targets, animation);
 };
 
+TowerDefenseManager.showGUIItemSlot = function (args) {
+  this._GUIItemSlot = args["show"] == "true";
+  UFC.UFCTD.HUDGUI.ITEMSLOT.visible = this._GUIItemSlot;
+  if (this._GUIItemSlot) UFC.UFCTD.HUDGUI.ITEMSLOT.open();
+  else UFC.UFCTD.HUDGUI.ITEMSLOT.close();
+};
+
 TowerDefenseManager.showHUDTDGold = function (args) {
   this._HUDGold = args["show"] == "true";
-  SceneManager.getScene()._goldWindow.visible = this._HUDGold;
+  UFC.UFCTD.HUDGUI.GOLDWINDOW.visible = this._HUDGold;
 };
 
 TowerDefenseManager.showHUDTDHealth = function (args) {
@@ -2423,14 +2453,16 @@ TowerDefenseManager.showHUDTDHealth = function (args) {
 };
 
 TowerDefenseManager.config = function (args) {
-  if (args["onlyTerrain"] != "0") {
-    let ot = args["onlyTerrain"].split(",").map(Number);
+  let ot = JSON.parse(args["onlyTerrain"]);
+  if (ot && ot.length > 0) {
+    ot = ot.map(Number);
     $gamePlayer.getGuideAction().setOnlyTerrain(ot);
   }
 
-  if (args["exceptTerrain"] != "0") {
-    let ot = args["exceptTerrain"].split(",").map(Number);
-    $gamePlayer.getGuideAction().setExceptTerrain(ot);
+  let et = JSON.parse(args["exceptTerrain"]);
+  if (et && et.length > 0) {
+    et = et.map(Number);
+    $gamePlayer.getGuideAction().setExceptTerrain(et);
   }
 
   if (args["limitAnimation"] != "0") {
@@ -2592,6 +2624,12 @@ Object.defineProperty(TowerDefenseManager, "getHUDHealth", {
   },
 });
 
+Object.defineProperty(TowerDefenseManager, "getGUIItemSlot", {
+  get: function () {
+    return this._GUIItemSlot;
+  },
+});
+
 Object.defineProperty(TowerDefenseManager, "getHUDHealthValue", {
   get: function () {
     return $gameVariables.value(UFC.UFCTD.CONFIG.healthVarId);
@@ -2735,7 +2773,7 @@ ufcTowerData.prototype.initialize = function (data) {
     });
   }
 
-  if (data["sellprice"] == "?") {
+  if (data["sellprice"]) {
     this._sellPrice = $dataItems[this._id].price / 2;
   } else {
     this._sellPrice = data["sellprice"];
@@ -2953,7 +2991,8 @@ ufcTowerEffects.prototype.getEffect = function () {
 };
 
 ufcTowerEffects.prototype.getChanceEffect = function () {
-  return this._chance < 100 ? this._chance > Math.randomInt(100) : true;
+  let chance = Math.randomInt(100);
+  return this._chance < 100 ? this._chance > chance : true;
 };
 
 ufcTowerEffects.prototype.isDone = function () {
@@ -3124,7 +3163,7 @@ Window_GUIItemSlot.prototype.initialize = function () {
 Window_GUIItemSlot.prototype.callOkHandler = function () {
   this.activate();
   let tower = this._towers[this.index()];
-  if (!tower) return;
+  if (!tower || $gameMessage.isBusy()) return;
   $gamePlayer.getGuideAction().resetParent();
   $gameParty.gainItem($dataItems[tower.id], -1);
   TowerDefenseManager.clearSelect();
@@ -3504,6 +3543,7 @@ Window_TDAction.prototype.close = function () {
   }
   Window_Command.prototype.close.call(this);
   $gameMessage.setWindowTower(false);
+  this.deactivate();
 };
 
 Window_TDAction.prototype.setTower = function (ufcTowerData, callback) {
@@ -3986,6 +4026,44 @@ Window_TDActionUpgrade.prototype.resetLineHeight = function () {
   this._lineHeight = this._defaultLineHeight;
 };
 
+function Window_TDGold() {
+  this.initialize(...arguments);
+}
+
+Window_TDGold.prototype = Object.create(Window_Selectable.prototype);
+Window_TDGold.prototype.constructor = Window_TDGold;
+
+Window_TDGold.prototype.initialize = function (rect) {
+  Window_Selectable.prototype.initialize.call(this, rect);
+  this.refresh();
+};
+
+Window_TDGold.prototype.colSpacing = function () {
+  return 0;
+};
+
+Window_TDGold.prototype.refresh = function () {
+  const rect = this.itemLineRect(0);
+  const x = rect.x;
+  const y = rect.y;
+  const width = rect.width;
+  this.contents.clear();
+  this.drawCurrencyValue(this.value(), this.currencyUnit(), x, y, width);
+};
+
+Window_TDGold.prototype.value = function () {
+  return $gameParty.gold();
+};
+
+Window_TDGold.prototype.currencyUnit = function () {
+  return TextManager.currencyUnit;
+};
+
+Window_TDGold.prototype.open = function () {
+  this.refresh();
+  Window_Selectable.prototype.open.call(this);
+};
+
 function Window_TDHealth() {
   this.initialize(...arguments);
 }
@@ -4008,7 +4086,7 @@ Window_TDHealth.prototype.refresh = function () {
   this.contents.clear();
   this.contents.fontSize = 22;
   this.drawBackground(-5, 3, 200, 30);
-  this.drawText("Crystal Health", -10, 0, 200, "center");
+  this.drawText(UFC.UFCTD.CONFIG.crystalName, -10, 0, 200, "center");
   this.drawGaugeRect(0, rect.height, this.innerWidth, 20);
 };
 

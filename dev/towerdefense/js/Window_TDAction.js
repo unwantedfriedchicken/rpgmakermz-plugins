@@ -146,6 +146,7 @@ Window_TDAction.prototype.close = function () {
   }
   Window_Command.prototype.close.call(this);
   $gameMessage.setWindowTower(false);
+  this.deactivate();
 };
 
 Window_TDAction.prototype.setTower = function (ufcTowerData, callback) {

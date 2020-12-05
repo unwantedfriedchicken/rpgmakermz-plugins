@@ -34,7 +34,8 @@ ufcTowerEffects.prototype.getEffect = function () {
 };
 
 ufcTowerEffects.prototype.getChanceEffect = function () {
-  return this._chance < 100 ? this._chance > Math.randomInt(100) : true;
+  let chance = Math.randomInt(100);
+  return this._chance < 100 ? this._chance > chance : true;
 };
 
 ufcTowerEffects.prototype.isDone = function () {

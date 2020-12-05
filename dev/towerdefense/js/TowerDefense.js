@@ -265,7 +265,6 @@ UFC.UFCTD.ALIAS._Scene_Map_createAllWindows =
 Scene_Map.prototype.createAllWindows = function () {
   UFC.UFCTD.ALIAS._Scene_Map_createAllWindows.call(this);
   this.createHUDTD();
-
   this.createGoldWindow();
   this.createTDHealth();
 };
@@ -278,6 +277,7 @@ Scene_Map.prototype.createHUDTD = function () {
     width: 300,
     height: 240,
   };
+  UFC.UFCTD.HUDGUI.ITEMSLOT.visible = TowerDefenseManager.getGUIItemSlot;
   UFC.UFCTD.HUDGUI.TOWERACTION = new Window_TDAction(
     new Rectangle(
       360,
@@ -287,6 +287,12 @@ Scene_Map.prototype.createHUDTD = function () {
     )
   );
   this.addWindow(UFC.UFCTD.HUDGUI.TOWERACTION);
+
+  UFC.UFCTD.HUDGUI.GOLDWINDOW = new Window_TDGold(
+    new Rectangle(0, 0, 200, this.calcWindowHeight(1, true))
+  );
+  this.addWindow(UFC.UFCTD.HUDGUI.GOLDWINDOW);
+  UFC.UFCTD.HUDGUI.GOLDWINDOW.visible = TowerDefenseManager.getHUDGold;
 };
 Scene_Map.prototype.createTDHealth = function () {
   let windowWidth = 200;
@@ -295,14 +301,6 @@ Scene_Map.prototype.createTDHealth = function () {
   );
   this.addWindow(this._TDHealthWindow);
   this._TDHealthWindow.visible = TowerDefenseManager.getHUDHealth;
-};
-
-Scene_Map.prototype.createGoldWindow = function () {
-  this._goldWindow = new Window_Gold(
-    new Rectangle(0, 0, 200, this.calcWindowHeight(1, true))
-  );
-  this.addWindow(this._goldWindow);
-  this._goldWindow.visible = TowerDefenseManager.getHUDGold;
 };
 
 // ----------------------------------- End HUD -------------------------
@@ -360,7 +358,7 @@ Game_Map.prototype.ufcCalcGrid = function () {
 };
 
 Game_Map.prototype.updateGoldHud = function () {
-  SceneManager.getScene()._goldWindow.refresh();
+  UFC.UFCTD.HUDGUI.GOLDWINDOW.refresh();
 };
 
 Game_Map.prototype.updateHealthHud = function () {

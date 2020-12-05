@@ -20,7 +20,7 @@ Window_TDHealth.prototype.refresh = function () {
   this.contents.clear();
   this.contents.fontSize = 22;
   this.drawBackground(-5, 3, 200, 30);
-  this.drawText("Crystal Health", -10, 0, 200, "center");
+  this.drawText(UFC.UFCTD.CONFIG.crystalName, -10, 0, 200, "center");
   this.drawGaugeRect(0, rect.height, this.innerWidth, 20);
 };
 

@@ -5,6 +5,7 @@ UFC.UFCTD.CONFIG = {
   healthVarId: +UFC.UFCTD.PARAMETERS["setting_towerHealthVarId"],
   healthMaxVarId: +UFC.UFCTD.PARAMETERS["setting_towerMaxHealthVarId"],
   gameOverSwitchId: +UFC.UFCTD.PARAMETERS["setting_gameoverSwitchId"],
+  crystalName: UFC.UFCTD.PARAMETERS["setting_crystalName"],
 };
 
 UFC.UFCTD.HUDGUI = {
@@ -53,6 +54,14 @@ PluginManager.registerCommand("UFCTowerDefense", "setSpawn", function (args) {
     args
   );
 });
+
+PluginManager.registerCommand(
+  "UFCTowerDefense",
+  "showGUIItemSlot",
+  function (args) {
+    TowerDefenseManager.showGUIItemSlot(args);
+  }
+);
 
 PluginManager.registerCommand("UFCTowerDefense", "showGold", function (args) {
   TowerDefenseManager.showHUDTDGold(args);

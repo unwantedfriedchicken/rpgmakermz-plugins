@@ -5,6 +5,7 @@ function TowerDefenseManager() {
 TowerDefenseManager.initialize = function () {
   this._HUDGold = false;
   this._HUDHealth = false;
+  this._GUIItemSlot = false;
   this._state = TowerDefenseManager.STATE.IDLE;
   this._selectedUFCTD = null;
   this._limitAnimation = 0;
@@ -114,9 +115,16 @@ TowerDefenseManager.requestAnimation = function (targets, animation) {
     $gameTemp.requestAnimation(targets, animation);
 };
 
+TowerDefenseManager.showGUIItemSlot = function (args) {
+  this._GUIItemSlot = args["show"] == "true";
+  UFC.UFCTD.HUDGUI.ITEMSLOT.visible = this._GUIItemSlot;
+  if (this._GUIItemSlot) UFC.UFCTD.HUDGUI.ITEMSLOT.open();
+  else UFC.UFCTD.HUDGUI.ITEMSLOT.close();
+};
+
 TowerDefenseManager.showHUDTDGold = function (args) {
   this._HUDGold = args["show"] == "true";
-  SceneManager.getScene()._goldWindow.visible = this._HUDGold;
+  UFC.UFCTD.HUDGUI.GOLDWINDOW.visible = this._HUDGold;
 };
 
 TowerDefenseManager.showHUDTDHealth = function (args) {
@@ -125,14 +133,16 @@ TowerDefenseManager.showHUDTDHealth = function (args) {
 };
 
 TowerDefenseManager.config = function (args) {
-  if (args["onlyTerrain"] != "0") {
-    let ot = args["onlyTerrain"].split(",").map(Number);
+  let ot = JSON.parse(args["onlyTerrain"]);
+  if (ot && ot.length > 0) {
+    ot = ot.map(Number);
     $gamePlayer.getGuideAction().setOnlyTerrain(ot);
   }
 
-  if (args["exceptTerrain"] != "0") {
-    let ot = args["exceptTerrain"].split(",").map(Number);
-    $gamePlayer.getGuideAction().setExceptTerrain(ot);
+  let et = JSON.parse(args["exceptTerrain"]);
+  if (et && et.length > 0) {
+    et = et.map(Number);
+    $gamePlayer.getGuideAction().setExceptTerrain(et);
   }
 
   if (args["limitAnimation"] != "0") {
@@ -291,6 +301,12 @@ Object.defineProperty(TowerDefenseManager, "getHUDGold", {
 Object.defineProperty(TowerDefenseManager, "getHUDHealth", {
   get: function () {
     return this._HUDHealth;
+  },
+});
+
+Object.defineProperty(TowerDefenseManager, "getGUIItemSlot", {
+  get: function () {
+    return this._GUIItemSlot;
   },
 });
 

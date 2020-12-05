@@ -4,6 +4,12 @@
 @plugindesc Add Tower Defense Mechanic
 @author Unwanted Fried Chicken
 
+@param setting_crystalName
+@text Crystal Name
+@desc Name of the crystal/gate
+@type string
+@default Crystal Health
+
 @param setting_limitAnimation
 @text Limit Animation
 @desc If frame rate become low because so many effect try limit the animation
@@ -129,39 +135,15 @@
 
 @arg onlyTerrain
 @text Place building terrain
-@desc Set place building terrain tag, if set 0 then building can be placed anywhere except where player can't pass. multiple tag use , to seprate
-@type text
-@default 0
+@desc Set place building only in this terrain tag, If empty building can be placed anywhere
+@type number[]
+@default []
 
 @arg exceptTerrain
 @text Can't place in this terrain
-@desc Set place where building can't be set with terrain tag. multiple tag use , to seprate
-@type text
-@default 0
-
-@command showHealthBar
-@text Show Health HUD
-@desc Show Health HUD
-
-@arg show
-@text Show
-@desc Show Health Hud
-@type boolean
-@default true
-
-@command showGold
-@text Show Gold HUD
-@desc Show Gold HUD
-
-@arg show
-@text Show
-@desc Show Gold Hud
-@type boolean
-@default true
-
-@command updateHealthHud
-@text Update Health Hud
-@desc Update Health Hud To Current Variable Value
+@desc Set place where building can't be set with this terrain tag.
+@type number[]
+@default []
 
 @command limitAnimation
 @text Limit Animation
@@ -390,4 +372,37 @@
 @decimals 2
 @desc Defines enemy scale
 
+@command showGUIItemSlot
+@text Show Item Slot GUI
+@desc Show Item Slot GUI
+
+@arg show
+@text Show
+@desc Show Item Slot GUI
+@type boolean
+@default true
+
+@command showHealthBar
+@text Show Health HUD
+@desc Show Health HUD
+
+@arg show
+@text Show
+@desc Show Health Hud
+@type boolean
+@default true
+
+@command showGold
+@text Show Gold HUD
+@desc Show Gold HUD
+
+@arg show
+@text Show
+@desc Show Gold Hud
+@type boolean
+@default true
+
+@command updateHealthHud
+@text Update Health Hud
+@desc Update Health Hud To Current Variable Value
 */
