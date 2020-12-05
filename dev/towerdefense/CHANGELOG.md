@@ -1,6 +1,6 @@
 # Change Log
 
-## Version 1.1 - dev
+## Version 1.1 - 6/12/2020
 
 Special thanks to [@wrigty12](https://forums.rpgmakerweb.com/index.php?members/wrigty12.25770/), [@estriole](https://forums.rpgmakerweb.com/index.php?members/estriole.2487/) for their inputs!
 
