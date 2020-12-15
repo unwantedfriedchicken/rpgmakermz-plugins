@@ -1,5 +1,9 @@
 # Change Log
 
+## Version 1.2 - dev
+
+- CHANGE: Change update `updateHealthHud` to `updateHUD`. `updateHUD` will update every hud gold and health
+
 ## Version 1.1 - 6/12/2020
 
 Special thanks to [@wrigty12](https://forums.rpgmakerweb.com/index.php?members/wrigty12.25770/), [@estriole](https://forums.rpgmakerweb.com/index.php?members/estriole.2487/) for their inputs!

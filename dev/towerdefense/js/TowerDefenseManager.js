@@ -3,6 +3,7 @@ function TowerDefenseManager() {
 }
 
 TowerDefenseManager.initialize = function () {
+  this._active = false;
   this._HUDGold = false;
   this._HUDHealth = false;
   this._GUIItemSlot = false;
@@ -48,9 +49,9 @@ TowerDefenseManager.debugMode = function () {
       }
       if (e.key == 3) {
         $gameVariables.setValue(UFC.UFCTD.CONFIG.healthVarId, 99999);
-        $gameMap.updateHealthHud();
+        TowerDefenseManager.updateHUDHealth();
         $gameParty.gainGold(99999999);
-        $gameMap.updateGoldHud();
+        TowerDefenseManager.updateHUDGold();
       }
       if (e.key == 4) {
         this.setLimitAnimation(UFC.UFCTD.DEBUGMODE.limitAnimation);
@@ -107,7 +108,7 @@ TowerDefenseManager.attackTower = function (damage) {
     $gameSwitches.setValue(UFC.UFCTD.CONFIG.gameOverSwitchId, true);
   }
 
-  $gameMap.updateHealthHud();
+  TowerDefenseManager.updateHUDHealth();
 };
 
 TowerDefenseManager.requestAnimation = function (targets, animation) {
@@ -129,7 +130,32 @@ TowerDefenseManager.showHUDTDGold = function (args) {
 
 TowerDefenseManager.showHUDTDHealth = function (args) {
   this._HUDHealth = args["show"] == "true";
-  SceneManager.getScene()._TDHealthWindow.visible = this._HUDHealth;
+  UFC.UFCTD.HUDGUI.HEALTHWINDOW.visible = this._HUDHealth;
+};
+
+TowerDefenseManager.updateHUDGold = function () {
+  if (
+    !this._active ||
+    !UFC.UFCTD.HUDGUI.GOLDWINDOW ||
+    UFC.UFCTD.HUDGUI.GOLDWINDOW._destroyed
+  )
+    return;
+  UFC.UFCTD.HUDGUI.GOLDWINDOW.refresh();
+};
+
+TowerDefenseManager.updateHUDHealth = function () {
+  if (
+    !this._active ||
+    !UFC.UFCTD.HUDGUI.HEALTHWINDOW ||
+    UFC.UFCTD.HUDGUI.HEALTHWINDOW._destroyed
+  )
+    return;
+  UFC.UFCTD.HUDGUI.HEALTHWINDOW.refresh();
+};
+
+TowerDefenseManager.updateHUD = function () {
+  this.updateHUDGold();
+  this.updateHUDHealth();
 };
 
 TowerDefenseManager.config = function (args) {
@@ -149,11 +175,12 @@ TowerDefenseManager.config = function (args) {
     this.setLimitAnimation(+args["limitAnimation"]);
   }
 
-  $gameMap.updateHealthHud();
+  TowerDefenseManager.setActive(true);
+  TowerDefenseManager.updateHUDHealth();
   $gameMap.ufcCalcGrid();
 
   // Disable Open Menu
-  $gameSystem.disableMenu();
+  // $gameSystem.disableMenu();
 
   this.cacheImage();
 };
@@ -164,6 +191,10 @@ TowerDefenseManager.cacheImage = function () {
   for (let image of this._cacheSprite) {
     ImageManager.loadCharacter(image);
   }
+};
+
+TowerDefenseManager.setActive = function (active) {
+  this._active = active;
 };
 
 TowerDefenseManager.actionTower = function (towerData, callback) {

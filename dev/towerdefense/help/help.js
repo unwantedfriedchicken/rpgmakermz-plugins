@@ -424,7 +424,7 @@ unwantedfriedchicken<at>gmail.com
 @type boolean
 @default true
 
-@command updateHealthHud
-@text Update Health Hud
-@desc Update Health Hud To Current Variable Value
+@command updateHUD
+@text Update Hud
+@desc Update every Hud To Current Variable Value
 */

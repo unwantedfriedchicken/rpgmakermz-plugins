@@ -265,8 +265,6 @@ UFC.UFCTD.ALIAS._Scene_Map_createAllWindows =
 Scene_Map.prototype.createAllWindows = function () {
   UFC.UFCTD.ALIAS._Scene_Map_createAllWindows.call(this);
   this.createHUDTD();
-  this.createGoldWindow();
-  this.createTDHealth();
 };
 
 // ----------------------------------- HUD --------------------------------
@@ -293,14 +291,13 @@ Scene_Map.prototype.createHUDTD = function () {
   );
   this.addWindow(UFC.UFCTD.HUDGUI.GOLDWINDOW);
   UFC.UFCTD.HUDGUI.GOLDWINDOW.visible = TowerDefenseManager.getHUDGold;
-};
-Scene_Map.prototype.createTDHealth = function () {
+
   let windowWidth = 200;
-  this._TDHealthWindow = new Window_TDHealth(
+  UFC.UFCTD.HUDGUI.HEALTHWINDOW = new Window_TDHealth(
     new Rectangle(Graphics.boxWidth / 2 - windowWidth / 2, -10, windowWidth, 80)
   );
-  this.addWindow(this._TDHealthWindow);
-  this._TDHealthWindow.visible = TowerDefenseManager.getHUDHealth;
+  this.addWindow(UFC.UFCTD.HUDGUI.HEALTHWINDOW);
+  UFC.UFCTD.HUDGUI.HEALTHWINDOW.visible = TowerDefenseManager.getHUDHealth;
 };
 
 // ----------------------------------- End HUD -------------------------
@@ -310,7 +307,7 @@ UFC.UFCTD.ALIAS._Game_Interpreter_command125 =
   Game_Interpreter.prototype.command125;
 Game_Interpreter.prototype.command125 = function () {
   UFC.UFCTD.ALIAS._Game_Interpreter_command125.apply(this, arguments);
-  $gameMap.updateGoldHud();
+  TowerDefenseManager.updateHUDGold();
   return true;
 };
 
@@ -355,14 +352,6 @@ Game_Map.prototype.ufcGetGrid = function () {
 
 Game_Map.prototype.ufcCalcGrid = function () {
   this.ufcGetGrid().calcGrid();
-};
-
-Game_Map.prototype.updateGoldHud = function () {
-  UFC.UFCTD.HUDGUI.GOLDWINDOW.refresh();
-};
-
-Game_Map.prototype.updateHealthHud = function () {
-  SceneManager.getScene()._TDHealthWindow.refresh();
 };
 
 Game_Map.prototype.ufcGetTowerDefenseList = function () {
@@ -487,7 +476,7 @@ Game_Map.prototype.updateTowerDefenseEnemy = function () {
 
 Game_Map.prototype.updateProjectile = function () {
   for (const projectile of this.ufcProjectiles()) {
-    if (!projectile.destroy) projectile.update();
+    if (!projectile.isDestroyed()) projectile.update();
   }
 };
 

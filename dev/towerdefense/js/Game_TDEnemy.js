@@ -265,7 +265,7 @@ Game_TDEnemy.prototype.destroy = function () {
   $gameMap.ufcDestroyEnemy(this);
   this._destroy = true;
   $gameParty.gainGold(+this._enemyData.gold);
-  $gameMap.updateGoldHud();
+  TowerDefenseManager.updateHUDGold();
 };
 
 Game_TDEnemy.prototype.isDestroyed = function () {

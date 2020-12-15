@@ -38,7 +38,7 @@ Sprite_ufcProjectile.prototype.update = function () {
   this.updateCharacterFrame();
   this.updatePosition();
 
-  if (this._projectileData.destroy || !this._projectileData) {
+  if (this._projectileData.isDestroyed() || !this._projectileData) {
     this.destroy();
   }
 };

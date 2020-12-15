@@ -75,7 +75,7 @@ Window_TDAction.prototype.upgradeTower = function (upgradeIndex) {
     pan: 0,
   });
   $gameParty.gainGold(-+this._towerData._upgrade[upgradeIndex].price);
-  $gameMap.updateGoldHud();
+  TowerDefenseManager.updateHUDGold();
   // Upgrade
   $gamePlayer.getGuideAction().resetParent();
   TowerDefenseManager.selectTower(
@@ -124,7 +124,7 @@ Window_TDAction.prototype.callOkHandler = function () {
         pan: 0,
       });
       $gameParty.gainGold(+this._towerData._sellPrice);
-      $gameMap.updateGoldHud();
+      TowerDefenseManager.updateHUDGold();
       this._towerDataDestroyCallback();
       UFC.UFCTD.HUDGUI.ITEMSLOT.open();
       break;

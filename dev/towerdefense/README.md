@@ -70,8 +70,13 @@ you can delete any **optional** note
 > > **PRICE**  
 > > Price for upgrade the tower, if not stated price is using price in DB
 
-> **Example**  
-> `<upgrade:23><upgrade2:34|200>`  
+> **Example**
+
+```
+<upgrade:23>
+<upgrade2:34|200>
+```
+
 > Have 2 upgrade from this tower and the second upgrade price is 200
 
 **note** : Note when tower is selected / in upgrade  

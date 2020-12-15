@@ -67,13 +67,9 @@ PluginManager.registerCommand("UFCTowerDefense", "showGold", function (args) {
   TowerDefenseManager.showHUDTDGold(args);
 });
 
-PluginManager.registerCommand(
-  "UFCTowerDefense",
-  "updateHealthHud",
-  function () {
-    $gameMap.updateHealthHud();
-  }
-);
+PluginManager.registerCommand("UFCTowerDefense", "updateHUD", function () {
+  TowerDefenseManager.updateHUD();
+});
 
 PluginManager.registerCommand(
   "UFCTowerDefense",

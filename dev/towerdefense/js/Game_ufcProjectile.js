@@ -26,7 +26,7 @@ Game_ufcProjectile.prototype.initialize = function (
   this.canvasY = this.screenY(this._y);
   this.vX = 0;
   this.vY = 0;
-  this.destroy = false;
+  this._destroy = false;
   this.rotation = 180;
   this._distCollide = 38;
   this.setDirection(2);
@@ -62,15 +62,15 @@ Game_ufcProjectile.prototype.update = function () {
       this._distCollide ||
     this._target.isDestroyed()
   ) {
-    this.destroyProjectile();
+    this.destroy();
   }
 };
 
-Game_ufcProjectile.prototype.destroyProjectile = function () {
+Game_ufcProjectile.prototype.destroy = function () {
   TowerDefenseManager.requestAnimation([this._target], this.animationId);
   $gameMap.ufcDestroyProjectile(this);
   this._target.attacked(this.damage);
-  this.destroy = true;
+  this._destroy = true;
 };
 
 Game_ufcProjectile.prototype.isMoving = function () {

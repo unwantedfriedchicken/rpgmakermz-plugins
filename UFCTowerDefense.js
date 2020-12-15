@@ -424,9 +424,9 @@ unwantedfriedchicken<at>gmail.com
 @type boolean
 @default true
 
-@command updateHealthHud
-@text Update Health Hud
-@desc Update Health Hud To Current Variable Value
+@command updateHUD
+@text Update Hud
+@desc Update every Hud To Current Variable Value
 */
 
 var Imported = Imported || {};
@@ -510,13 +510,9 @@ PluginManager.registerCommand("UFCTowerDefense", "showGold", function (args) {
   TowerDefenseManager.showHUDTDGold(args);
 });
 
-PluginManager.registerCommand(
-  "UFCTowerDefense",
-  "updateHealthHud",
-  function () {
-    $gameMap.updateHealthHud();
-  }
-);
+PluginManager.registerCommand("UFCTowerDefense", "updateHUD", function () {
+  TowerDefenseManager.updateHUD();
+});
 
 PluginManager.registerCommand(
   "UFCTowerDefense",
@@ -964,7 +960,7 @@ Game_TDEnemy.prototype.destroy = function () {
   $gameMap.ufcDestroyEnemy(this);
   this._destroy = true;
   $gameParty.gainGold(+this._enemyData.gold);
-  $gameMap.updateGoldHud();
+  TowerDefenseManager.updateHUDGold();
 };
 
 Game_TDEnemy.prototype.isDestroyed = function () {
@@ -1153,7 +1149,7 @@ Game_ufcProjectile.prototype.initialize = function (
   this.canvasY = this.screenY(this._y);
   this.vX = 0;
   this.vY = 0;
-  this.destroy = false;
+  this._destroy = false;
   this.rotation = 180;
   this._distCollide = 38;
   this.setDirection(2);
@@ -1189,15 +1185,15 @@ Game_ufcProjectile.prototype.update = function () {
       this._distCollide ||
     this._target.isDestroyed()
   ) {
-    this.destroyProjectile();
+    this.destroy();
   }
 };
 
-Game_ufcProjectile.prototype.destroyProjectile = function () {
+Game_ufcProjectile.prototype.destroy = function () {
   TowerDefenseManager.requestAnimation([this._target], this.animationId);
   $gameMap.ufcDestroyProjectile(this);
   this._target.attacked(this.damage);
-  this.destroy = true;
+  this._destroy = true;
 };
 
 Game_ufcProjectile.prototype.isMoving = function () {
@@ -1288,7 +1284,7 @@ Sprite_ufcProjectile.prototype.update = function () {
   this.updateCharacterFrame();
   this.updatePosition();
 
-  if (this._projectileData.destroy || !this._projectileData) {
+  if (this._projectileData.isDestroyed() || !this._projectileData) {
     this.destroy();
   }
 };
@@ -2041,8 +2037,6 @@ UFC.UFCTD.ALIAS._Scene_Map_createAllWindows =
 Scene_Map.prototype.createAllWindows = function () {
   UFC.UFCTD.ALIAS._Scene_Map_createAllWindows.call(this);
   this.createHUDTD();
-  this.createGoldWindow();
-  this.createTDHealth();
 };
 
 // ----------------------------------- HUD --------------------------------
@@ -2069,14 +2063,13 @@ Scene_Map.prototype.createHUDTD = function () {
   );
   this.addWindow(UFC.UFCTD.HUDGUI.GOLDWINDOW);
   UFC.UFCTD.HUDGUI.GOLDWINDOW.visible = TowerDefenseManager.getHUDGold;
-};
-Scene_Map.prototype.createTDHealth = function () {
+
   let windowWidth = 200;
-  this._TDHealthWindow = new Window_TDHealth(
+  UFC.UFCTD.HUDGUI.HEALTHWINDOW = new Window_TDHealth(
     new Rectangle(Graphics.boxWidth / 2 - windowWidth / 2, -10, windowWidth, 80)
   );
-  this.addWindow(this._TDHealthWindow);
-  this._TDHealthWindow.visible = TowerDefenseManager.getHUDHealth;
+  this.addWindow(UFC.UFCTD.HUDGUI.HEALTHWINDOW);
+  UFC.UFCTD.HUDGUI.HEALTHWINDOW.visible = TowerDefenseManager.getHUDHealth;
 };
 
 // ----------------------------------- End HUD -------------------------
@@ -2086,7 +2079,7 @@ UFC.UFCTD.ALIAS._Game_Interpreter_command125 =
   Game_Interpreter.prototype.command125;
 Game_Interpreter.prototype.command125 = function () {
   UFC.UFCTD.ALIAS._Game_Interpreter_command125.apply(this, arguments);
-  $gameMap.updateGoldHud();
+  TowerDefenseManager.updateHUDGold();
   return true;
 };
 
@@ -2131,14 +2124,6 @@ Game_Map.prototype.ufcGetGrid = function () {
 
 Game_Map.prototype.ufcCalcGrid = function () {
   this.ufcGetGrid().calcGrid();
-};
-
-Game_Map.prototype.updateGoldHud = function () {
-  UFC.UFCTD.HUDGUI.GOLDWINDOW.refresh();
-};
-
-Game_Map.prototype.updateHealthHud = function () {
-  SceneManager.getScene()._TDHealthWindow.refresh();
 };
 
 Game_Map.prototype.ufcGetTowerDefenseList = function () {
@@ -2263,7 +2248,7 @@ Game_Map.prototype.updateTowerDefenseEnemy = function () {
 
 Game_Map.prototype.updateProjectile = function () {
   for (const projectile of this.ufcProjectiles()) {
-    if (!projectile.destroy) projectile.update();
+    if (!projectile.isDestroyed()) projectile.update();
   }
 };
 
@@ -2345,6 +2330,7 @@ function TowerDefenseManager() {
 }
 
 TowerDefenseManager.initialize = function () {
+  this._active = false;
   this._HUDGold = false;
   this._HUDHealth = false;
   this._GUIItemSlot = false;
@@ -2390,9 +2376,9 @@ TowerDefenseManager.debugMode = function () {
       }
       if (e.key == 3) {
         $gameVariables.setValue(UFC.UFCTD.CONFIG.healthVarId, 99999);
-        $gameMap.updateHealthHud();
+        TowerDefenseManager.updateHUDHealth();
         $gameParty.gainGold(99999999);
-        $gameMap.updateGoldHud();
+        TowerDefenseManager.updateHUDGold();
       }
       if (e.key == 4) {
         this.setLimitAnimation(UFC.UFCTD.DEBUGMODE.limitAnimation);
@@ -2449,7 +2435,7 @@ TowerDefenseManager.attackTower = function (damage) {
     $gameSwitches.setValue(UFC.UFCTD.CONFIG.gameOverSwitchId, true);
   }
 
-  $gameMap.updateHealthHud();
+  TowerDefenseManager.updateHUDHealth();
 };
 
 TowerDefenseManager.requestAnimation = function (targets, animation) {
@@ -2471,7 +2457,32 @@ TowerDefenseManager.showHUDTDGold = function (args) {
 
 TowerDefenseManager.showHUDTDHealth = function (args) {
   this._HUDHealth = args["show"] == "true";
-  SceneManager.getScene()._TDHealthWindow.visible = this._HUDHealth;
+  UFC.UFCTD.HUDGUI.HEALTHWINDOW.visible = this._HUDHealth;
+};
+
+TowerDefenseManager.updateHUDGold = function () {
+  if (
+    !this._active ||
+    !UFC.UFCTD.HUDGUI.GOLDWINDOW ||
+    UFC.UFCTD.HUDGUI.GOLDWINDOW._destroyed
+  )
+    return;
+  UFC.UFCTD.HUDGUI.GOLDWINDOW.refresh();
+};
+
+TowerDefenseManager.updateHUDHealth = function () {
+  if (
+    !this._active ||
+    !UFC.UFCTD.HUDGUI.HEALTHWINDOW ||
+    UFC.UFCTD.HUDGUI.HEALTHWINDOW._destroyed
+  )
+    return;
+  UFC.UFCTD.HUDGUI.HEALTHWINDOW.refresh();
+};
+
+TowerDefenseManager.updateHUD = function () {
+  this.updateHUDGold();
+  this.updateHUDHealth();
 };
 
 TowerDefenseManager.config = function (args) {
@@ -2491,11 +2502,12 @@ TowerDefenseManager.config = function (args) {
     this.setLimitAnimation(+args["limitAnimation"]);
   }
 
-  $gameMap.updateHealthHud();
+  TowerDefenseManager.setActive(true);
+  TowerDefenseManager.updateHUDHealth();
   $gameMap.ufcCalcGrid();
 
   // Disable Open Menu
-  $gameSystem.disableMenu();
+  // $gameSystem.disableMenu();
 
   this.cacheImage();
 };
@@ -2506,6 +2518,10 @@ TowerDefenseManager.cacheImage = function () {
   for (let image of this._cacheSprite) {
     ImageManager.loadCharacter(image);
   }
+};
+
+TowerDefenseManager.setActive = function (active) {
+  this._active = active;
 };
 
 TowerDefenseManager.actionTower = function (towerData, callback) {
@@ -3507,7 +3523,7 @@ Window_TDAction.prototype.upgradeTower = function (upgradeIndex) {
     pan: 0,
   });
   $gameParty.gainGold(-+this._towerData._upgrade[upgradeIndex].price);
-  $gameMap.updateGoldHud();
+  TowerDefenseManager.updateHUDGold();
   // Upgrade
   $gamePlayer.getGuideAction().resetParent();
   TowerDefenseManager.selectTower(
@@ -3556,7 +3572,7 @@ Window_TDAction.prototype.callOkHandler = function () {
         pan: 0,
       });
       $gameParty.gainGold(+this._towerData._sellPrice);
-      $gameMap.updateGoldHud();
+      TowerDefenseManager.updateHUDGold();
       this._towerDataDestroyCallback();
       UFC.UFCTD.HUDGUI.ITEMSLOT.open();
       break;
