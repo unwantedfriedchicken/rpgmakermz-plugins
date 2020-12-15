@@ -1630,6 +1630,7 @@ Sprite_ufcTDTower.prototype.initMembers = function (ufcTD) {
 
 Sprite_ufcTDTower.prototype.resetRangeGraphics = function () {
   let _rangeGraphics = new PIXI.Graphics();
+  let _realRange = this._range * 2 + 1;
   if (this._towerData.isHaveAura())
     _rangeGraphics.beginFill(
       UFC.UFCTD.TOWERSETTINGS.auraRangeColor,
@@ -1640,13 +1641,27 @@ Sprite_ufcTDTower.prototype.resetRangeGraphics = function () {
       UFC.UFCTD.TOWERSETTINGS.attackRangeColor,
       UFC.UFCTD.TOWERSETTINGS.attackRangeOpacity
     );
-  _rangeGraphics.drawRect(
-    0,
-    0,
-    (this._range * 2 + 1) * $gameMap.tileWidth(),
-    (this._range * 2 + 1) * $gameMap.tileHeight()
-  );
+  // _rangeGraphics.drawRect(
+  //   0,
+  //   0,
+  //   _realRange * $gameMap.tileWidth(),
+  //   _realRange * $gameMap.tileHeight()
+  // );
+  // _rangeGraphics.endFill();
+
+  let lineSize = 6;
+  for (let x = 0; x < _realRange; x++) {
+    for (let y = 0; y < _realRange; y++) {
+      _rangeGraphics.drawRect(
+        this.posX(x) + lineSize / 2,
+        this.posY(y) + lineSize / 2,
+        $gameMap.tileWidth() - lineSize,
+        $gameMap.tileHeight() - lineSize
+      );
+    }
+  }
   _rangeGraphics.endFill();
+
   let rangeSprite = Graphics.app.renderer.generateTexture(_rangeGraphics);
   if (!this._rangeGraphics) {
     this._rangeGraphics = new PIXI.Sprite(rangeSprite);
@@ -1759,6 +1774,14 @@ Sprite_ufcTDTower.prototype.setRangeVisibility = function (visible) {
 Sprite_ufcTDTower.prototype.setPosition = function (x, y) {
   let pos = $gameMap.positionToCanvas(x, y);
   this.move(pos.x, pos.y);
+};
+
+Sprite_ufcTDTower.prototype.posX = function (x) {
+  return x * $gameMap.tileWidth();
+};
+
+Sprite_ufcTDTower.prototype.posY = function (y) {
+  return y * $gameMap.tileHeight();
 };
 
 Sprite_ufcTDTower.prototype.destroy = function (options) {
