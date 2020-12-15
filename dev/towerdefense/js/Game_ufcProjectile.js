@@ -66,13 +66,19 @@ Game_ufcProjectile.prototype.update = function () {
   }
 };
 
-Game_ufcProjectile.prototype.destroy = function () {
-  TowerDefenseManager.requestAnimation([this._target], this.animationId);
+Game_ufcProjectile.prototype.destroy = function (onlyDestroy = false) {
+  if (!onlyDestroy) {
+    TowerDefenseManager.requestAnimation([this._target], this.animationId);
+    this._target.attacked(this.damage);
+  }
   $gameMap.ufcDestroyProjectile(this);
-  this._target.attacked(this.damage);
   this._destroy = true;
 };
 
 Game_ufcProjectile.prototype.isMoving = function () {
   return true;
+};
+
+Game_ufcProjectile.prototype.isDestroyed = function () {
+  return this._destroy;
 };

@@ -117,6 +117,7 @@ TowerDefenseManager.requestAnimation = function (targets, animation) {
 };
 
 TowerDefenseManager.showGUIItemSlot = function (args) {
+  if (!this.isActive) return;
   this._GUIItemSlot = args["show"] == "true";
   UFC.UFCTD.HUDGUI.ITEMSLOT.visible = this._GUIItemSlot;
   if (this._GUIItemSlot) UFC.UFCTD.HUDGUI.ITEMSLOT.open();
@@ -124,18 +125,20 @@ TowerDefenseManager.showGUIItemSlot = function (args) {
 };
 
 TowerDefenseManager.showHUDTDGold = function (args) {
+  if (!this.isActive) return;
   this._HUDGold = args["show"] == "true";
   UFC.UFCTD.HUDGUI.GOLDWINDOW.visible = this._HUDGold;
 };
 
 TowerDefenseManager.showHUDTDHealth = function (args) {
+  if (!this.isActive) return;
   this._HUDHealth = args["show"] == "true";
   UFC.UFCTD.HUDGUI.HEALTHWINDOW.visible = this._HUDHealth;
 };
 
 TowerDefenseManager.updateHUDGold = function () {
   if (
-    !this._active ||
+    !this.isActive ||
     !UFC.UFCTD.HUDGUI.GOLDWINDOW ||
     UFC.UFCTD.HUDGUI.GOLDWINDOW._destroyed
   )
@@ -145,7 +148,7 @@ TowerDefenseManager.updateHUDGold = function () {
 
 TowerDefenseManager.updateHUDHealth = function () {
   if (
-    !this._active ||
+    !this.isActive ||
     !UFC.UFCTD.HUDGUI.HEALTHWINDOW ||
     UFC.UFCTD.HUDGUI.HEALTHWINDOW._destroyed
   )
@@ -159,6 +162,12 @@ TowerDefenseManager.updateHUD = function () {
 };
 
 TowerDefenseManager.config = function (args) {
+  SceneManager.getScene().createHUDTD();
+  $gameMap.setupTDGrid();
+
+  const _spriteSet = SceneManager.getSpriteSetMap();
+  _spriteSet._tilemap.addChild(new Sprite_ufcGrid($gameMap.ufcGetGrid()));
+
   let ot = JSON.parse(args["onlyTerrain"]);
   if (ot && ot.length > 0) {
     ot = ot.map(Number);
@@ -180,7 +189,7 @@ TowerDefenseManager.config = function (args) {
   $gameMap.ufcCalcGrid();
 
   // Disable Open Menu
-  // $gameSystem.disableMenu();
+  $gameSystem.disableMenu();
 
   this.cacheImage();
 };
@@ -195,6 +204,26 @@ TowerDefenseManager.cacheImage = function () {
 
 TowerDefenseManager.setActive = function (active) {
   this._active = active;
+};
+
+TowerDefenseManager.disableTowerDefense = function () {
+  this.setActive(false);
+
+  // Destroy HUD
+  UFC.UFCTD.HUDGUI.ITEMSLOT.destroy();
+  UFC.UFCTD.HUDGUI.GOLDWINDOW.destroy();
+  UFC.UFCTD.HUDGUI.HEALTHWINDOW.destroy();
+
+  // Destroy Grid
+  $gameMap.ufcGetGrid().destroy();
+
+  // Destroy Projectile
+  for (const projectile of $gameMap.ufcProjectiles()) {
+    projectile.destroy(true);
+  }
+
+  // Enable Open Menu
+  $gameSystem.enableMenu();
 };
 
 TowerDefenseManager.actionTower = function (towerData, callback) {
@@ -350,6 +379,12 @@ Object.defineProperty(TowerDefenseManager, "getHUDHealthValue", {
 Object.defineProperty(TowerDefenseManager, "getHUDHealthMaxValue", {
   get: function () {
     return $gameVariables.value(UFC.UFCTD.CONFIG.healthMaxVarId);
+  },
+});
+
+Object.defineProperty(TowerDefenseManager, "isActive", {
+  get: function () {
+    return this._active;
   },
 });
 

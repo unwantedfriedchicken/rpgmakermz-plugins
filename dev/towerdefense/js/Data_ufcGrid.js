@@ -3,6 +3,7 @@ const Data_ufcGrid = function () {
 };
 
 Data_ufcGrid.prototype.initialize = function () {
+  this._destroy = false;
   this._event = new PIXI.utils.EventEmitter();
   this._gridData = [];
   this._eventData = [];
@@ -104,4 +105,13 @@ Data_ufcGrid.prototype.clearGrid = function (x, y) {
     $gameMap.tileWidth(),
     $gameMap.tileHeight()
   );
+};
+
+Data_ufcGrid.prototype.destroy = function () {
+  this._destroy = true;
+  this._bitmap.destroy();
+};
+
+Data_ufcGrid.prototype.isDestroyed = function () {
+  return this._destroy;
 };

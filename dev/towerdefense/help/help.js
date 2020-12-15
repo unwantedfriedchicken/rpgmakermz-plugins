@@ -167,6 +167,10 @@ unwantedfriedchicken<at>gmail.com
 @type number[]
 @default []
 
+@command disableTowerDefense
+@text Disable Tower Defense
+@desc Disable Tower Defense mean will destroy any tower defense element, to go back to tower defense mode need to call Config again
+
 @command limitAnimation
 @text Limit Animation
 @desc Set limit animation

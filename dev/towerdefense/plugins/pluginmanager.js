@@ -83,6 +83,14 @@ PluginManager.registerCommand("UFCTowerDefense", "config", function (args) {
   TowerDefenseManager.config(args);
 });
 
+PluginManager.registerCommand(
+  "UFCTowerDefense",
+  "disableTowerDefense",
+  function () {
+    TowerDefenseManager.disableTowerDefense();
+  }
+);
+
 PluginManager.registerCommand("UFCTowerDefense", "startWave", function (args) {
   $gameMap.addTowerDefenseNewWave(args);
 });

@@ -25,6 +25,10 @@ Sprite_ufcGrid.prototype.update = function () {
   this.y = this.screenY(-0.5);
 
   this._data.updateEvents();
+
+  if (this._data.isDestroyed()) {
+    this.destroy();
+  }
 };
 
 Sprite_ufcGrid.prototype.screenX = function (x) {

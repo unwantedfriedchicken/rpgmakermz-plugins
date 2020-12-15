@@ -167,6 +167,10 @@ unwantedfriedchicken<at>gmail.com
 @type number[]
 @default []
 
+@command disableTowerDefense
+@text Disable Tower Defense
+@desc Disable Tower Defense mean will destroy any tower defense element, to go back to tower defense mode need to call Config again
+
 @command limitAnimation
 @text Limit Animation
 @desc Set limit animation
@@ -526,6 +530,14 @@ PluginManager.registerCommand("UFCTowerDefense", "config", function (args) {
   TowerDefenseManager.config(args);
 });
 
+PluginManager.registerCommand(
+  "UFCTowerDefense",
+  "disableTowerDefense",
+  function () {
+    TowerDefenseManager.disableTowerDefense();
+  }
+);
+
 PluginManager.registerCommand("UFCTowerDefense", "startWave", function (args) {
   $gameMap.addTowerDefenseNewWave(args);
 });
@@ -590,6 +602,7 @@ const Data_ufcGrid = function () {
 };
 
 Data_ufcGrid.prototype.initialize = function () {
+  this._destroy = false;
   this._event = new PIXI.utils.EventEmitter();
   this._gridData = [];
   this._eventData = [];
@@ -691,6 +704,15 @@ Data_ufcGrid.prototype.clearGrid = function (x, y) {
     $gameMap.tileWidth(),
     $gameMap.tileHeight()
   );
+};
+
+Data_ufcGrid.prototype.destroy = function () {
+  this._destroy = true;
+  this._bitmap.destroy();
+};
+
+Data_ufcGrid.prototype.isDestroyed = function () {
+  return this._destroy;
 };
 
 function Game_TDEnemy() {
@@ -1189,15 +1211,21 @@ Game_ufcProjectile.prototype.update = function () {
   }
 };
 
-Game_ufcProjectile.prototype.destroy = function () {
-  TowerDefenseManager.requestAnimation([this._target], this.animationId);
+Game_ufcProjectile.prototype.destroy = function (onlyDestroy = false) {
+  if (!onlyDestroy) {
+    TowerDefenseManager.requestAnimation([this._target], this.animationId);
+    this._target.attacked(this.damage);
+  }
   $gameMap.ufcDestroyProjectile(this);
-  this._target.attacked(this.damage);
   this._destroy = true;
 };
 
 Game_ufcProjectile.prototype.isMoving = function () {
   return true;
+};
+
+Game_ufcProjectile.prototype.isDestroyed = function () {
+  return this._destroy;
 };
 
 const Sprite_ufcGrid = function () {
@@ -1227,6 +1255,10 @@ Sprite_ufcGrid.prototype.update = function () {
   this.y = this.screenY(-0.5);
 
   this._data.updateEvents();
+
+  if (this._data.isDestroyed()) {
+    this.destroy();
+  }
 };
 
 Sprite_ufcGrid.prototype.screenX = function (x) {
@@ -1925,6 +1957,7 @@ UFC.UFCTD.ALIAS._Game_Player_triggerButtonAction =
   Game_Player.prototype.triggerButtonAction;
 Game_Player.prototype.triggerButtonAction = function () {
   if (
+    TowerDefenseManager.isActive &&
     Input.isTriggered("ok") &&
     TowerDefenseManager.getState == TowerDefenseManager.STATE.BUILD &&
     !this.getGuideAction().isBlocked()
@@ -1948,6 +1981,7 @@ Game_Player.prototype.triggerButtonAction = function () {
 UFC.UFCTD.ALIAS._Game_Player_moveByInput = Game_Player.prototype.moveByInput;
 Game_Player.prototype.moveByInput = function () {
   if (
+    TowerDefenseManager.isActive &&
     TowerDefenseManager.getState == TowerDefenseManager.STATE.BUILD &&
     this.getInputDirection() > 0 &&
     this.getGuideAction().isMouseMode
@@ -1960,6 +1994,7 @@ Game_Player.prototype.moveByInput = function () {
 UFC.UFCTD.ALIAS._Game_Player_executeMove = Game_Player.prototype.executeMove;
 Game_Player.prototype.executeMove = function () {
   if (
+    TowerDefenseManager.isActive &&
     $gameTemp.isDestinationValid() &&
     TowerDefenseManager.getState == TowerDefenseManager.STATE.BUILD
   ) {
@@ -1988,6 +2023,7 @@ Game_Player.prototype.update = function () {
   UFC.UFCTD.ALIAS._Game_Player_update.call(this, ...arguments);
 
   if (
+    TowerDefenseManager.isActive &&
     TouchInput.isTriggered() &&
     TowerDefenseManager.getState == TowerDefenseManager.STATE.BUILD
   ) {
@@ -2013,7 +2049,11 @@ Game_Player.prototype.triggerTouchActionD2 = function (x2, y2) {
 };
 
 Game_Player.prototype.checkEventTower = function (x, y) {
-  if (TowerDefenseManager.getState != TowerDefenseManager.STATE.IDLE) return;
+  if (
+    !TowerDefenseManager.isActive ||
+    TowerDefenseManager.getState != TowerDefenseManager.STATE.IDLE
+  )
+    return false;
   let x2 = x;
   let y2 = y;
   if (!x2 || !y2) {
@@ -2039,7 +2079,8 @@ Game_Player.prototype.checkEventTower = function (x, y) {
 
 UFC.UFCTD.ALIAS._Scene_Map_onMapTouch = Scene_Map.prototype.onMapTouch;
 Scene_Map.prototype.onMapTouch = function () {
-  if (UFC.UFCTD.HUDGUI.MESSAGE.isHoverHUDItem) return;
+  if (TowerDefenseManager.isActive && UFC.UFCTD.HUDGUI.MESSAGE.isHoverHUDItem)
+    return;
   return UFC.UFCTD.ALIAS._Scene_Map_onMapTouch.call(this);
 };
 
@@ -2047,19 +2088,13 @@ UFC.UFCTD.ALIAS._Scene_Map_updateCallMenu = Scene_Map.prototype.updateCallMenu;
 Scene_Map.prototype.updateCallMenu = function () {
   UFC.UFCTD.ALIAS._Scene_Map_updateCallMenu.call(this);
   if (
+    TowerDefenseManager.isActive &&
     !this.isMenuEnabled() &&
     TowerDefenseManager.getState == TowerDefenseManager.STATE.BUILD &&
     this.isMenuCalled()
   ) {
     TowerDefenseManager.cancelSelect();
   }
-};
-
-UFC.UFCTD.ALIAS._Scene_Map_createAllWindows =
-  Scene_Map.prototype.createAllWindows;
-Scene_Map.prototype.createAllWindows = function () {
-  UFC.UFCTD.ALIAS._Scene_Map_createAllWindows.call(this);
-  this.createHUDTD();
 };
 
 // ----------------------------------- HUD --------------------------------
@@ -2135,9 +2170,7 @@ Game_Map.prototype.initialize = function () {
   this._towerDefenseGrid = null;
 };
 
-UFC.UFCTD.ALIAS._Game_Map_setup = Game_Map.prototype.setup;
-Game_Map.prototype.setup = function (mapId) {
-  UFC.UFCTD.ALIAS._Game_Map_setup.call(this, mapId);
+Game_Map.prototype.setupTDGrid = function () {
   this._towerDefenseGrid = new Data_ufcGrid();
 };
 
@@ -2237,9 +2270,11 @@ Game_Map.prototype.positionToCanvas = function (x, y) {
 UFC.UFCTD.ALIAS._Game_Map_update = Game_Map.prototype.update;
 Game_Map.prototype.update = function (sceneActive) {
   UFC.UFCTD.ALIAS._Game_Map_update.call(this, sceneActive);
-  this.updateTowerDefenseWave();
-  this.updateTowerDefenseEnemy();
-  this.updateProjectile();
+  if (TowerDefenseManager.isActive) {
+    this.updateTowerDefenseWave();
+    this.updateTowerDefenseEnemy();
+    this.updateProjectile();
+  }
 };
 
 Game_Map.prototype.addTowerDefenseNewWave = function (wavedata) {
@@ -2277,7 +2312,8 @@ Game_Map.prototype.updateProjectile = function () {
 
 UFC.UFCTD.ALIAS._Game_Map_refresh = Game_Map.prototype.refresh;
 Game_Map.prototype.refresh = function () {
-  if (UFC.UFCTD.HUDGUI.ITEMSLOT) UFC.UFCTD.HUDGUI.ITEMSLOT.refresh();
+  if (TowerDefenseManager.isActive && UFC.UFCTD.HUDGUI.ITEMSLOT)
+    UFC.UFCTD.HUDGUI.ITEMSLOT.refresh();
   UFC.UFCTD.ALIAS._Game_Map_refresh.call(this);
 };
 
@@ -2303,6 +2339,7 @@ UFC.UFCTD.ALIAS._Spriteset_Map_createCharacters =
   Spriteset_Map.prototype.createCharacters;
 Spriteset_Map.prototype.createCharacters = function () {
   UFC.UFCTD.ALIAS._Spriteset_Map_createCharacters.call(this);
+  if (!TowerDefenseManager.isActive) return;
 
   // Create Tower
   let towers = $gameMap._events.filter(
@@ -2325,6 +2362,7 @@ Spriteset_Map.prototype.createCharacters = function () {
   }
 
   this._tilemap.addChild(new Sprite_ufcGrid($gameMap.ufcGetGrid()));
+
   if (TowerDefenseManager.getState != TowerDefenseManager.STATE.IDLE) {
     TowerDefenseManager.selectTowerMode();
   }
@@ -2467,6 +2505,7 @@ TowerDefenseManager.requestAnimation = function (targets, animation) {
 };
 
 TowerDefenseManager.showGUIItemSlot = function (args) {
+  if (!this.isActive) return;
   this._GUIItemSlot = args["show"] == "true";
   UFC.UFCTD.HUDGUI.ITEMSLOT.visible = this._GUIItemSlot;
   if (this._GUIItemSlot) UFC.UFCTD.HUDGUI.ITEMSLOT.open();
@@ -2474,18 +2513,20 @@ TowerDefenseManager.showGUIItemSlot = function (args) {
 };
 
 TowerDefenseManager.showHUDTDGold = function (args) {
+  if (!this.isActive) return;
   this._HUDGold = args["show"] == "true";
   UFC.UFCTD.HUDGUI.GOLDWINDOW.visible = this._HUDGold;
 };
 
 TowerDefenseManager.showHUDTDHealth = function (args) {
+  if (!this.isActive) return;
   this._HUDHealth = args["show"] == "true";
   UFC.UFCTD.HUDGUI.HEALTHWINDOW.visible = this._HUDHealth;
 };
 
 TowerDefenseManager.updateHUDGold = function () {
   if (
-    !this._active ||
+    !this.isActive ||
     !UFC.UFCTD.HUDGUI.GOLDWINDOW ||
     UFC.UFCTD.HUDGUI.GOLDWINDOW._destroyed
   )
@@ -2495,7 +2536,7 @@ TowerDefenseManager.updateHUDGold = function () {
 
 TowerDefenseManager.updateHUDHealth = function () {
   if (
-    !this._active ||
+    !this.isActive ||
     !UFC.UFCTD.HUDGUI.HEALTHWINDOW ||
     UFC.UFCTD.HUDGUI.HEALTHWINDOW._destroyed
   )
@@ -2509,6 +2550,12 @@ TowerDefenseManager.updateHUD = function () {
 };
 
 TowerDefenseManager.config = function (args) {
+  SceneManager.getScene().createHUDTD();
+  $gameMap.setupTDGrid();
+
+  const _spriteSet = SceneManager.getSpriteSetMap();
+  _spriteSet._tilemap.addChild(new Sprite_ufcGrid($gameMap.ufcGetGrid()));
+
   let ot = JSON.parse(args["onlyTerrain"]);
   if (ot && ot.length > 0) {
     ot = ot.map(Number);
@@ -2530,7 +2577,7 @@ TowerDefenseManager.config = function (args) {
   $gameMap.ufcCalcGrid();
 
   // Disable Open Menu
-  // $gameSystem.disableMenu();
+  $gameSystem.disableMenu();
 
   this.cacheImage();
 };
@@ -2545,6 +2592,26 @@ TowerDefenseManager.cacheImage = function () {
 
 TowerDefenseManager.setActive = function (active) {
   this._active = active;
+};
+
+TowerDefenseManager.disableTowerDefense = function () {
+  this.setActive(false);
+
+  // Destroy HUD
+  UFC.UFCTD.HUDGUI.ITEMSLOT.destroy();
+  UFC.UFCTD.HUDGUI.GOLDWINDOW.destroy();
+  UFC.UFCTD.HUDGUI.HEALTHWINDOW.destroy();
+
+  // Destroy Grid
+  $gameMap.ufcGetGrid().destroy();
+
+  // Destroy Projectile
+  for (const projectile of $gameMap.ufcProjectiles()) {
+    projectile.destroy(true);
+  }
+
+  // Enable Open Menu
+  $gameSystem.enableMenu();
 };
 
 TowerDefenseManager.actionTower = function (towerData, callback) {
@@ -2700,6 +2767,12 @@ Object.defineProperty(TowerDefenseManager, "getHUDHealthValue", {
 Object.defineProperty(TowerDefenseManager, "getHUDHealthMaxValue", {
   get: function () {
     return $gameVariables.value(UFC.UFCTD.CONFIG.healthMaxVarId);
+  },
+});
+
+Object.defineProperty(TowerDefenseManager, "isActive", {
+  get: function () {
+    return this._active;
   },
 });
 
