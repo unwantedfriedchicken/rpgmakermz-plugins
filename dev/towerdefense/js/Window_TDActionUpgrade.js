@@ -93,7 +93,7 @@ Window_TDActionUpgrade.prototype.setUpgrade = function (upgradeData) {
   this.open();
   this.status.open();
   this.deactivate();
-  this.select(-1);
+  this.deselect();
 };
 
 Window_TDActionUpgrade.prototype.drawTitle = function () {
@@ -128,7 +128,7 @@ Window_TDActionUpgrade.prototype.windowHovered = function (
     this._selected = false;
   } else {
     this.deactivate();
-    this.select(-1);
+    this.deselect();
   }
   if (emit) this.emit("selectUpgradeWindow", isHovered);
 };

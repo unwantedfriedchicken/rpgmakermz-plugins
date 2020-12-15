@@ -131,6 +131,33 @@ unwantedfriedchicken<at>gmail.com
 @decimals 1
 @default 0.4
 
+@param tooltip
+@text Tooltip
+@type boolean
+@desc Enable tooltip?
+@default true
+
+@param tooltipYPosition
+@parent tooltip
+@text Y Position
+@type number
+@desc Y position of tooltip
+@default -40
+
+@param tooltipFontSize
+@parent tooltip
+@text Font Size
+@type number
+@desc Tooltip font size
+@default 18
+
+@param tooltipBackgroundType
+@parent tooltip
+@text Background Type
+@type number
+@desc Background type for tooltip, 0 = default, 1 = dim, 2 = nothing
+@default 1
+
 @param debugMode
 @text Debug Mode
 @type boolean
@@ -151,6 +178,9 @@ unwantedfriedchicken<at>gmail.com
 @desc Limit Animation
 @default 5
 
+
+
+============== Plugin Command ================
 @command config
 @text Config Tower Defense
 @desc Configuration

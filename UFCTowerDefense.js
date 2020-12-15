@@ -131,6 +131,33 @@ unwantedfriedchicken<at>gmail.com
 @decimals 1
 @default 0.4
 
+@param tooltip
+@text Tooltip
+@type boolean
+@desc Enable tooltip?
+@default true
+
+@param tooltipYPosition
+@parent tooltip
+@text Y Position
+@type number
+@desc Y position of tooltip
+@default -40
+
+@param tooltipFontSize
+@parent tooltip
+@text Font Size
+@type number
+@desc Tooltip font size
+@default 18
+
+@param tooltipBackgroundType
+@parent tooltip
+@text Background Type
+@type number
+@desc Background type for tooltip, 0 = default, 1 = dim, 2 = nothing
+@default 1
+
 @param debugMode
 @text Debug Mode
 @type boolean
@@ -151,6 +178,9 @@ unwantedfriedchicken<at>gmail.com
 @desc Limit Animation
 @default 5
 
+
+
+============== Plugin Command ================
 @command config
 @text Config Tower Defense
 @desc Configuration
@@ -476,6 +506,13 @@ UFC.UFCTD.TOWERSETTINGS = {
   auraRangeColor: PIXI.utils.string2hex(UFC.UFCTD.PARAMETERS["auraRangeColor"]),
   gridColor: UFC.UFCTD.PARAMETERS["gridColor"],
   gridColorOpacity: +UFC.UFCTD.PARAMETERS["gridColorOpacity"] * 255,
+};
+
+UFC.UFCTD.TOOLTIPSETTINGS = {
+  enable: UFC.UFCTD.PARAMETERS["tooltip"] == "true",
+  yPosition: +UFC.UFCTD.PARAMETERS["tooltipYPosition"],
+  fontSize: +UFC.UFCTD.PARAMETERS["tooltipFontSize"],
+  backgroundType: +UFC.UFCTD.PARAMETERS["tooltipBackgroundType"],
 };
 
 UFC.UFCTD.DEBUGMODE = {
@@ -3291,7 +3328,67 @@ Window_GUIItemSlot.prototype.initialize = function () {
 
   this.setBackgroundType(UFC.UFCTD.HUDGUI.SETTINGS.itemWindowType);
 
+  if (UFC.UFCTD.TOOLTIPSETTINGS.enable) {
+    this.toolTip = new Window_Base(
+      new Rectangle(
+        0,
+        UFC.UFCTD.TOOLTIPSETTINGS.yPosition,
+        UFC.UFCTD.HUDGUI.SETTINGS.itemSize,
+        60
+      )
+    );
+    this.toolTip.setBackgroundType(UFC.UFCTD.TOOLTIPSETTINGS.backgroundType);
+    this.addChild(this.toolTip);
+  }
+
   this.refresh();
+};
+
+Window_GUIItemSlot.prototype.moveTooltip = function (index) {
+  let tower = this._towers[index];
+  if (index == -1 || !tower) {
+    this.toolTip.visible = false;
+    return;
+  }
+
+  this.toolTip.visible = true;
+  let fontSize = UFC.UFCTD.TOOLTIPSETTINGS.fontSize;
+  this.toolTip.contents.fontSize = fontSize;
+  let tooltipWidth = this.toolTip.textWidth(tower.name);
+  let tooltipHeight =
+    fontSize + $gameSystem.windowPadding() * 2 + this.toolTip.lineHeight() / 2;
+  let rectItem = this.itemRect(index);
+  this.toolTip.move(
+    rectItem.x -
+      tooltipWidth / 2 +
+      UFC.UFCTD.HUDGUI.SETTINGS.itemSize / 2 -
+      this.colSpacing() / 2,
+    this.toolTip.y,
+    tooltipWidth + $gameSystem.windowPadding() * 2,
+    tooltipHeight
+  );
+  this.toolTip.createContents();
+  this.toolTip.setBackgroundType(UFC.UFCTD.TOOLTIPSETTINGS.backgroundType);
+  this.toolTip.contents.fontSize = fontSize;
+  this.toolTip.contents.drawText(
+    tower.name,
+    0,
+    0,
+    tooltipWidth,
+    this.toolTip.innerHeight - fontSize * 0.15,
+    "center"
+  );
+};
+
+Window_GUIItemSlot.prototype.select = function (index) {
+  if (
+    this._index != index &&
+    this.toolTip &&
+    UFC.UFCTD.TOOLTIPSETTINGS.enable
+  ) {
+    this.moveTooltip(index);
+  }
+  Window_Command.prototype.select.call(this, index);
 };
 
 Window_GUIItemSlot.prototype.callOkHandler = function () {
@@ -3317,7 +3414,7 @@ Window_GUIItemSlot.prototype.activeKeyboard = function () {
 Window_GUIItemSlot.prototype.deactiveKeyboard = function () {
   this._selectKeyboard = false;
   $gameMessage.setWindowTower(false);
-  this.select(-1);
+  this.deselect();
   this.deactivate();
 };
 
@@ -3359,7 +3456,7 @@ Window_GUIItemSlot.prototype.drawItemBackground = function (index) {
     this.drawIcon(
       this.commandIconIndex(index),
       rect.x + (rect.width - size) / 2,
-      rect.y + (rect.width - size) / 2,
+      rect.y + (rect.width - size) / 2 + this.rowSpacing() / 2,
       size,
       size
     );
@@ -3368,18 +3465,8 @@ Window_GUIItemSlot.prototype.drawItemBackground = function (index) {
 
 Window_GUIItemSlot.prototype.drawItem = function (index) {
   const itemRect = this.itemRect(index);
-  const rect = this.itemLineRect(index);
-  const align = this.itemTextAlign();
   this.resetTextColor();
   this.changePaintOpacity(this.isCommandEnabled(index));
-  this.contents.fontSize = 12;
-  this.drawText(
-    this.commandName(index),
-    rect.x,
-    itemRect.height - 28,
-    rect.width,
-    align
-  );
   const numItem = this.commandNumItem(index);
   if (numItem > 1) {
     let numSizeRect = new Rectangle(
@@ -3448,12 +3535,12 @@ Window_GUIItemSlot.prototype.processTouch = function () {
   } else {
     if (this._selectKeyboard) return;
     UFC.UFCTD.HUDGUI.MESSAGE.isHoverHUDItem = false;
-    this.select(-1);
+    this.deselect();
     this.deactivate();
   }
 };
 
-Window_GUIItemSlot.prototype.onTouchSelect = function (trigger) {
+Window_GUIItemSlot.prototype.onTouchSelect = function () {
   this._doubleTouch = false;
   if (this.isCursorMovable()) {
     const lastIndex = this.index();
@@ -3519,7 +3606,7 @@ Window_GUIItemSlot.prototype.update = function () {
 Window_GUIItemSlot.prototype.refresh = function () {
   Window_Command.prototype.refresh.call(this);
   this.clearCommandList();
-  this.select(-1);
+  this.deselect();
   this.makeCommandTowers();
   this.drawAllItems();
 };
@@ -3984,7 +4071,7 @@ Window_TDActionUpgrade.prototype.setUpgrade = function (upgradeData) {
   this.open();
   this.status.open();
   this.deactivate();
-  this.select(-1);
+  this.deselect();
 };
 
 Window_TDActionUpgrade.prototype.drawTitle = function () {
@@ -4019,7 +4106,7 @@ Window_TDActionUpgrade.prototype.windowHovered = function (
     this._selected = false;
   } else {
     this.deactivate();
-    this.select(-1);
+    this.deselect();
   }
   if (emit) this.emit("selectUpgradeWindow", isHovered);
 };

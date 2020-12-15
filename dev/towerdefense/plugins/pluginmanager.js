@@ -31,6 +31,13 @@ UFC.UFCTD.TOWERSETTINGS = {
   gridColorOpacity: +UFC.UFCTD.PARAMETERS["gridColorOpacity"] * 255,
 };
 
+UFC.UFCTD.TOOLTIPSETTINGS = {
+  enable: UFC.UFCTD.PARAMETERS["tooltip"] == "true",
+  yPosition: +UFC.UFCTD.PARAMETERS["tooltipYPosition"],
+  fontSize: +UFC.UFCTD.PARAMETERS["tooltipFontSize"],
+  backgroundType: +UFC.UFCTD.PARAMETERS["tooltipBackgroundType"],
+};
+
 UFC.UFCTD.DEBUGMODE = {
   enable: UFC.UFCTD.PARAMETERS["debugMode"] == "true",
   tickerSpeed: +UFC.UFCTD.PARAMETERS["tickerSpeed"],

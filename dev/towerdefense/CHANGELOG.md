@@ -5,6 +5,7 @@
 - CHANGE: Change update `updateHealthHud` to `updateHUD`. `updateHUD` will update every hud gold and health
 - CHANGE: Now if there's no `Plugin Command Config` in the map, the game will not create hud or any tower defense mechanic.
 - ADD: `Plugin Command: Disable Tower Defense` This will destroy any tower defense element and enable menu
+- ADD: Add tooltip to backpack item selection
 
 ## Version 1.1 - 6/12/2020
 
