@@ -127,6 +127,8 @@ Window_GUIItemSlot.prototype.cursorLeft = function (wrap) {
 };
 
 Window_GUIItemSlot.prototype.processCursorMove = function () {
+  if ($gameMessage.isBusyDefault()) return;
+
   if (this.isCancelTriggered() && this._selectKeyboard) {
     this.deactiveKeyboard();
     return;
@@ -304,7 +306,11 @@ Window_GUIItemSlot.prototype.update = function () {
     if ($gameMessage.isBusy() && this.visible) {
       this.close();
       this.visible = false;
-    } else if (!$gameMessage.isBusy() && !this.visible) {
+    } else if (
+      !$gameMessage.isBusy() &&
+      !this.visible &&
+      TowerDefenseManager.getState == TowerDefenseManager.STATE.IDLE
+    ) {
       this.open();
       this.visible = true;
     }
@@ -351,6 +357,12 @@ Window_GUIItemSlot.prototype.close = function () {
 };
 
 Window_GUIItemSlot.prototype.open = function () {
+  for (const child of this.children) {
+    if (child.close) {
+      child.open();
+    }
+  }
+
   // Also close shop
   if (UFC.UFCTD.SHOPGUISETTINGS.enable) UFC.UFCTD.HUDGUI.SHOP.open();
 

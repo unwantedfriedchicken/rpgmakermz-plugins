@@ -124,6 +124,8 @@ TowerDefenseManager.showGUIItemSlot = function (args) {
   if (!this.isActive) return;
   this._GUIItemSlot = args["show"] == "true";
   UFC.UFCTD.HUDGUI.ITEMSLOT.visible = this._GUIItemSlot;
+  if (UFC.UFCTD.SHOPGUISETTINGS.enable)
+    UFC.UFCTD.HUDGUI.SHOP.visible = this._GUIItemSlot;
   if (this._GUIItemSlot) UFC.UFCTD.HUDGUI.ITEMSLOT.open();
   else UFC.UFCTD.HUDGUI.ITEMSLOT.close();
 };

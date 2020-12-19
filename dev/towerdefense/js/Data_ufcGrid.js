@@ -68,7 +68,8 @@ Data_ufcGrid.prototype.updateEvents = function () {
       this._eventData.remove(event);
     }
     if (!event.event.pos(event.pos.x, event.pos.y)) {
-      this.fillGrid(event.pos.x, event.pos.y);
+      if (this._gridData[event.pos.x][event.pos.y])
+        this.fillGrid(event.pos.x, event.pos.y);
       this.clearGrid(event.event.x, event.event.y);
       event.pos.x = event.event.x;
       event.pos.y = event.event.y;

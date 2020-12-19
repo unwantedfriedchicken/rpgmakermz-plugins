@@ -91,6 +91,7 @@ Window_TDAction.prototype.callOkHandler = function () {
     // Move
     case 0:
       $gamePlayer.getGuideAction().resetParent();
+      TowerDefenseManager.clearSelect();
       TowerDefenseManager.selectTower($dataItems[this._towerData._id].ufcTower);
       TowerDefenseManager.selectTowerMode();
       this._towerDataDestroyCallback();

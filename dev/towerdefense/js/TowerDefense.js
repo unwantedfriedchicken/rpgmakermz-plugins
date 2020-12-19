@@ -359,6 +359,7 @@ Scene_Map.prototype.createHUDTD = function () {
   if (UFC.UFCTD.SHOPGUISETTINGS.enable) {
     UFC.UFCTD.HUDGUI.SHOP = new Window_TDShop();
     this.addWindow(UFC.UFCTD.HUDGUI.SHOP);
+    UFC.UFCTD.HUDGUI.SHOP.visible = TowerDefenseManager.getGUIItemSlot;
   }
 };
 
@@ -386,6 +387,10 @@ Game_Message.prototype.isBusy = function () {
     this._windowTowerActionShow ||
     UFC.UFCTD.ALIAS._Game_Message_isBusy.call(this)
   );
+};
+
+Game_Message.prototype.isBusyDefault = function () {
+  return UFC.UFCTD.ALIAS._Game_Message_isBusy.call(this);
 };
 
 Game_Message.prototype.setWindowTower = function (showTower) {
