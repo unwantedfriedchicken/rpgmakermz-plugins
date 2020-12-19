@@ -178,6 +178,12 @@ Game_TDEnemy.prototype.updateEffects = function () {
           );
           break;
         case TowerDefenseManager.EFFECTS.STEAL:
+          AudioManager.playSe({
+            name: "Coin",
+            volume: 40,
+            pitch: 100,
+            pan: 0,
+          });
           TowerDefenseManager.gainGold(
             this._effects[effect].effect.getEffect()
           );
