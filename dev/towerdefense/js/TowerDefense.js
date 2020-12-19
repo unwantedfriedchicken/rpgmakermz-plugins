@@ -38,7 +38,7 @@ Window_ShopStatus.prototype.refresh = function () {
   UFC.UFCTD.ALIAS._Window_ShopStatus_refresh.call(this);
 
   if (this._item) {
-    if (this.isTowerItem) {
+    if (this.isTowerItem()) {
       this.drawTowerInfo(0, 60, "center");
     }
   }
@@ -395,7 +395,6 @@ Game_Message.prototype.setWindowTower = function (showTower) {
 UFC.UFCTD.ALIAS._Game_Map_initialize = Game_Map.prototype.initialize;
 Game_Map.prototype.initialize = function () {
   UFC.UFCTD.ALIAS._Game_Map_initialize.apply(this, arguments);
-  this._towerDefenseList = [];
   this._towerDefenseWave = [];
   this._towerDefenseEnemy = [];
   this._towerDefenseProjectile = [];
@@ -412,10 +411,6 @@ Game_Map.prototype.ufcGetGrid = function () {
 
 Game_Map.prototype.ufcCalcGrid = function () {
   this.ufcGetGrid().calcGrid();
-};
-
-Game_Map.prototype.ufcGetTowerDefenseList = function () {
-  return this._towerDefenseList;
 };
 
 // _characterSprites is used by rpgmaker engine to play animation

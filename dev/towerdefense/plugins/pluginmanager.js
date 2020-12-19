@@ -114,8 +114,15 @@ PluginManager.registerCommand("UFCTowerDefense", "config", function (args) {
 PluginManager.registerCommand(
   "UFCTowerDefense",
   "disableTowerDefense",
-  function () {
-    TowerDefenseManager.disableTowerDefense();
+  function (args) {
+    let destroyTower = args["destroyTower"] == "true";
+    let destroyEnemy = args["destroyEnemy"] == "true";
+    let deleteTDItems = args["deleteTDItems"] == "true";
+    TowerDefenseManager.disableTowerDefense(
+      destroyTower,
+      destroyEnemy,
+      deleteTDItems
+    );
   }
 );
 

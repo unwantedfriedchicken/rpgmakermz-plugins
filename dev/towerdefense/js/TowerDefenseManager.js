@@ -145,6 +145,10 @@ TowerDefenseManager.gainGold = function (gold) {
   this.updateHUDGold();
 };
 
+TowerDefenseManager.gainItem = function (item, amount) {
+  $gameParty.gainItem($dataItems[item], amount);
+};
+
 TowerDefenseManager.updateHUDGold = function () {
   if (
     !this.isActive ||
@@ -217,7 +221,11 @@ TowerDefenseManager.setActive = function (active) {
   this._active = active;
 };
 
-TowerDefenseManager.disableTowerDefense = function () {
+TowerDefenseManager.disableTowerDefense = function (
+  destroyTower = false,
+  destroyEnemy = false,
+  destroyTDItems = true
+) {
   this._config = false;
 
   this.setActive(false);
@@ -226,6 +234,7 @@ TowerDefenseManager.disableTowerDefense = function () {
   UFC.UFCTD.HUDGUI.ITEMSLOT.destroy();
   UFC.UFCTD.HUDGUI.GOLDWINDOW.destroy();
   UFC.UFCTD.HUDGUI.HEALTHWINDOW.destroy();
+  if (UFC.UFCTD.SHOPGUISETTINGS.enable) UFC.UFCTD.HUDGUI.SHOP.destroy();
 
   // Destroy Grid
   $gameMap.ufcGetGrid().destroy();
@@ -233,6 +242,29 @@ TowerDefenseManager.disableTowerDefense = function () {
   // Destroy Projectile
   for (const projectile of $gameMap.ufcProjectiles()) {
     projectile.destroy(true);
+  }
+
+  // Destroy Tower
+  if (destroyTower) {
+    let towers = $gameMap._events.filter(
+      (event) => event instanceof Game_TDTower
+    );
+    for (const tower of towers) {
+      tower.destroy(true);
+    }
+  }
+
+  // Destroy Enemy
+  if (destroyEnemy) {
+    for (let i = 0; i < $gameMap.ufcEnemies().length; i++) {
+      $gameMap.ufcEnemies()[i].destroy(true);
+      i--;
+    }
+  }
+
+  // Delete Items
+  if (destroyTDItems) {
+    $gameParty._towers = {};
   }
 
   // Enable Open Menu
@@ -250,7 +282,7 @@ TowerDefenseManager.selectTower = function (towerData) {
 };
 
 TowerDefenseManager.cancelSelect = function (sfx = true) {
-  $gameParty.gainItem($dataItems[this._selectedUFCTD._id], 1);
+  this.gainItem(this._selectedUFCTD._id, 1);
   // SFX
   if (sfx)
     AudioManager.playSe({
@@ -297,6 +329,17 @@ TowerDefenseManager.addDBEnemy = function (enemyData) {
   }
 
   for (let data in enemyData) {
+    // parse in here instead in init Game_TDEnemy, so doesnt need to parse again
+    switch (data) {
+      case "itemDrop":
+        enemyData[data] =
+          JSON.parse(enemyData[data]).map((item) => JSON.parse(item)) || [];
+        break;
+      case "resistance":
+        enemyData[data] =
+          JSON.parse(enemyData[data]).map((item) => item.toLowerCase()) || [];
+        break;
+    }
     $dataTDEnemy[enemyData.id][data] = enemyData[data];
   }
 };

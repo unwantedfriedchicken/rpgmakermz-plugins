@@ -7,7 +7,7 @@
 
 @help
 Author: UnwantedFriedChicken
-Version: 1.1
+Version: 1.2
 Itch.io : https://unwantedfriedchicken.itch.io
 Github : https://github.com/unwantedfriedchicken/rpgmakermz-plugins/
 
@@ -259,6 +259,24 @@ unwantedfriedchicken<at>gmail.com
 @text Disable Tower Defense
 @desc Disable Tower Defense mean will destroy any tower defense element, to go back to tower defense mode need to call Config again
 
+@arg destroyTower
+@type boolean
+@default false
+@text Destroy Tower
+@desc Destroy/delete any placed tower
+
+@arg destroyEnemy
+@type boolean
+@default false
+@text Destroy Enemy
+@desc Destroy/delete any enemy
+
+@arg deleteTDItems
+@type boolean
+@default true
+@text Delete Tower Defense Item
+@desc Delete every tower defense items in backpack
+
 @command limitAnimation
 @text Limit Animation
 @desc Set limit animation
@@ -496,6 +514,24 @@ unwantedfriedchicken<at>gmail.com
 @decimals 2
 @desc Defines enemy scale
 
+@arg itemDrop
+@text Item Drop
+@desc Item Drop
+@type struct<ItemDrops>[]
+@default []
+
+@arg resistance
+@text Effects Resistance
+@desc Effect resistance
+@type select[]
+@option Cold
+@option Poison
+@option Stun
+@option Rage
+@option Steal
+@option Critical
+@default []
+
 @command showGUIItemSlot
 @text Show Item Slot GUI
 @desc Show Item Slot GUI
@@ -543,8 +579,26 @@ unwantedfriedchicken<at>gmail.com
 @command shopGUIItemsReset
 @text Shop GUI Items Reset
 @desc Reset GUI Shop to default
+*/
 
+/*~struct~ItemDrops:
+@param items
+@text Items
+@desc Items
+@type item
+@default 0
 
+@param amount
+@text Amount
+@desc amount drop
+@type number
+@default 1
+
+@param chance
+@text Chance
+@desc chance drop
+@type number
+@default 100
 */
 
 var Imported = Imported || {};
@@ -552,7 +606,7 @@ Imported.UFCTowerDefense = true;
 
 var UFC = UFC || {};
 UFC.UFCTD = UFC.UFCTD || {};
-UFC.UFCTD.VERSION = 1.0;
+UFC.UFCTD.VERSION = 1.2;
 UFC.UFCTD.ALIAS = UFC.UFCTD.ALIAS || {};
 
 var $dataTDEnemy = $dataTDEnemy || {};
@@ -675,8 +729,15 @@ PluginManager.registerCommand("UFCTowerDefense", "config", function (args) {
 PluginManager.registerCommand(
   "UFCTowerDefense",
   "disableTowerDefense",
-  function () {
-    TowerDefenseManager.disableTowerDefense();
+  function (args) {
+    let destroyTower = args["destroyTower"] == "true";
+    let destroyEnemy = args["destroyEnemy"] == "true";
+    let deleteTDItems = args["deleteTDItems"] == "true";
+    TowerDefenseManager.disableTowerDefense(
+      destroyTower,
+      destroyEnemy,
+      deleteTDItems
+    );
   }
 );
 
@@ -901,6 +962,8 @@ Game_TDEnemy.prototype.initialize = function (enemyName, spawnId) {
   Game_Character.prototype.initialize.call(this);
   this._mapId = $gameMap._mapId;
   this._enemyData = Object.assign({}, $dataTDEnemy[enemyName]);
+  this._resistance = this._enemyData.resistance;
+  this._itemDrop = this._enemyData.itemDrop;
   this._spawn = $dataTDSpawnLocation[this._mapId][spawnId];
   this._direction = TowerDefenseManager.convertDirection(
     this._spawn._direction
@@ -1033,7 +1096,10 @@ Game_TDEnemy.prototype.updateEffects = function () {
     if (!this._effects[effect].effect) continue;
 
     if (!this._effects[effect].enable) {
-      if (!this._effects[effect].effect.getChanceEffect()) {
+      if (
+        this.checkResistance(effect) ||
+        !this._effects[effect].effect.getChanceEffect()
+      ) {
         this._effects[effect].enable = false;
         this._effects[effect].effect = null;
         continue;
@@ -1143,7 +1209,7 @@ Game_TDEnemy.prototype.triggerDestroy = function (destroyData) {
     TowerDefenseManager.requestAnimation([this], +destroyData.animationId);
   }
 
-  this.destroy();
+  this.destroy(true);
 };
 
 Game_TDEnemy.prototype.attack = function (eventid) {
@@ -1178,25 +1244,45 @@ Game_TDEnemy.prototype.attacked = function (damage) {
   }
 };
 
-Object.defineProperty(Game_TDEnemy.prototype, "health", {
-  get: function () {
-    return this._enemyData.health;
-  },
-});
+Game_TDEnemy.prototype.checkResistance = function (effect) {
+  return this._resistance.length > 0
+    ? this._resistance.includes(effect)
+    : false;
+};
+
+Game_TDEnemy.prototype.getDropItem = function () {
+  if (this._itemDrop.length > 0)
+    for (item of this._itemDrop) {
+      if (item.chance < 100) {
+        let chance = Math.randomInt(100);
+        if (item.chance < chance) continue;
+      }
+      TowerDefenseManager.gainItem(+item.items, +item.amount);
+    }
+};
 
 Game_TDEnemy.prototype.isMoving = function () {
   return this._realX !== this._x || this._realY !== this._y;
 };
 
-Game_TDEnemy.prototype.destroy = function () {
+Game_TDEnemy.prototype.destroy = function (isTrigger = false) {
   $gameMap.ufcDestroyEnemy(this);
   this._destroy = true;
-  TowerDefenseManager.gainGold(+this._enemyData.gold);
+  if (!isTrigger) {
+    this.getDropItem();
+    TowerDefenseManager.gainGold(+this._enemyData.gold);
+  }
 };
 
 Game_TDEnemy.prototype.isDestroyed = function () {
   return this._destroy;
 };
+
+Object.defineProperty(Game_TDEnemy.prototype, "health", {
+  get: function () {
+    return this._enemyData.health;
+  },
+});
 
 function Game_TDTower() {
   this.initialize(...arguments);
@@ -1323,18 +1409,19 @@ Game_TDTower.prototype.attack = function (enemy) {
   );
 };
 
-Game_TDTower.prototype.destroy = function () {
-  AudioManager.playSe({
-    name: "Door2",
-    volume: 25,
-    pitch: 100,
-    pan: 0,
-  });
+Game_TDTower.prototype.destroy = function (onlyDestroy = false) {
+  if (!onlyDestroy)
+    AudioManager.playSe({
+      name: "Door2",
+      volume: 25,
+      pitch: 100,
+      pan: 0,
+    });
   $gameMap.ufcDestroyTower(this);
 
   for (let tower of this._towerEffectedByAura) {
     tower.resetBuffs();
-    tower.checkGetBuffs();
+    if (!onlyDestroy) tower.checkGetBuffs();
   }
   this._towerEffectedByAura = [];
   this._destroy = true;
@@ -2074,7 +2161,7 @@ Window_ShopStatus.prototype.refresh = function () {
   UFC.UFCTD.ALIAS._Window_ShopStatus_refresh.call(this);
 
   if (this._item) {
-    if (this.isTowerItem) {
+    if (this.isTowerItem()) {
       this.drawTowerInfo(0, 60, "center");
     }
   }
@@ -2431,7 +2518,6 @@ Game_Message.prototype.setWindowTower = function (showTower) {
 UFC.UFCTD.ALIAS._Game_Map_initialize = Game_Map.prototype.initialize;
 Game_Map.prototype.initialize = function () {
   UFC.UFCTD.ALIAS._Game_Map_initialize.apply(this, arguments);
-  this._towerDefenseList = [];
   this._towerDefenseWave = [];
   this._towerDefenseEnemy = [];
   this._towerDefenseProjectile = [];
@@ -2448,10 +2534,6 @@ Game_Map.prototype.ufcGetGrid = function () {
 
 Game_Map.prototype.ufcCalcGrid = function () {
   this.ufcGetGrid().calcGrid();
-};
-
-Game_Map.prototype.ufcGetTowerDefenseList = function () {
-  return this._towerDefenseList;
 };
 
 // _characterSprites is used by rpgmaker engine to play animation
@@ -2801,6 +2883,10 @@ TowerDefenseManager.gainGold = function (gold) {
   this.updateHUDGold();
 };
 
+TowerDefenseManager.gainItem = function (item, amount) {
+  $gameParty.gainItem($dataItems[item], amount);
+};
+
 TowerDefenseManager.updateHUDGold = function () {
   if (
     !this.isActive ||
@@ -2873,7 +2959,11 @@ TowerDefenseManager.setActive = function (active) {
   this._active = active;
 };
 
-TowerDefenseManager.disableTowerDefense = function () {
+TowerDefenseManager.disableTowerDefense = function (
+  destroyTower = false,
+  destroyEnemy = false,
+  destroyTDItems = true
+) {
   this._config = false;
 
   this.setActive(false);
@@ -2882,6 +2972,7 @@ TowerDefenseManager.disableTowerDefense = function () {
   UFC.UFCTD.HUDGUI.ITEMSLOT.destroy();
   UFC.UFCTD.HUDGUI.GOLDWINDOW.destroy();
   UFC.UFCTD.HUDGUI.HEALTHWINDOW.destroy();
+  if (UFC.UFCTD.SHOPGUISETTINGS.enable) UFC.UFCTD.HUDGUI.SHOP.destroy();
 
   // Destroy Grid
   $gameMap.ufcGetGrid().destroy();
@@ -2889,6 +2980,29 @@ TowerDefenseManager.disableTowerDefense = function () {
   // Destroy Projectile
   for (const projectile of $gameMap.ufcProjectiles()) {
     projectile.destroy(true);
+  }
+
+  // Destroy Tower
+  if (destroyTower) {
+    let towers = $gameMap._events.filter(
+      (event) => event instanceof Game_TDTower
+    );
+    for (const tower of towers) {
+      tower.destroy(true);
+    }
+  }
+
+  // Destroy Enemy
+  if (destroyEnemy) {
+    for (let i = 0; i < $gameMap.ufcEnemies().length; i++) {
+      $gameMap.ufcEnemies()[i].destroy(true);
+      i--;
+    }
+  }
+
+  // Delete Items
+  if (destroyTDItems) {
+    $gameParty._towers = {};
   }
 
   // Enable Open Menu
@@ -2906,7 +3020,7 @@ TowerDefenseManager.selectTower = function (towerData) {
 };
 
 TowerDefenseManager.cancelSelect = function (sfx = true) {
-  $gameParty.gainItem($dataItems[this._selectedUFCTD._id], 1);
+  this.gainItem(this._selectedUFCTD._id, 1);
   // SFX
   if (sfx)
     AudioManager.playSe({
@@ -2953,6 +3067,17 @@ TowerDefenseManager.addDBEnemy = function (enemyData) {
   }
 
   for (let data in enemyData) {
+    // parse in here instead in init Game_TDEnemy, so doesnt need to parse again
+    switch (data) {
+      case "itemDrop":
+        enemyData[data] =
+          JSON.parse(enemyData[data]).map((item) => JSON.parse(item)) || [];
+        break;
+      case "resistance":
+        enemyData[data] =
+          JSON.parse(enemyData[data]).map((item) => item.toLowerCase()) || [];
+        break;
+    }
     $dataTDEnemy[enemyData.id][data] = enemyData[data];
   }
 };
@@ -3665,7 +3790,7 @@ Window_GUIItemSlot.prototype.callOkHandler = function () {
   let tower = this._towers[this.index()];
   if (!tower || ($gameMessage.isBusy() && !this._selectKeyboard)) return;
   $gamePlayer.getGuideAction().resetParent();
-  $gameParty.gainItem($dataItems[tower.id], -1);
+  TowerDefenseManager.gainItem(tower.id, -1);
   TowerDefenseManager.clearSelect();
   TowerDefenseManager.selectTower(tower);
   TowerDefenseManager.selectTowerMode();

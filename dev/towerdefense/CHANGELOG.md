@@ -8,8 +8,12 @@ Thanks for [@wrigty12](https://forums.rpgmakerweb.com/index.php?members/wrigty12
 - CHANGE: Now if there's no `Plugin Command Config` in the map, the game will not create hud or any tower defense mechanic.
 - ADD: `Plugin Command: Disable Tower Defense` This will destroy any tower defense element and enable menu
 - ADD: Add tooltip to backpack item selection
-- ADD: `Trigger Wait`, make enemy wait when touch with the event
+- ADD: `Trigger Wait Enemy`, make enemy wait when touch with the event
 - ADD: Shop GUI, setting can be configured in plugins parameters, this will also add `Plugin Command Shop GUI Items` & `Plugin Command Shop GUI Items Reset`
+- ADD: Steal effect, steal gold per hit -> `steal|2|0|80` -> `ID steal | gold per hit | do nothing | chance steal`
+- ADD: Critical effect, add critical chance -> `critical|2|0|50` -> `ID critical | damage multiplier | do nothing | chance critical`
+- ADD: Resistance effect option to `Setup Enemy`, if configured this will make the enemy resist with the effect
+- ADD: Item Drop option to `Setup Enemy`, if you want enemy drop certain items when defeated
 
 ## Version 1.1 - 6/12/2020
 

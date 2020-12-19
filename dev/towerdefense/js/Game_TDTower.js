@@ -123,18 +123,19 @@ Game_TDTower.prototype.attack = function (enemy) {
   );
 };
 
-Game_TDTower.prototype.destroy = function () {
-  AudioManager.playSe({
-    name: "Door2",
-    volume: 25,
-    pitch: 100,
-    pan: 0,
-  });
+Game_TDTower.prototype.destroy = function (onlyDestroy = false) {
+  if (!onlyDestroy)
+    AudioManager.playSe({
+      name: "Door2",
+      volume: 25,
+      pitch: 100,
+      pan: 0,
+    });
   $gameMap.ufcDestroyTower(this);
 
   for (let tower of this._towerEffectedByAura) {
     tower.resetBuffs();
-    tower.checkGetBuffs();
+    if (!onlyDestroy) tower.checkGetBuffs();
   }
   this._towerEffectedByAura = [];
   this._destroy = true;

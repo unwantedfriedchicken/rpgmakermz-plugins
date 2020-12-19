@@ -7,7 +7,7 @@
 
 @help
 Author: UnwantedFriedChicken
-Version: 1.1
+Version: 1.2
 Itch.io : https://unwantedfriedchicken.itch.io
 Github : https://github.com/unwantedfriedchicken/rpgmakermz-plugins/
 
@@ -259,6 +259,24 @@ unwantedfriedchicken<at>gmail.com
 @text Disable Tower Defense
 @desc Disable Tower Defense mean will destroy any tower defense element, to go back to tower defense mode need to call Config again
 
+@arg destroyTower
+@type boolean
+@default false
+@text Destroy Tower
+@desc Destroy/delete any placed tower
+
+@arg destroyEnemy
+@type boolean
+@default false
+@text Destroy Enemy
+@desc Destroy/delete any enemy
+
+@arg deleteTDItems
+@type boolean
+@default true
+@text Delete Tower Defense Item
+@desc Delete every tower defense items in backpack
+
 @command limitAnimation
 @text Limit Animation
 @desc Set limit animation
@@ -496,6 +514,24 @@ unwantedfriedchicken<at>gmail.com
 @decimals 2
 @desc Defines enemy scale
 
+@arg itemDrop
+@text Item Drop
+@desc Item Drop
+@type struct<ItemDrops>[]
+@default []
+
+@arg resistance
+@text Effects Resistance
+@desc Effect resistance
+@type select[]
+@option Cold
+@option Poison
+@option Stun
+@option Rage
+@option Steal
+@option Critical
+@default []
+
 @command showGUIItemSlot
 @text Show Item Slot GUI
 @desc Show Item Slot GUI
@@ -543,6 +579,24 @@ unwantedfriedchicken<at>gmail.com
 @command shopGUIItemsReset
 @text Shop GUI Items Reset
 @desc Reset GUI Shop to default
+*/
 
+/*~struct~ItemDrops:
+@param items
+@text Items
+@desc Items
+@type item
+@default 0
 
+@param amount
+@text Amount
+@desc amount drop
+@type number
+@default 1
+
+@param chance
+@text Chance
+@desc chance drop
+@type number
+@default 100
 */

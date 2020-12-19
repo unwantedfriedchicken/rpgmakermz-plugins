@@ -9,6 +9,8 @@ Game_TDEnemy.prototype.initialize = function (enemyName, spawnId) {
   Game_Character.prototype.initialize.call(this);
   this._mapId = $gameMap._mapId;
   this._enemyData = Object.assign({}, $dataTDEnemy[enemyName]);
+  this._resistance = this._enemyData.resistance;
+  this._itemDrop = this._enemyData.itemDrop;
   this._spawn = $dataTDSpawnLocation[this._mapId][spawnId];
   this._direction = TowerDefenseManager.convertDirection(
     this._spawn._direction
@@ -141,7 +143,10 @@ Game_TDEnemy.prototype.updateEffects = function () {
     if (!this._effects[effect].effect) continue;
 
     if (!this._effects[effect].enable) {
-      if (!this._effects[effect].effect.getChanceEffect()) {
+      if (
+        this.checkResistance(effect) ||
+        !this._effects[effect].effect.getChanceEffect()
+      ) {
         this._effects[effect].enable = false;
         this._effects[effect].effect = null;
         continue;
@@ -251,7 +256,7 @@ Game_TDEnemy.prototype.triggerDestroy = function (destroyData) {
     TowerDefenseManager.requestAnimation([this], +destroyData.animationId);
   }
 
-  this.destroy();
+  this.destroy(true);
 };
 
 Game_TDEnemy.prototype.attack = function (eventid) {
@@ -286,22 +291,42 @@ Game_TDEnemy.prototype.attacked = function (damage) {
   }
 };
 
-Object.defineProperty(Game_TDEnemy.prototype, "health", {
-  get: function () {
-    return this._enemyData.health;
-  },
-});
+Game_TDEnemy.prototype.checkResistance = function (effect) {
+  return this._resistance.length > 0
+    ? this._resistance.includes(effect)
+    : false;
+};
+
+Game_TDEnemy.prototype.getDropItem = function () {
+  if (this._itemDrop.length > 0)
+    for (item of this._itemDrop) {
+      if (item.chance < 100) {
+        let chance = Math.randomInt(100);
+        if (item.chance < chance) continue;
+      }
+      TowerDefenseManager.gainItem(+item.items, +item.amount);
+    }
+};
 
 Game_TDEnemy.prototype.isMoving = function () {
   return this._realX !== this._x || this._realY !== this._y;
 };
 
-Game_TDEnemy.prototype.destroy = function () {
+Game_TDEnemy.prototype.destroy = function (isTrigger = false) {
   $gameMap.ufcDestroyEnemy(this);
   this._destroy = true;
-  TowerDefenseManager.gainGold(+this._enemyData.gold);
+  if (!isTrigger) {
+    this.getDropItem();
+    TowerDefenseManager.gainGold(+this._enemyData.gold);
+  }
 };
 
 Game_TDEnemy.prototype.isDestroyed = function () {
   return this._destroy;
 };
+
+Object.defineProperty(Game_TDEnemy.prototype, "health", {
+  get: function () {
+    return this._enemyData.health;
+  },
+});

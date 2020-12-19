@@ -90,7 +90,7 @@ Window_GUIItemSlot.prototype.callOkHandler = function () {
   let tower = this._towers[this.index()];
   if (!tower || ($gameMessage.isBusy() && !this._selectKeyboard)) return;
   $gamePlayer.getGuideAction().resetParent();
-  $gameParty.gainItem($dataItems[tower.id], -1);
+  TowerDefenseManager.gainItem(tower.id, -1);
   TowerDefenseManager.clearSelect();
   TowerDefenseManager.selectTower(tower);
   TowerDefenseManager.selectTowerMode();
