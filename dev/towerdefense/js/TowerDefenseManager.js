@@ -52,8 +52,7 @@ TowerDefenseManager.debugMode = function () {
       if (e.key == 3) {
         $gameVariables.setValue(UFC.UFCTD.CONFIG.healthVarId, 99999);
         TowerDefenseManager.updateHUDHealth();
-        $gameParty.gainGold(99999999);
-        TowerDefenseManager.updateHUDGold();
+        TowerDefenseManager.gainGold(99999999);
       }
       if (e.key == 4) {
         this.setLimitAnimation(UFC.UFCTD.DEBUGMODE.limitAnimation);
@@ -97,6 +96,8 @@ TowerDefenseManager.EFFECTS = {
   POISON: "poison",
   STUN: "stun",
   RAGE: "rage",
+  STEAL: "steal",
+  CRITICAL: "critical",
 };
 
 TowerDefenseManager.setLimitAnimation = function (limit) {
@@ -137,6 +138,11 @@ TowerDefenseManager.showHUDTDHealth = function (args) {
   if (!this.isActive) return;
   this._HUDHealth = args["show"] == "true";
   UFC.UFCTD.HUDGUI.HEALTHWINDOW.visible = this._HUDHealth;
+};
+
+TowerDefenseManager.gainGold = function (gold) {
+  $gameParty.gainGold(gold);
+  this.updateHUDGold();
 };
 
 TowerDefenseManager.updateHUDGold = function () {

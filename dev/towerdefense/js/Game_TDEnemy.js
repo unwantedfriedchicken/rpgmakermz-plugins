@@ -146,6 +146,7 @@ Game_TDEnemy.prototype.updateEffects = function () {
         this._effects[effect].effect = null;
         continue;
       }
+      let passive = false;
       switch (effect) {
         case TowerDefenseManager.EFFECTS.COLD:
           this.addMoveSpeedEffect(
@@ -171,6 +172,23 @@ Game_TDEnemy.prototype.updateEffects = function () {
             false
           );
           break;
+        case TowerDefenseManager.EFFECTS.STEAL:
+          TowerDefenseManager.gainGold(
+            this._effects[effect].effect.getEffect()
+          );
+          passive = true;
+          break;
+        case TowerDefenseManager.EFFECTS.CRITICAL:
+          this.attacked({
+            damage: this._effects[effect].effect.getCriticalDamage(),
+          });
+          passive = true;
+          break;
+      }
+      if (passive) {
+        this._effects[effect].enable = false;
+        this._effects[effect].effect = null;
+        continue;
       }
       this._event.emit("addEffect", effect);
       this._effects[effect].enable = true;
@@ -262,6 +280,7 @@ Game_TDEnemy.prototype.attacked = function (damage) {
   if (damage.effects && damage.effects.length > 0) {
     let _ef = damage.effects;
     for (const effect in _ef) {
+      _ef[effect].damage = damage.damage;
       this._effects[_ef[effect].name].effect = new ufcTowerEffects(_ef[effect]);
     }
   }
@@ -280,8 +299,7 @@ Game_TDEnemy.prototype.isMoving = function () {
 Game_TDEnemy.prototype.destroy = function () {
   $gameMap.ufcDestroyEnemy(this);
   this._destroy = true;
-  $gameParty.gainGold(+this._enemyData.gold);
-  TowerDefenseManager.updateHUDGold();
+  TowerDefenseManager.gainGold(+this._enemyData.gold);
 };
 
 Game_TDEnemy.prototype.isDestroyed = function () {

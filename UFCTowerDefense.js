@@ -295,7 +295,7 @@ unwantedfriedchicken<at>gmail.com
 @default []
 
 @command triggerWait
-@text Trigger Wait
+@text Trigger Wait Enemy
 @desc Trigger for wait
 
 @arg duration
@@ -532,7 +532,7 @@ unwantedfriedchicken<at>gmail.com
 
 @command shopGUIItemsEdit
 @text Shop GUI Items
-@desc Change what items appear in the Menu Shop
+@desc Change items appear in the Menu Shop
 
 @arg items
 @text Items
@@ -1038,6 +1038,7 @@ Game_TDEnemy.prototype.updateEffects = function () {
         this._effects[effect].effect = null;
         continue;
       }
+      let passive = false;
       switch (effect) {
         case TowerDefenseManager.EFFECTS.COLD:
           this.addMoveSpeedEffect(
@@ -1063,6 +1064,23 @@ Game_TDEnemy.prototype.updateEffects = function () {
             false
           );
           break;
+        case TowerDefenseManager.EFFECTS.STEAL:
+          TowerDefenseManager.gainGold(
+            this._effects[effect].effect.getEffect()
+          );
+          passive = true;
+          break;
+        case TowerDefenseManager.EFFECTS.CRITICAL:
+          this.attacked({
+            damage: this._effects[effect].effect.getCriticalDamage(),
+          });
+          passive = true;
+          break;
+      }
+      if (passive) {
+        this._effects[effect].enable = false;
+        this._effects[effect].effect = null;
+        continue;
       }
       this._event.emit("addEffect", effect);
       this._effects[effect].enable = true;
@@ -1154,6 +1172,7 @@ Game_TDEnemy.prototype.attacked = function (damage) {
   if (damage.effects && damage.effects.length > 0) {
     let _ef = damage.effects;
     for (const effect in _ef) {
+      _ef[effect].damage = damage.damage;
       this._effects[_ef[effect].name].effect = new ufcTowerEffects(_ef[effect]);
     }
   }
@@ -1172,8 +1191,7 @@ Game_TDEnemy.prototype.isMoving = function () {
 Game_TDEnemy.prototype.destroy = function () {
   $gameMap.ufcDestroyEnemy(this);
   this._destroy = true;
-  $gameParty.gainGold(+this._enemyData.gold);
-  TowerDefenseManager.updateHUDGold();
+  TowerDefenseManager.gainGold(+this._enemyData.gold);
 };
 
 Game_TDEnemy.prototype.isDestroyed = function () {
@@ -2690,8 +2708,7 @@ TowerDefenseManager.debugMode = function () {
       if (e.key == 3) {
         $gameVariables.setValue(UFC.UFCTD.CONFIG.healthVarId, 99999);
         TowerDefenseManager.updateHUDHealth();
-        $gameParty.gainGold(99999999);
-        TowerDefenseManager.updateHUDGold();
+        TowerDefenseManager.gainGold(99999999);
       }
       if (e.key == 4) {
         this.setLimitAnimation(UFC.UFCTD.DEBUGMODE.limitAnimation);
@@ -2735,6 +2752,8 @@ TowerDefenseManager.EFFECTS = {
   POISON: "poison",
   STUN: "stun",
   RAGE: "rage",
+  STEAL: "steal",
+  CRITICAL: "critical",
 };
 
 TowerDefenseManager.setLimitAnimation = function (limit) {
@@ -2775,6 +2794,11 @@ TowerDefenseManager.showHUDTDHealth = function (args) {
   if (!this.isActive) return;
   this._HUDHealth = args["show"] == "true";
   UFC.UFCTD.HUDGUI.HEALTHWINDOW.visible = this._HUDHealth;
+};
+
+TowerDefenseManager.gainGold = function (gold) {
+  $gameParty.gainGold(gold);
+  this.updateHUDGold();
 };
 
 TowerDefenseManager.updateHUDGold = function () {
@@ -3371,6 +3395,7 @@ ufcTowerEffects.prototype.initialize = function (data) {
   this._effect = data.effect;
   this._duration = data.duration;
   this._chance = data.chance;
+  this._lastDamage = data.damage;
   this._curTime = this._duration;
   this._isDone = false;
   this._effectPerSecond = false;
@@ -3395,6 +3420,14 @@ ufcTowerEffects.prototype.epsCallback = function () {
 
 ufcTowerEffects.prototype.getEffect = function () {
   return this._effect;
+};
+
+ufcTowerEffects.prototype.getCriticalDamage = function () {
+  let damage = this._lastDamage;
+  damage *= this._effect;
+  damage -= this._lastDamage;
+  damage = Math.ceil(damage);
+  return damage;
 };
 
 ufcTowerEffects.prototype.getChanceEffect = function () {
@@ -3975,8 +4008,7 @@ Window_TDAction.prototype.upgradeTower = function (upgradeIndex) {
     pitch: 100,
     pan: 0,
   });
-  $gameParty.gainGold(-+this._towerData._upgrade[upgradeIndex].price);
-  TowerDefenseManager.updateHUDGold();
+  TowerDefenseManager.gainGold(-+this._towerData._upgrade[upgradeIndex].price);
   // Upgrade
   $gamePlayer.getGuideAction().resetParent();
   TowerDefenseManager.selectTower(
@@ -4024,8 +4056,7 @@ Window_TDAction.prototype.callOkHandler = function () {
         pitch: 100,
         pan: 0,
       });
-      $gameParty.gainGold(+this._towerData._sellPrice);
-      TowerDefenseManager.updateHUDGold();
+      TowerDefenseManager.gainGold(+this._towerData._sellPrice);
       this._towerDataDestroyCallback();
       UFC.UFCTD.HUDGUI.ITEMSLOT.open();
       break;

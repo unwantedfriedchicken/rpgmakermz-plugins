@@ -90,8 +90,10 @@ you can delete any **optional** note
 > >
 > > > **cold** : decrease enemy movement, effect using percentage, ex: 50 mean increase 50% movementspeed  
 > > > **stun** : stun enemy movement, effect doesnt matter here  
-> > > **poison**: poison enemy, the effect is using damage per second, ex: 2 mean 2hp/s  
-> > > **rage**: increase enemy movement, effect using percentage, ex: 50 mean increase 50% movementspeed
+> > > **poison** : poison enemy, the effect is using damage per second, ex: 2 mean 2hp/s  
+> > > **rage** : increase enemy movement, effect using percentage, ex: 50 mean increase 50% movementspeed  
+> > > **steal** : increase gold per hit monster, effect duration doesnt matter here  
+> > > **critical** : critical attack, with effect multiply from damage, ex: 1.3 mean damage \* 1.3, effect duration doesnt matter here
 
 > > **EFFECT VALUE**  
 > > the effect value that tower give

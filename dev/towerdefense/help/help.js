@@ -295,7 +295,7 @@ unwantedfriedchicken<at>gmail.com
 @default []
 
 @command triggerWait
-@text Trigger Wait
+@text Trigger Wait Enemy
 @desc Trigger for wait
 
 @arg duration
@@ -532,7 +532,7 @@ unwantedfriedchicken<at>gmail.com
 
 @command shopGUIItemsEdit
 @text Shop GUI Items
-@desc Change what items appear in the Menu Shop
+@desc Change items appear in the Menu Shop
 
 @arg items
 @text Items

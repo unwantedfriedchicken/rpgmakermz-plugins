@@ -7,6 +7,7 @@ ufcTowerEffects.prototype.initialize = function (data) {
   this._effect = data.effect;
   this._duration = data.duration;
   this._chance = data.chance;
+  this._lastDamage = data.damage;
   this._curTime = this._duration;
   this._isDone = false;
   this._effectPerSecond = false;
@@ -31,6 +32,14 @@ ufcTowerEffects.prototype.epsCallback = function () {
 
 ufcTowerEffects.prototype.getEffect = function () {
   return this._effect;
+};
+
+ufcTowerEffects.prototype.getCriticalDamage = function () {
+  let damage = this._lastDamage;
+  damage *= this._effect;
+  damage -= this._lastDamage;
+  damage = Math.ceil(damage);
+  return damage;
 };
 
 ufcTowerEffects.prototype.getChanceEffect = function () {
