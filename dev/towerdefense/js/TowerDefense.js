@@ -113,6 +113,53 @@ Window_ShopStatus.prototype.isTowerItem = function () {
   return !!this._item.ufcTower;
 };
 
+// --------------------- Shop --------------------
+UFC.UFCTD.ALIAS._Scene_Shop_popScene = Scene_Shop.prototype.popScene;
+Scene_Shop.prototype.popScene = function () {
+  TowerDefenseManager.openShop(false);
+  UFC.UFCTD.ALIAS._Scene_Shop_popScene.call(this);
+};
+
+UFC.UFCTD.ALIAS._Window_ShopBuy_price = Window_ShopBuy.prototype.price;
+Window_ShopBuy.prototype.price = function (item) {
+  if (
+    TowerDefenseManager.isShopOpen &&
+    UFC.UFCTD.SHOPGUISETTINGS.multiplier != 1
+  ) {
+    let _price =
+      UFC.UFCTD.ALIAS._Window_ShopBuy_price.call(this, item) *
+      UFC.UFCTD.SHOPGUISETTINGS.multiplier;
+    if (UFC.UFCTD.SHOPGUISETTINGS.roundPrice != 0) {
+      let _pow = Math.pow(10, UFC.UFCTD.SHOPGUISETTINGS.roundPrice);
+      _price = Math.ceil(_price / _pow) * _pow;
+    }
+    return _price;
+  } else {
+    return UFC.UFCTD.ALIAS._Window_ShopBuy_price.call(this, item);
+  }
+};
+
+UFC.UFCTD.ALIAS._Window_ShopCommand_makeCommandList =
+  Window_ShopCommand.prototype.makeCommandList;
+Window_ShopCommand.prototype.makeCommandList = function () {
+  if (TowerDefenseManager.isShopOpen) {
+    this.addCommand(TextManager.buy, "buy");
+    this.addCommand(TextManager.cancel, "cancel");
+  } else {
+    UFC.UFCTD.ALIAS._Window_ShopCommand_makeCommandList.call(this);
+  }
+};
+
+UFC.UFCTD.ALIAS._Window_ShopCommand_maxCols =
+  Window_ShopCommand.prototype.maxCols;
+Window_ShopCommand.prototype.maxCols = function () {
+  if (TowerDefenseManager.isShopOpen) {
+    return 2;
+  } else {
+    return UFC.UFCTD.ALIAS._Window_ShopCommand_maxCols.call(this);
+  }
+};
+
 // ------------------------------------------------------------------
 
 Game_Character.prototype.moveAwayFromHere = function () {
@@ -235,7 +282,7 @@ Game_Player.prototype.checkEventTower = function (x, y) {
     y2 = $gameMap.roundYWithDirection(this._y, this._direction);
   }
   const events = $gameMap.eventsXyNt(x2, y2);
-  const tower = events.filter((event) => event instanceof Game_TowerDefense);
+  const tower = events.filter((event) => event instanceof Game_TDTower);
   if (tower.length <= 0) return false;
   else {
     tower[0].actionTower();
@@ -243,17 +290,17 @@ Game_Player.prototype.checkEventTower = function (x, y) {
   }
 };
 
-// still not sure if I should cache here instead using event
-// const _Scene_Boot_loadSystemImages = Scene_Boot.prototype.loadSystemImages;
-// Scene_Boot.prototype.loadSystemImages = function () {
-//   _Scene_Boot_loadSystemImages.call(this);
-//   ImageManager.loadSystem("TDSheets");
-// };
+// Since shop icon is get call in start need to be chached
+UFC.UFCTD.ALIAS._Scene_Boot_loadSystemImages =
+  Scene_Boot.prototype.loadSystemImages;
+Scene_Boot.prototype.loadSystemImages = function () {
+  UFC.UFCTD.ALIAS._Scene_Boot_loadSystemImages.call(this);
+  ImageManager.loadSystem("TDShopIcon");
+};
 
 UFC.UFCTD.ALIAS._Scene_Map_onMapTouch = Scene_Map.prototype.onMapTouch;
 Scene_Map.prototype.onMapTouch = function () {
-  if (TowerDefenseManager.isActive && UFC.UFCTD.HUDGUI.MESSAGE.isHoverHUDItem)
-    return;
+  if (TowerDefenseManager.isActive && UFC.UFCTD.HUDGUI.MESSAGE.isBusy()) return;
   return UFC.UFCTD.ALIAS._Scene_Map_onMapTouch.call(this);
 };
 
@@ -268,6 +315,13 @@ Scene_Map.prototype.updateCallMenu = function () {
   ) {
     TowerDefenseManager.cancelSelect();
   }
+};
+
+UFC.UFCTD.ALIAS._Scene_Map_createAllWindows =
+  Scene_Map.prototype.createAllWindows;
+Scene_Map.prototype.createAllWindows = function () {
+  UFC.UFCTD.ALIAS._Scene_Map_createAllWindows.call(this);
+  if (TowerDefenseManager.isConfigured) this.createHUDTD();
 };
 
 // ----------------------------------- HUD --------------------------------
@@ -301,6 +355,11 @@ Scene_Map.prototype.createHUDTD = function () {
   );
   this.addWindow(UFC.UFCTD.HUDGUI.HEALTHWINDOW);
   UFC.UFCTD.HUDGUI.HEALTHWINDOW.visible = TowerDefenseManager.getHUDHealth;
+
+  if (UFC.UFCTD.SHOPGUISETTINGS.enable) {
+    UFC.UFCTD.HUDGUI.SHOP = new Window_TDShop();
+    this.addWindow(UFC.UFCTD.HUDGUI.SHOP);
+  }
 };
 
 // ----------------------------------- End HUD -------------------------
@@ -384,7 +443,7 @@ Game_Map.prototype.ufcAddProjectile = function (projectileData) {
 
 Game_Map.prototype.ufcAddTower = function (towerData) {
   let newTowerIndex = this._events.push(
-    new Game_TowerDefense(towerData, this._mapId)
+    new Game_TDTower(towerData, this._mapId)
   );
   this.ufcAddCharacterSprites(
     new Sprite_ufcTDTower(this._events[newTowerIndex - 1])
@@ -516,7 +575,7 @@ Spriteset_Map.prototype.createCharacters = function () {
 
   // Create Tower
   let towers = $gameMap._events.filter(
-    (event) => event instanceof Game_TowerDefense
+    (event) => event instanceof Game_TDTower
   );
   for (const tower of towers) {
     this._tilemap.addChild(new Sprite_ufcTDTower(tower));

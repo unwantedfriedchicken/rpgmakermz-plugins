@@ -10,7 +10,7 @@ for demo check https://unwantedfriedchicken.itch.io/adventurer-guild-the-barrier
 - Setup your plugin parameter
 - Add tower to your database, see **Setup Tower** section
 - Add enemy event, setup the character image and set trigger to parallel and add event **Setup Enemy Data** and **erase event**
-- Add event with trigger parallel and Setup your variable health & max health also add plugin command **UFCTowerDefense -> Config Tower Defense** and add erase event since we only need to call it once
+- Add event with trigger parallel and Setup your variable health & max health also add plugin command **UFCTowerDefense -> Config Tower Defense** and add erase event since we only need to call it once, and this is important to initialize the tower defense mode
 - (optional) if you want to immediately autorun to play towerdefense mode also add plugin command **Show Health Hud, Show Gold HUD, Show Item Slot GUI**
 - Add enemy spawn location with add event and -> add plugin command **Set Enemy Spawn Location** -> add **Erase event**
 - Add event for enemy damage the crystal with add event and add plugin command **Trigger Destroy Enemy** -> add Erase event
@@ -139,7 +139,11 @@ you can delete any **optional** note
 
 ### **Config Tower Defense** (required)
 
-This is used for configuration and calculating some grid, configuration terrain is using terrain tag
+This is used for configuration and initialize the mode make it parallel if you want current map have tower defense mode
+
+### **Disable Tower Defense**
+
+This will disable & destroy any tower defense mode,
 
 ### **Limit Animation**
 
@@ -158,6 +162,10 @@ Most of the time this trigger is used for attacking the crystal/hp but if you wa
 ### **Trigger Move Enemy**
 
 Set enemy direction if want only specific enemy combine it with trigger config
+
+### **Trigger Trigger Wait Enemy**
+
+Enemy will wait in this area for configured duration before move
 
 ### **Start Tower Defense**
 
@@ -183,9 +191,17 @@ Show your Health HUD
 
 Show your Gold HUD
 
-### **Update Health HUD**
+### **Update HUD**
 
-When you decrease/increase the variable used by crystal health and need to update the health hud call this command
+When you decrease/increase the variable used by crystal health or any hud element call this to update the graphics
+
+### **Shop GUI Items**
+
+Change items appear in the Shop GUI
+
+### **Shop GUI Items Reset**
+
+Reset items in Shop GUI to default items
 
 ---
 

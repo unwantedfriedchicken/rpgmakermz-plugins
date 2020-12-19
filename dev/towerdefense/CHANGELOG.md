@@ -2,10 +2,14 @@
 
 ## Version 1.2 - dev
 
+Thanks for [@wrigty12](https://forums.rpgmakerweb.com/index.php?members/wrigty12.25770/) for their [extension!](https://forums.rpgmakerweb.com/index.php?threads/ufc-tower-defense.130384/post-1141044) now there's Shop GUI!
+
 - CHANGE: Change update `updateHealthHud` to `updateHUD`. `updateHUD` will update every hud gold and health
 - CHANGE: Now if there's no `Plugin Command Config` in the map, the game will not create hud or any tower defense mechanic.
 - ADD: `Plugin Command: Disable Tower Defense` This will destroy any tower defense element and enable menu
 - ADD: Add tooltip to backpack item selection
+- ADD: `Trigger Wait`, make enemy wait when touch with the event
+- ADD: Shop GUI, setting can be configured in plugins parameters, this will also add `Plugin Command Shop GUI Items` & `Plugin Command Shop GUI Items Reset`
 
 ## Version 1.1 - 6/12/2020
 

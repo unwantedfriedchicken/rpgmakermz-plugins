@@ -4,6 +4,8 @@ function TowerDefenseManager() {
 
 TowerDefenseManager.initialize = function () {
   this._active = false;
+  this._config = false;
+  this._shopOpen = false;
   this._HUDGold = false;
   this._HUDHealth = false;
   this._GUIItemSlot = false;
@@ -40,7 +42,7 @@ TowerDefenseManager.debugMode = function () {
         UFC.UFCTD.DEBUGMODE.CONFIG.showRange = !UFC.UFCTD.DEBUGMODE.CONFIG
           .showRange;
         $gameMap._events
-          .filter((event) => event instanceof Game_TowerDefense)
+          .filter((event) => event instanceof Game_TDTower)
           .forEach((event) =>
             event
               .getTowerData()
@@ -81,6 +83,7 @@ TowerDefenseManager.ENEMYTYPE = {
 TowerDefenseManager.TRIGGERTYPE = {
   DESTROY: "destroy",
   DIRECTION: "direction",
+  WAIT: "wait",
   CONFIG: "config",
 };
 
@@ -192,6 +195,8 @@ TowerDefenseManager.config = function (args) {
   $gameSystem.disableMenu();
 
   this.cacheImage();
+
+  this._config = true;
 };
 
 // Cache image that being used in tower data, bullets & character
@@ -207,6 +212,8 @@ TowerDefenseManager.setActive = function (active) {
 };
 
 TowerDefenseManager.disableTowerDefense = function () {
+  this._config = false;
+
   this.setActive(false);
 
   // Destroy HUD
@@ -261,7 +268,7 @@ TowerDefenseManager.clearSelect = function () {
 
 TowerDefenseManager.selectTowerMode = function () {
   const selectedTower = new Sprite_ufcTDTower(
-    new Game_TowerDefense(this.getSelectedTowerData(), $gameMap._mapId)
+    new Game_TDTower(this.getSelectedTowerData(), $gameMap._mapId)
   );
   selectedTower.setRangeVisibility(true);
   $gamePlayer.getGuideAction().setActive(true);
@@ -340,6 +347,10 @@ TowerDefenseManager.placeTower = function () {
   });
 };
 
+TowerDefenseManager.openShop = function (open) {
+  this._shopOpen = open;
+};
+
 Object.defineProperty(TowerDefenseManager, "getState", {
   get: function () {
     return this._state;
@@ -385,6 +396,18 @@ Object.defineProperty(TowerDefenseManager, "getHUDHealthMaxValue", {
 Object.defineProperty(TowerDefenseManager, "isActive", {
   get: function () {
     return this._active;
+  },
+});
+
+Object.defineProperty(TowerDefenseManager, "isConfigured", {
+  get: function () {
+    return this._config;
+  },
+});
+
+Object.defineProperty(TowerDefenseManager, "isShopOpen", {
+  get: function () {
+    return this._shopOpen && this.isActive && UFC.UFCTD.SHOPGUISETTINGS.enable;
   },
 });
 

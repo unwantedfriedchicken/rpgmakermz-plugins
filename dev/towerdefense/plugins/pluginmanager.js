@@ -17,6 +17,13 @@ UFC.UFCTD.HUDGUI = {
   },
   MESSAGE: {
     isHoverHUDItem: false,
+    isHoverGUIShop: false,
+    isBusy: function () {
+      return (
+        UFC.UFCTD.HUDGUI.MESSAGE.isHoverHUDItem ||
+        UFC.UFCTD.HUDGUI.MESSAGE.isHoverGUIShop
+      );
+    },
   },
 };
 
@@ -36,6 +43,20 @@ UFC.UFCTD.TOOLTIPSETTINGS = {
   yPosition: +UFC.UFCTD.PARAMETERS["tooltipYPosition"],
   fontSize: +UFC.UFCTD.PARAMETERS["tooltipFontSize"],
   backgroundType: +UFC.UFCTD.PARAMETERS["tooltipBackgroundType"],
+};
+
+UFC.UFCTD.SHOPGUISETTINGS = {
+  enable: UFC.UFCTD.PARAMETERS["shopgui"] == "true",
+  defaultItems: JSON.parse(
+    UFC.UFCTD.PARAMETERS["shopguiDefaultItems"]
+  ).map((item) => [0, +item, 0, 0]),
+  itemsEdit: [],
+  multiplier: +UFC.UFCTD.PARAMETERS["shopguiMultiplier"],
+  roundPrice: +UFC.UFCTD.PARAMETERS["shopguiRoundPrice"],
+  iconWidth: +UFC.UFCTD.PARAMETERS["shopguiIconWidth"],
+  iconHeight: +UFC.UFCTD.PARAMETERS["shopguiIconHeight"],
+  iconXPosition: +UFC.UFCTD.PARAMETERS["shopguiIconXPosition"],
+  iconYPosition: +UFC.UFCTD.PARAMETERS["shopguiIconYPosition"],
 };
 
 UFC.UFCTD.DEBUGMODE = {
@@ -154,5 +175,38 @@ PluginManager.registerCommand(
         exceptEnemy: JSON.parse(args["exceptEnemy"]),
       }
     );
+  }
+);
+
+PluginManager.registerCommand(
+  "UFCTowerDefense",
+  "triggerWait",
+  function (args) {
+    TowerDefenseManager.addDBTrigger(
+      this._mapId,
+      this._eventId,
+      TowerDefenseManager.TRIGGERTYPE.WAIT,
+      {
+        duration: +args["duration"],
+      }
+    );
+  }
+);
+
+PluginManager.registerCommand(
+  "UFCTowerDefense",
+  "shopGUIItemsEdit",
+  function (args) {
+    UFC.UFCTD.SHOPGUISETTINGS.itemsEdit = JSON.parse(
+      args["items"]
+    ).map((item) => [0, +item, 0, 0]);
+  }
+);
+
+PluginManager.registerCommand(
+  "UFCTowerDefense",
+  "shopGUIItemsReset",
+  function () {
+    UFC.UFCTD.SHOPGUISETTINGS.itemsEdit = [];
   }
 );

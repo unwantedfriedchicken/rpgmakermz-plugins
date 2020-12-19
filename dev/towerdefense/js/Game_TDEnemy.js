@@ -33,6 +33,8 @@ Game_TDEnemy.prototype.initialize = function (enemyName, spawnId) {
   this._animationPlaying = false;
   this._through = this._enemyData.isThrough == "true";
   this._event = new PIXI.utils.EventEmitter();
+  this._triggerInit = false;
+  this._triggerWait = 0;
 };
 
 Game_TDEnemy.prototype.isSameType = function (type) {
@@ -94,29 +96,43 @@ Game_TDEnemy.prototype.update = function () {
   Game_Character.prototype.update.call(this);
 
   this.updateEffects();
-  if (!this.isMoving()) {
-    let getTrigger = TowerDefenseManager.getTrigger(
-      this._mapId,
-      this._x,
-      this._y
-    );
-    if (getTrigger) {
-      if (this.checkTriggerConfig(getTrigger.config)) {
-        for (let trigger in getTrigger) {
-          switch (trigger) {
-            case TowerDefenseManager.TRIGGERTYPE.DIRECTION:
-              this.setDirection(
-                TowerDefenseManager.convertDirection(getTrigger[trigger])
-              );
-              break;
-            case TowerDefenseManager.TRIGGERTYPE.DESTROY:
-              this.triggerDestroy(getTrigger[trigger]);
-              return;
+
+  // Trigger Wait
+  if (this._triggerWait > 0) this._triggerWait--;
+
+  if (!this.isMoving() && this._triggerWait <= 0) {
+    if (!this._triggerInit) {
+      let getTrigger = TowerDefenseManager.getTrigger(
+        this._mapId,
+        this._x,
+        this._y
+      );
+      if (getTrigger) {
+        if (this.checkTriggerConfig(getTrigger.config)) {
+          for (let trigger in getTrigger) {
+            switch (trigger) {
+              case TowerDefenseManager.TRIGGERTYPE.DIRECTION:
+                this.setDirection(
+                  TowerDefenseManager.convertDirection(getTrigger[trigger])
+                );
+                break;
+              case TowerDefenseManager.TRIGGERTYPE.DESTROY:
+                this.triggerDestroy(getTrigger[trigger]);
+                this._triggerInit = true;
+                break;
+              case TowerDefenseManager.TRIGGERTYPE.WAIT:
+                this._triggerWait = getTrigger[trigger].duration;
+                this._triggerInit = true;
+                break;
+            }
           }
+          if (this._triggerInit) return;
         }
       }
     }
+
     this.moveStraight(this._direction);
+    this._triggerInit = false;
   }
 };
 

@@ -110,6 +110,20 @@ Window_GUIItemSlot.prototype.deactiveKeyboard = function () {
   $gameMessage.setWindowTower(false);
   this.deselect();
   this.deactivate();
+
+  // Deactive Shop Selection
+  UFC.UFCTD.HUDGUI.SHOP.deselect();
+};
+
+Window_GUIItemSlot.prototype.cursorLeft = function (wrap) {
+  if (wrap && this.index() === 0 && UFC.UFCTD.SHOPGUISETTINGS.enable) {
+    UFC.UFCTD.HUDGUI.SHOP.selected();
+    this.deselect();
+    this.deactivate();
+    return;
+  }
+
+  Window_Command.prototype.cursorLeft.call(this, wrap);
 };
 
 Window_GUIItemSlot.prototype.processCursorMove = function () {
@@ -321,4 +335,24 @@ Window_GUIItemSlot.prototype.makeCommandTowers = function () {
       this.addCommand("", 0, 0, true);
     }
   }
+};
+
+Window_GUIItemSlot.prototype.close = function () {
+  for (const child of this.children) {
+    if (child.close) {
+      child.close();
+    }
+  }
+
+  // Also close shop
+  if (UFC.UFCTD.SHOPGUISETTINGS.enable) UFC.UFCTD.HUDGUI.SHOP.close();
+
+  Window_Command.prototype.close.call(this);
+};
+
+Window_GUIItemSlot.prototype.open = function () {
+  // Also close shop
+  if (UFC.UFCTD.SHOPGUISETTINGS.enable) UFC.UFCTD.HUDGUI.SHOP.open();
+
+  Window_Command.prototype.open.call(this);
 };

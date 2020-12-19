@@ -158,6 +158,64 @@ unwantedfriedchicken<at>gmail.com
 @desc Background type for tooltip, 0 = default, 1 = dim, 2 = nothing
 @default 1
 
+@param shopgui
+@text Add Shop Button
+@type boolean
+@desc Add shop button gui
+@default true
+
+@param shopguiDefaultItems
+@parent shopgui
+@text Default Items
+@type item[]
+@desc Default items appear in shop
+@default ["41","42","43","44","45","46","47"]
+
+@param shopguiMultiplier
+@parent shopgui
+@text Price Multiplier
+@type number
+@decimals 2
+@desc Price multiplier when buy from shop button
+@default 1.2
+
+@param shopguiRoundPrice
+@parent shopgui
+@text Round Price
+@type number
+@default 1
+@desc Round the price power 10, 0 = disable, 1 = 10, 2 = 100. ex: value 2 -> price 140 -> become 200
+
+@param shopguiIconWidth
+@parent shopgui
+@text Icon Width
+@type number
+@default 144
+@desc Icon Width
+
+@param shopguiIconHeight
+@parent shopgui
+@text Icon Height
+@type number
+@default 72
+@desc Icon Height
+
+@param shopguiIconXPosition
+@parent shopgui
+@text Icon X Position
+@type string
+@default 0
+@desc Icon X Position
+
+@param shopguiIconYPosition
+@parent shopgui
+@text Icon Y Position
+@type string
+@default 0
+@desc Icon Y Position
+
+=========================== DEBUG =================================
+
 @param debugMode
 @text Debug Mode
 @type boolean
@@ -180,7 +238,7 @@ unwantedfriedchicken<at>gmail.com
 
 
 
-============== Plugin Command ================
+=========================== Plugin Command =================================
 @command config
 @text Config Tower Defense
 @desc Configuration
@@ -235,6 +293,16 @@ unwantedfriedchicken<at>gmail.com
 @type string[]
 @desc This enemy will not get triggered
 @default []
+
+@command triggerWait
+@text Trigger Wait
+@desc Trigger for wait
+
+@arg duration
+@text Duration
+@desc duration frames (1/60 sec)
+@type number
+@default 60
 
 @command triggerDestroy
 @text Trigger Destroy Enemy
@@ -461,4 +529,20 @@ unwantedfriedchicken<at>gmail.com
 @command updateHUD
 @text Update Hud
 @desc Update every Hud To Current Variable Value
+
+@command shopGUIItemsEdit
+@text Shop GUI Items
+@desc Change what items appear in the Menu Shop
+
+@arg items
+@text Items
+@desc Items appear in the GUI Shop
+@type item[]
+@default []
+
+@command shopGUIItemsReset
+@text Shop GUI Items Reset
+@desc Reset GUI Shop to default
+
+
 */

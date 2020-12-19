@@ -1,11 +1,11 @@
-function Game_TowerDefense() {
+function Game_TDTower() {
   this.initialize(...arguments);
 }
 
-Game_TowerDefense.prototype = Object.create(Game_Character.prototype);
-Game_TowerDefense.prototype.constructor = Game_TowerDefense;
+Game_TDTower.prototype = Object.create(Game_Character.prototype);
+Game_TDTower.prototype.constructor = Game_TDTower;
 
-Game_TowerDefense.prototype.initialize = function (towerData, mapId) {
+Game_TDTower.prototype.initialize = function (towerData, mapId) {
   Game_Character.prototype.initialize.call(this);
   this._mapId = mapId;
   this._towerData = towerData;
@@ -23,10 +23,10 @@ Game_TowerDefense.prototype.initialize = function (towerData, mapId) {
   }
 };
 
-Game_TowerDefense.prototype.addAuraEffects = function () {
+Game_TDTower.prototype.addAuraEffects = function () {
   let towers = $gameMap._events.filter(
     (event) =>
-      event instanceof Game_TowerDefense &&
+      event instanceof Game_TDTower &&
       event !== this &&
       PIXI.utils.isInRange(
         event._x,
@@ -42,27 +42,27 @@ Game_TowerDefense.prototype.addAuraEffects = function () {
   }
 };
 
-Game_TowerDefense.prototype.addTowerEffectedByAura = function (tower) {
+Game_TDTower.prototype.addTowerEffectedByAura = function (tower) {
   this._towerEffectedByAura.push(tower);
 };
 
-Game_TowerDefense.prototype.getTowerData = function () {
+Game_TDTower.prototype.getTowerData = function () {
   return this._towerData;
 };
 
-Game_TowerDefense.prototype.isStarting = function () {
+Game_TDTower.prototype.isStarting = function () {
   return false;
 };
 
-Game_TowerDefense.prototype.isTriggerIn = function () {
+Game_TDTower.prototype.isTriggerIn = function () {
   return false;
 };
 
-Game_TowerDefense.prototype.refresh = function () {
+Game_TDTower.prototype.refresh = function () {
   return false;
 };
 
-Game_TowerDefense.prototype.update = function () {
+Game_TDTower.prototype.update = function () {
   this._attackTime--;
   if (
     !this._target &&
@@ -109,7 +109,7 @@ Game_TowerDefense.prototype.update = function () {
   }
 };
 
-Game_TowerDefense.prototype.attack = function (enemy) {
+Game_TDTower.prototype.attack = function (enemy) {
   let projectileId = $gameMap.ufcProjectiles();
   // Update bullet
   $gameMap.ufcAddProjectile(
@@ -123,7 +123,7 @@ Game_TowerDefense.prototype.attack = function (enemy) {
   );
 };
 
-Game_TowerDefense.prototype.destroy = function () {
+Game_TDTower.prototype.destroy = function () {
   AudioManager.playSe({
     name: "Door2",
     volume: 25,
@@ -140,11 +140,11 @@ Game_TowerDefense.prototype.destroy = function () {
   this._destroy = true;
 };
 
-Game_TowerDefense.prototype.isDestroyed = function () {
+Game_TDTower.prototype.isDestroyed = function () {
   return this._destroy;
 };
 
-Game_TowerDefense.prototype.actionTower = function () {
+Game_TDTower.prototype.actionTower = function () {
   $gameMessage.setWindowTower(true);
   TowerDefenseManager.actionTower(this._towerData, () => {
     this.destroy(); // Callback for move and upgrade
