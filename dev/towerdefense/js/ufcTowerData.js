@@ -37,10 +37,11 @@ ufcTowerData.prototype.initialize = function (data) {
   }
 
   if (data["sellprice"]) {
-    this._sellPrice = $dataItems[this._id].price / 2;
-  } else {
     this._sellPrice = data["sellprice"];
+  } else {
+    this._sellPrice = $dataItems[this._id].price / 2;
   }
+
   this._effects = [];
   if (data["effects"]) {
     let effects = data["effects"].split(",");
