@@ -6,7 +6,7 @@ for demo check https://unwantedfriedchicken.itch.io/adventurer-guild-the-barrier
 ## How to use
 
 - Install **Guideaction** & **UFCTowerDefense**
-- Download **TDSet.png** from [**Resources**](https://github.com/unwantedfriedchicken/rpgmakermz-plugins/tree/master/resources) folder and place it to **img/system**
+- Download **TDSet.png** & **TDShopIcon.png** from [**Resources**](https://github.com/unwantedfriedchicken/rpgmakermz-plugins/tree/master/resources) folder and place it to **img/system**
 - Setup your plugin parameter
 - Add tower to your database, see **Setup Tower** section
 - Add enemy event, setup the character image and set trigger to parallel and add event **Setup Enemy Data** and **erase event**
