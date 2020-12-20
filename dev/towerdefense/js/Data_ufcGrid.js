@@ -21,6 +21,22 @@ Data_ufcGrid.prototype.setVisible = function (visible) {
   this._event.emit("showGrid", visible);
 };
 
+Data_ufcGrid.prototype.refreshBitmap = function () {
+  this._bitmap = new Bitmap(
+    $gameMap.width() * $gameMap.tileWidth(),
+    $gameMap.height() * $gameMap.tileHeight()
+  );
+  for (let x = 0; x < $gameMap.width(); x++) {
+    for (let y = 0; y < $gameMap.height(); y++) {
+      if (this._gridData[x][y]) {
+        this.fillGrid(x, y);
+      } else {
+        this.clearGrid(x, y);
+      }
+    }
+  }
+};
+
 Data_ufcGrid.prototype.getData = function () {
   return this._gridData;
 };

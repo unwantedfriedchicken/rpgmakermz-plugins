@@ -411,6 +411,9 @@ Game_Map.prototype.setupTDGrid = function () {
 };
 
 Game_Map.prototype.ufcGetGrid = function () {
+  if (this._towerDefenseGrid && !this._towerDefenseGrid._bitmap._canvas) {
+    this._towerDefenseGrid.refreshBitmap();
+  }
   return this._towerDefenseGrid;
 };
 
