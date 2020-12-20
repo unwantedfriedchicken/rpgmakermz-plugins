@@ -1,6 +1,6 @@
 # Change Log
 
-## Version 1.2 - dev
+## Version 1.2 - 20/12/2020
 
 Thanks for [@wrigty12](https://forums.rpgmakerweb.com/index.php?members/wrigty12.25770/) for their [extension!](https://forums.rpgmakerweb.com/index.php?threads/ufc-tower-defense.130384/post-1141044) now there's Shop GUI!
 
