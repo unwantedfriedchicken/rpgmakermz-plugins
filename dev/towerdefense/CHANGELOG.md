@@ -1,5 +1,9 @@
 # Change Log
 
+## Version 1.2.2 - 21/12/2020
+
+- ADD: add visustella compatibility
+
 ## Version 1.2.1 - 20/12/2020
 
 - BUGFIX: When using keyboard and move tower, the grid is slightly off

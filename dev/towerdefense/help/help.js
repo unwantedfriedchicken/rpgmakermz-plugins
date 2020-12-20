@@ -7,7 +7,7 @@
 
 @help
 Author: UnwantedFriedChicken
-Version: 1.2
+Version: 1.2.2
 Itch.io : https://unwantedfriedchicken.itch.io
 Github : https://github.com/unwantedfriedchicken/rpgmakermz-plugins/
 

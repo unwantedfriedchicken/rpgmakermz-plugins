@@ -201,6 +201,7 @@ GuideAction.prototype.canPass = function (x, y, d) {
   if (!this.isMapPassable(x, y, d)) {
     return false;
   }
+  if (this.checkTDTower(x2, y2)) return false;
   if (this.isCollidedWithCharacters(x2, y2)) {
     return false;
   }
@@ -217,6 +218,7 @@ GuideAction.prototype.canPassMouse = function (x, y) {
   if (!$gameMap.checkPassage(x, y, 0x0f)) {
     return false;
   }
+  if (this.checkTDTower(x, y)) return false;
   if (this.isCollidedWithCharacters(x, y)) {
     return false;
   }
@@ -224,6 +226,14 @@ GuideAction.prototype.canPassMouse = function (x, y) {
     return false;
   }
   return true;
+};
+
+GuideAction.prototype.checkTDTower = function (x, y) {
+  if (!Imported.UFCTowerDefense) return false;
+  let towers = $gameMap._events.filter(
+    (event) => event instanceof Game_TDTower && event.pos(x, y)
+  );
+  return towers.length > 0 ? true : false;
 };
 
 GuideAction.prototype.checkTerrainTag = function (x, y) {

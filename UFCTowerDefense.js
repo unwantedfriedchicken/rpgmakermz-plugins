@@ -7,7 +7,7 @@
 
 @help
 Author: UnwantedFriedChicken
-Version: 1.2
+Version: 1.2.2
 Itch.io : https://unwantedfriedchicken.itch.io
 Github : https://github.com/unwantedfriedchicken/rpgmakermz-plugins/
 
@@ -1617,9 +1617,9 @@ Sprite_ufcGrid.prototype.screenY = function (y) {
   return Math.floor($gameMap.adjustY(y) * th + th / 2);
 };
 
-Sprite_ufcGrid.prototype.destroy = function (options) {
+Sprite_ufcGrid.prototype.destroy = function () {
   this._data._event.removeListener("showGrid", this.setVisible, this);
-  Sprite.prototype.destroy.call(this, options);
+  PIXI.Sprite.prototype.destroy.call(this, { children: true, texture: true });
 };
 
 const Sprite_ufcProjectile = function () {
@@ -2364,9 +2364,9 @@ Game_Player.prototype.triggerButtonAction = function () {
     return true;
   }
 
-  return UFC.UFCTD.ALIAS._Game_Player_triggerButtonAction.apply(
+  return UFC.UFCTD.ALIAS._Game_Player_triggerButtonAction.call(
     this,
-    arguments
+    ...arguments
   );
 };
 
@@ -2453,13 +2453,19 @@ Game_Player.prototype.checkEventTower = function (x, y) {
     x2 = $gameMap.roundXWithDirection(this._x, this._direction);
     y2 = $gameMap.roundYWithDirection(this._y, this._direction);
   }
-  const events = $gameMap.eventsXyNt(x2, y2);
-  const tower = events.filter((event) => event instanceof Game_TDTower);
-  if (tower.length <= 0) return false;
+  const tower = this.checkTDTower(x2, y2, true);
+  if (!tower) return false;
   else {
     tower[0].actionTower();
     return true;
   }
+};
+
+Game_Player.prototype.checkTDTower = function (x, y, getData = false) {
+  let towers = $gameMap._events.filter(
+    (event) => event instanceof Game_TDTower && event.pos(x, y)
+  );
+  return towers.length > 0 ? (getData ? towers : true) : false;
 };
 
 // Since shop icon is get call in start need to be chached
@@ -2792,6 +2798,42 @@ Game_Party.prototype.itemContainer = function (item) {
 Game_Party.prototype.towers = function () {
   return Object.keys(this._towers).map((id) => $dataItems[id].ufcTower);
 };
+
+if (Imported.VisuMZ_1_EventsMoveCore) {
+  Game_Player.prototype.executeMoveDir8 = function () {
+    if (
+      TowerDefenseManager.isActive &&
+      $gameTemp.isDestinationValid() &&
+      TowerDefenseManager.getState == TowerDefenseManager.STATE.BUILD
+    ) {
+      const destX = $gameTemp.destinationX();
+      const destY = $gameTemp.destinationY();
+      let dist = $gameMap.distance(this.x, this.y, destX, destY);
+      if (dist <= 1) {
+        this.turnTowardCharacter({ x: destX, y: destY });
+        this.getGuideAction().updateBlocked();
+        if (!this.getGuideAction().isBlocked()) {
+          // Double check incase the map is scrolled
+          this.getGuideAction().updateBlocked(true);
+          if (!this.getGuideAction().isBlocked())
+            TowerDefenseManager.placeTower();
+          $gameTemp.clearDestination();
+        }
+        this.getGuideAction().clearTrigger();
+        return;
+      }
+    }
+    return Game_Character.prototype.executeMoveDir8.call(this, ...arguments);
+  };
+  UFC.UFCTD.ALIAS._Game_Player_canPass = Game_Player.prototype.canPass;
+  Game_Player.prototype.canPass = function (x, y, d) {
+    const x2 = $gameMap.roundXWithDirection(x, d);
+    const y2 = $gameMap.roundYWithDirection(y, d);
+    if (this.checkTDTower(x2, y2)) return false;
+
+    return UFC.UFCTD.ALIAS._Game_Player_canPass.call(this, ...arguments);
+  };
+}
 
 function TowerDefenseManager() {
   throw new Error("This is a static class");

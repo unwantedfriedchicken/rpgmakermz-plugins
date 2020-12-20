@@ -41,7 +41,7 @@ Sprite_ufcGrid.prototype.screenY = function (y) {
   return Math.floor($gameMap.adjustY(y) * th + th / 2);
 };
 
-Sprite_ufcGrid.prototype.destroy = function (options) {
+Sprite_ufcGrid.prototype.destroy = function () {
   this._data._event.removeListener("showGrid", this.setVisible, this);
-  Sprite.prototype.destroy.call(this, options);
+  PIXI.Sprite.prototype.destroy.call(this, { children: true, texture: true });
 };
