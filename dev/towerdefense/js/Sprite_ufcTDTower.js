@@ -64,7 +64,6 @@ Sprite_ufcTDTower.prototype.resetRangeGraphics = function () {
     }
   }
   _rangeGraphics.endFill();
-
   let rangeSprite = Graphics.app.renderer.generateTexture(_rangeGraphics);
   if (!this._rangeGraphics) {
     this._rangeGraphics = new PIXI.Sprite(rangeSprite);

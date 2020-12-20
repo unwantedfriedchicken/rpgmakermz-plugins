@@ -72,8 +72,14 @@ unwantedfriedchicken<at>gmail.com
 @param gui_itemBackpackBackgroundType
 @parent hudguiSettings
 @text Item Background Type
-@type number
-@desc Background type for window item, 0 = default, 1 = dim, 2 = nothing
+@type select
+@option Default
+@value 0
+@option Dim
+@value 1
+@option Nothing
+@value 2
+@desc Background type for window
 @default 0
 
 @param gui_itemBackpackNumSize
@@ -141,6 +147,7 @@ unwantedfriedchicken<at>gmail.com
 @parent tooltip
 @text Y Position
 @type number
+@min -99999
 @desc Y position of tooltip
 @default -40
 
@@ -154,8 +161,14 @@ unwantedfriedchicken<at>gmail.com
 @param tooltipBackgroundType
 @parent tooltip
 @text Background Type
-@type number
-@desc Background type for tooltip, 0 = default, 1 = dim, 2 = nothing
+@type select
+@option Default
+@value 0
+@option Dim
+@value 1
+@option Nothing
+@value 2
+@desc Background type for tooltip
 @default 1
 
 @param shopgui
@@ -188,31 +201,33 @@ unwantedfriedchicken<at>gmail.com
 
 @param shopguiIconWidth
 @parent shopgui
-@text Icon Width
+@text Shop Button Width
 @type number
 @default 144
-@desc Icon Width
+@desc Shop Button Width
 
 @param shopguiIconHeight
 @parent shopgui
-@text Icon Height
+@text Shop Button Height
 @type number
 @default 72
-@desc Icon Height
+@desc Shop Button Height
 
 @param shopguiIconXPosition
 @parent shopgui
-@text Icon X Position
-@type string
+@text Shop Button X Position
+@type number
+@min -99999
 @default 0
 @desc Icon X Position
 
 @param shopguiIconYPosition
 @parent shopgui
-@text Icon Y Position
-@type string
+@text Shop Button Y Position
+@type number
+@min -99999
 @default 0
-@desc Icon Y Position
+@desc Shop Button Y Position
 
 =========================== DEBUG =================================
 
@@ -295,9 +310,12 @@ unwantedfriedchicken<at>gmail.com
 @text Enemy Type
 @type select
 @option All
+@value all
 @option Air
+@value air
 @option Ground
-@default All
+@value ground
+@default all
 @desc Defines enemy type
 
 @arg onlyEnemy
@@ -483,9 +501,12 @@ unwantedfriedchicken<at>gmail.com
 @text Enemy Type
 @type select
 @option All
+@value all
 @option Air
+@value air
 @option Ground
-@default All
+@value ground
+@default all
 @desc Defines enemy type
 
 @arg isThrough
@@ -525,11 +546,17 @@ unwantedfriedchicken<at>gmail.com
 @desc Effect resistance
 @type select[]
 @option Cold
+@value cold
 @option Poison
+@value poison
 @option Stun
+@value stun
 @option Rage
+@value rage
 @option Steal
+@value steal
 @option Critical
+@value critical
 @default []
 
 @command showGUIItemSlot

@@ -153,22 +153,22 @@ GuideAction.prototype.setDirection = function (
     if (!this.canPass(x, y, d)) this.setVisible(false);
     else this.setVisible(true);
   }
-
+  let offsetY = 6;
   switch (d) {
     case 2:
-      this.setPosition(-this._tileWidth / 2, 0);
+      this.setPosition(-this._tileWidth / 2, offsetY);
       break;
     case 4:
       this.setPosition(
         -(this._tileWidth / 2) - this._tileWidth,
-        -this._tileHeight
+        -this._tileHeight + offsetY
       );
       break;
     case 6:
-      this.setPosition(this._tileWidth / 2, -this._tileHeight);
+      this.setPosition(this._tileWidth / 2, -this._tileHeight + offsetY);
       break;
     case 8:
-      this.setPosition(-(this._tileWidth / 2), -this._tileHeight * 2);
+      this.setPosition(-(this._tileWidth / 2), -this._tileHeight * 2 + offsetY);
       break;
   }
 };

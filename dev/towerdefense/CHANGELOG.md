@@ -1,8 +1,15 @@
 # Change Log
 
+## Version 1.2.1 - 20/12/2020
+
+- BUGFIX: When using keyboard and move tower, the grid is slightly off
+- BUGFIX: When mouse hover in upgrade menu and hit cancel button, backpack ui show
+- BUGFIX: Fix hover upgrade info sometimes display first upgrade not the one that selected
+- CHANGE: Cleanup some parameters Thanks [@wrigty12](https://forums.rpgmakerweb.com/index.php?members/wrigty12.25770/)
+
 ## Version 1.2 - 20/12/2020
 
-Thanks for [@wrigty12](https://forums.rpgmakerweb.com/index.php?members/wrigty12.25770/) for their [extension!](https://forums.rpgmakerweb.com/index.php?threads/ufc-tower-defense.130384/post-1141044) now there's Shop GUI!
+Thanks to [@wrigty12](https://forums.rpgmakerweb.com/index.php?members/wrigty12.25770/) for their [extension!](https://forums.rpgmakerweb.com/index.php?threads/ufc-tower-defense.130384/post-1141044) now there's Shop GUI!
 
 - CHANGE: Change update `updateHealthHud` to `updateHUD`. `updateHUD` will update every hud gold and health
 - CHANGE: Now if there's no `Plugin Command Config` in the map, the game will not create hud or any tower defense mechanic.

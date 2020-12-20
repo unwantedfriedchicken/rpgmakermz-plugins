@@ -128,7 +128,7 @@ Window_GUIItemSlot.prototype.cursorLeft = function (wrap) {
 };
 
 Window_GUIItemSlot.prototype.processCursorMove = function () {
-  if ($gameMessage.isBusyDefault()) return;
+  if ($gameMessage.isBusyDefault() || !this.visible) return;
 
   if (this.isCancelTriggered() && this._selectKeyboard) {
     this.deactiveKeyboard();
@@ -240,7 +240,7 @@ Window_Command.prototype.commandIconIndex = function (index) {
 
 Window_GUIItemSlot.prototype.processTouch = function () {
   Window_Command.prototype.processTouch.call(this);
-  if (this.isClosed()) return;
+  if (this.isClosed() || !this.visible) return;
   if (this.isTouchedInsideFrame()) {
     UFC.UFCTD.HUDGUI.MESSAGE.isHoverHUDItem = true;
     this.activate();

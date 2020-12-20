@@ -124,7 +124,7 @@ Window_TDActionUpgrade.prototype.windowHovered = function (
 ) {
   if (isHovered) {
     this.activate();
-    this.refreshStatus(0);
+    this.refreshStatus(this.index());
     this._selected = false;
   } else {
     this.deactivate();
@@ -233,16 +233,16 @@ Window_TDActionUpgrade.prototype.onTouchSelect = function (trigger) {
   }
 };
 
-Window_TDActionUpgrade.prototype.refreshStatus = function (index) {
+Window_TDActionUpgrade.prototype.refreshStatus = function () {
   this.status.drawDefaultStatus(
-    new ufcTowerData(this._upgradeData[index].data)
+    new ufcTowerData(this._upgradeData[this._tmpIndex].data)
   );
 };
 
 Window_TDActionUpgrade.prototype.select = function (index) {
   if (this._tmpIndex !== index && index !== -1 && this.status) {
     this._tmpIndex = index;
-    this.refreshStatus(index);
+    this.refreshStatus();
   }
   Window_Command.prototype.select.call(this, index);
 };

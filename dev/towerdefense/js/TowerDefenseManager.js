@@ -338,8 +338,7 @@ TowerDefenseManager.addDBEnemy = function (enemyData) {
           JSON.parse(enemyData[data]).map((item) => JSON.parse(item)) || [];
         break;
       case "resistance":
-        enemyData[data] =
-          JSON.parse(enemyData[data]).map((item) => item.toLowerCase()) || [];
+        enemyData[data] = JSON.parse(enemyData[data]) || [];
         break;
     }
     $dataTDEnemy[enemyData.id][data] = enemyData[data];

@@ -72,8 +72,14 @@ unwantedfriedchicken<at>gmail.com
 @param gui_itemBackpackBackgroundType
 @parent hudguiSettings
 @text Item Background Type
-@type number
-@desc Background type for window item, 0 = default, 1 = dim, 2 = nothing
+@type select
+@option Default
+@value 0
+@option Dim
+@value 1
+@option Nothing
+@value 2
+@desc Background type for window
 @default 0
 
 @param gui_itemBackpackNumSize
@@ -141,6 +147,7 @@ unwantedfriedchicken<at>gmail.com
 @parent tooltip
 @text Y Position
 @type number
+@min -99999
 @desc Y position of tooltip
 @default -40
 
@@ -154,8 +161,14 @@ unwantedfriedchicken<at>gmail.com
 @param tooltipBackgroundType
 @parent tooltip
 @text Background Type
-@type number
-@desc Background type for tooltip, 0 = default, 1 = dim, 2 = nothing
+@type select
+@option Default
+@value 0
+@option Dim
+@value 1
+@option Nothing
+@value 2
+@desc Background type for tooltip
 @default 1
 
 @param shopgui
@@ -188,31 +201,33 @@ unwantedfriedchicken<at>gmail.com
 
 @param shopguiIconWidth
 @parent shopgui
-@text Icon Width
+@text Shop Button Width
 @type number
 @default 144
-@desc Icon Width
+@desc Shop Button Width
 
 @param shopguiIconHeight
 @parent shopgui
-@text Icon Height
+@text Shop Button Height
 @type number
 @default 72
-@desc Icon Height
+@desc Shop Button Height
 
 @param shopguiIconXPosition
 @parent shopgui
-@text Icon X Position
-@type string
+@text Shop Button X Position
+@type number
+@min -99999
 @default 0
 @desc Icon X Position
 
 @param shopguiIconYPosition
 @parent shopgui
-@text Icon Y Position
-@type string
+@text Shop Button Y Position
+@type number
+@min -99999
 @default 0
-@desc Icon Y Position
+@desc Shop Button Y Position
 
 =========================== DEBUG =================================
 
@@ -295,9 +310,12 @@ unwantedfriedchicken<at>gmail.com
 @text Enemy Type
 @type select
 @option All
+@value all
 @option Air
+@value air
 @option Ground
-@default All
+@value ground
+@default all
 @desc Defines enemy type
 
 @arg onlyEnemy
@@ -483,9 +501,12 @@ unwantedfriedchicken<at>gmail.com
 @text Enemy Type
 @type select
 @option All
+@value all
 @option Air
+@value air
 @option Ground
-@default All
+@value ground
+@default all
 @desc Defines enemy type
 
 @arg isThrough
@@ -525,11 +546,17 @@ unwantedfriedchicken<at>gmail.com
 @desc Effect resistance
 @type select[]
 @option Cold
+@value cold
 @option Poison
+@value poison
 @option Stun
+@value stun
 @option Rage
+@value rage
 @option Steal
+@value steal
 @option Critical
+@value critical
 @default []
 
 @command showGUIItemSlot
@@ -683,7 +710,7 @@ UFC.UFCTD.DEBUGMODE = {
 PluginManager.registerCommand("UFCTowerDefense", "setupEnemy", function (args) {
   args.characterName = $gameMap._events[this._eventId]._characterName;
   args.characterIndex = $gameMap._events[this._eventId]._characterIndex;
-  args["enemyType"] = args["enemyType"].toLowerCase();
+  args["enemyType"] = args["enemyType"];
   TowerDefenseManager.addDBEnemy(args);
 });
 
@@ -792,7 +819,7 @@ PluginManager.registerCommand(
       this._eventId,
       TowerDefenseManager.TRIGGERTYPE.CONFIG,
       {
-        enemyType: args["enemyType"].toLowerCase(),
+        enemyType: args["enemyType"],
         onlyEnemy: JSON.parse(args["onlyEnemy"]),
         exceptEnemy: JSON.parse(args["exceptEnemy"]),
       }
@@ -1996,7 +2023,6 @@ Sprite_ufcTDTower.prototype.resetRangeGraphics = function () {
     }
   }
   _rangeGraphics.endFill();
-
   let rangeSprite = Graphics.app.renderer.generateTexture(_rangeGraphics);
   if (!this._rangeGraphics) {
     this._rangeGraphics = new PIXI.Sprite(rangeSprite);
@@ -3088,8 +3114,7 @@ TowerDefenseManager.addDBEnemy = function (enemyData) {
           JSON.parse(enemyData[data]).map((item) => JSON.parse(item)) || [];
         break;
       case "resistance":
-        enemyData[data] =
-          JSON.parse(enemyData[data]).map((item) => item.toLowerCase()) || [];
+        enemyData[data] = JSON.parse(enemyData[data]) || [];
         break;
     }
     $dataTDEnemy[enemyData.id][data] = enemyData[data];
@@ -3843,7 +3868,7 @@ Window_GUIItemSlot.prototype.cursorLeft = function (wrap) {
 };
 
 Window_GUIItemSlot.prototype.processCursorMove = function () {
-  if ($gameMessage.isBusyDefault()) return;
+  if ($gameMessage.isBusyDefault() || !this.visible) return;
 
   if (this.isCancelTriggered() && this._selectKeyboard) {
     this.deactiveKeyboard();
@@ -3955,7 +3980,7 @@ Window_Command.prototype.commandIconIndex = function (index) {
 
 Window_GUIItemSlot.prototype.processTouch = function () {
   Window_Command.prototype.processTouch.call(this);
-  if (this.isClosed()) return;
+  if (this.isClosed() || !this.visible) return;
   if (this.isTouchedInsideFrame()) {
     UFC.UFCTD.HUDGUI.MESSAGE.isHoverHUDItem = true;
     this.activate();
@@ -4560,7 +4585,7 @@ Window_TDActionUpgrade.prototype.windowHovered = function (
 ) {
   if (isHovered) {
     this.activate();
-    this.refreshStatus(0);
+    this.refreshStatus(this.index());
     this._selected = false;
   } else {
     this.deactivate();
@@ -4669,16 +4694,16 @@ Window_TDActionUpgrade.prototype.onTouchSelect = function (trigger) {
   }
 };
 
-Window_TDActionUpgrade.prototype.refreshStatus = function (index) {
+Window_TDActionUpgrade.prototype.refreshStatus = function () {
   this.status.drawDefaultStatus(
-    new ufcTowerData(this._upgradeData[index].data)
+    new ufcTowerData(this._upgradeData[this._tmpIndex].data)
   );
 };
 
 Window_TDActionUpgrade.prototype.select = function (index) {
   if (this._tmpIndex !== index && index !== -1 && this.status) {
     this._tmpIndex = index;
-    this.refreshStatus(index);
+    this.refreshStatus();
   }
   Window_Command.prototype.select.call(this, index);
 };
