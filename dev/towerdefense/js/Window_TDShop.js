@@ -137,3 +137,8 @@ Window_TDShop.prototype.deselect = function () {
   this._selected = false;
   this.deactivate();
 };
+
+Window_TDShop.prototype.close = function (wrap) {
+  UFC.UFCTD.HUDGUI.MESSAGE.isHoverGUIShop = false;
+  Window_Command.prototype.close.call(this, wrap);
+};

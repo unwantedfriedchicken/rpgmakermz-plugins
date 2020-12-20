@@ -3811,6 +3811,7 @@ Window_GUIItemSlot.prototype.callOkHandler = function () {
   TowerDefenseManager.selectTowerMode();
   this._selectKeyboard = false;
   $gameMessage.setWindowTower(false);
+  this.close();
 };
 
 Window_GUIItemSlot.prototype.activeKeyboard = function () {
@@ -3954,6 +3955,7 @@ Window_Command.prototype.commandIconIndex = function (index) {
 
 Window_GUIItemSlot.prototype.processTouch = function () {
   Window_Command.prototype.processTouch.call(this);
+  if (this.isClosed()) return;
   if (this.isTouchedInsideFrame()) {
     UFC.UFCTD.HUDGUI.MESSAGE.isHoverHUDItem = true;
     this.activate();
@@ -4064,6 +4066,8 @@ Window_GUIItemSlot.prototype.close = function () {
       child.close();
     }
   }
+
+  UFC.UFCTD.HUDGUI.MESSAGE.isHoverHUDItem = false;
 
   // Also close shop
   if (UFC.UFCTD.SHOPGUISETTINGS.enable) UFC.UFCTD.HUDGUI.SHOP.close();
@@ -4953,6 +4957,11 @@ Window_TDShop.prototype.deselect = function () {
   Window_Command.prototype.deselect.call(this);
   this._selected = false;
   this.deactivate();
+};
+
+Window_TDShop.prototype.close = function (wrap) {
+  UFC.UFCTD.HUDGUI.MESSAGE.isHoverGUIShop = false;
+  Window_Command.prototype.close.call(this, wrap);
 };
 
 function Window_TDStatus() {
