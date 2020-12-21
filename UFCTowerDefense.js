@@ -4379,7 +4379,7 @@ Window_TDAction.prototype.setTower = function (ufcTowerData, callback) {
   this.addCommand(upgradeText, 2, isThereAnUpgrade);
   this.addCommand("\\FS[20]Pickup", 4, true);
   this.addCommand(
-    "\\FS[16]Sell\\FS\n\\FS[20]" +
+    "\\FS[16]Sell\n\\FS[20]" +
       "\\C[14]" +
       this._towerData._sellPrice +
       "\\C " +
@@ -4559,36 +4559,6 @@ Window_TDAction.prototype.destroy = function () {
   );
   Window_Command.prototype.destroy.call(this);
 };
-
-if (Imported.VisuMZ_1_MessageCore)
-  Window_TDAction.prototype.processEscapeCharacter = function (
-    code,
-    textState
-  ) {
-    switch (code) {
-      case "C":
-        this.processColorChange(this.obtainEscapeParam(textState));
-        break;
-      case "I":
-        this.processDrawIcon(this.obtainEscapeParam(textState), textState);
-        break;
-      case "PX":
-        textState.x = this.obtainEscapeParam(textState);
-        break;
-      case "PY":
-        textState.y = this.obtainEscapeParam(textState);
-        break;
-      case "FS":
-        this.contents.fontSize = this.obtainEscapeParam(textState);
-        break;
-      case "{":
-        this.makeFontBigger();
-        break;
-      case "}":
-        this.makeFontSmaller();
-        break;
-    }
-  };
 
 function Window_TDActionUpgrade() {
   this.initialize(...arguments);
@@ -4877,36 +4847,6 @@ Window_TDActionUpgrade.prototype.setLineHeight = function (lineheight) {
 Window_TDActionUpgrade.prototype.resetLineHeight = function () {
   this._lineHeight = this._defaultLineHeight;
 };
-
-if (Imported.VisuMZ_1_MessageCore)
-  Window_TDActionUpgrade.prototype.processEscapeCharacter = function (
-    code,
-    textState
-  ) {
-    switch (code) {
-      case "C":
-        this.processColorChange(this.obtainEscapeParam(textState));
-        break;
-      case "I":
-        this.processDrawIcon(this.obtainEscapeParam(textState), textState);
-        break;
-      case "PX":
-        textState.x = this.obtainEscapeParam(textState);
-        break;
-      case "PY":
-        textState.y = this.obtainEscapeParam(textState);
-        break;
-      case "FS":
-        this.contents.fontSize = this.obtainEscapeParam(textState);
-        break;
-      case "{":
-        this.makeFontBigger();
-        break;
-      case "}":
-        this.makeFontSmaller();
-        break;
-    }
-  };
 
 function Window_TDGold() {
   this.initialize(...arguments);
