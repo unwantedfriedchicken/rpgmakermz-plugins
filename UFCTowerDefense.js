@@ -2453,19 +2453,12 @@ Game_Player.prototype.checkEventTower = function (x, y) {
     x2 = $gameMap.roundXWithDirection(this._x, this._direction);
     y2 = $gameMap.roundYWithDirection(this._y, this._direction);
   }
-  const tower = this.checkTDTower(x2, y2, true);
+  const tower = $gameMap.checkTDTower(x2, y2, true);
   if (!tower) return false;
   else {
     tower[0].actionTower();
     return true;
   }
-};
-
-Game_Player.prototype.checkTDTower = function (x, y, getData = false) {
-  let towers = $gameMap._events.filter(
-    (event) => event instanceof Game_TDTower && event.pos(x, y)
-  );
-  return towers.length > 0 ? (getData ? towers : true) : false;
 };
 
 // Since shop icon is get call in start need to be chached
@@ -2730,6 +2723,13 @@ Game_Map.prototype.refresh = function () {
   UFC.UFCTD.ALIAS._Game_Map_refresh.call(this);
 };
 
+Game_Map.prototype.checkTDTower = function (x, y, getData = false) {
+  let towers = this._events.filter(
+    (event) => event instanceof Game_TDTower && event.pos(x, y)
+  );
+  return towers.length > 0 ? (getData ? towers : true) : false;
+};
+
 Spriteset_Map.prototype.checkLimitAnimation = function () {
   return (
     this._animationSprites.length > TowerDefenseManager.getLimitAnimation &&
@@ -2829,7 +2829,7 @@ if (Imported.VisuMZ_1_EventsMoveCore) {
   Game_Player.prototype.canPass = function (x, y, d) {
     const x2 = $gameMap.roundXWithDirection(x, d);
     const y2 = $gameMap.roundYWithDirection(y, d);
-    if (this.checkTDTower(x2, y2)) return false;
+    if ($gameMap.checkTDTower(x2, y2)) return false;
 
     return UFC.UFCTD.ALIAS._Game_Player_canPass.call(this, ...arguments);
   };

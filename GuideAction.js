@@ -230,10 +230,8 @@ GuideAction.prototype.canPassMouse = function (x, y) {
 
 GuideAction.prototype.checkTDTower = function (x, y) {
   if (!Imported.UFCTowerDefense) return false;
-  let towers = $gameMap._events.filter(
-    (event) => event instanceof Game_TDTower && event.pos(x, y)
-  );
-  return towers.length > 0 ? true : false;
+  let towers = $gameMap.checkTDTower(x, y);
+  return towers;
 };
 
 GuideAction.prototype.checkTerrainTag = function (x, y) {
