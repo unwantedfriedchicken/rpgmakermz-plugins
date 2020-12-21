@@ -1534,7 +1534,8 @@ Game_ufcProjectile.prototype.screenY = function (y = this._y) {
 };
 
 Game_ufcProjectile.prototype.update = function () {
-  Game_Character.prototype.update.call(this);
+  if (Imported.VisuMZ_1_EventsMoveCore) this.baseUpdate();
+  else Game_Character.prototype.update.call(this);
   let targetY = this.screenY(this._target._realY);
   let targetX = this.screenX(this._target._realX);
 
@@ -1573,6 +1574,44 @@ Game_ufcProjectile.prototype.isMoving = function () {
 Game_ufcProjectile.prototype.isDestroyed = function () {
   return this._destroy;
 };
+
+if (Imported.VisuMZ_1_EventsMoveCore) {
+  Game_ufcProjectile.prototype.setDirection = function (d) {
+    this._direction = d;
+  };
+
+  Game_ufcProjectile.prototype.pattern = function () {
+    return this._pattern < 3 ? this._pattern : 1;
+  };
+  Game_ufcProjectile.prototype.direction = function () {
+    return this._direction;
+  };
+
+  Game_ufcProjectile.prototype.baseUpdate = function () {
+    if (this.isStopping()) {
+      this.updateStop();
+    }
+    if (this.isJumping()) {
+      this.updateJump();
+    } else if (this.isMoving()) {
+      this.updateMove();
+    }
+    this.updateAnimation();
+  };
+
+  Game_ufcProjectile.prototype.isSpriteVS8dir = function () {
+    return false;
+  };
+  Game_ufcProjectile.prototype.isPosing = function () {
+    return false;
+  };
+  Game_ufcProjectile.prototype.hasStepAnime = function () {
+    return false;
+  };
+  Game_ufcProjectile.prototype.updatePatternEventsMoveCore = function () {
+    return;
+  };
+}
 
 const Sprite_ufcGrid = function () {
   this.initialize(...arguments);
@@ -2072,6 +2111,7 @@ Sprite_ufcTDTower.prototype.update = function () {
   if (this._towerData._placeMode) return;
   this.updatePosition();
   if (this._tower.isDestroyed()) this.destroySprite();
+  if (Imported.VisuMZ_1_EventsMoveCore) this._tower.update();
 };
 
 Sprite_ufcTDTower.prototype.destroySprite = function () {
@@ -4520,6 +4560,36 @@ Window_TDAction.prototype.destroy = function () {
   Window_Command.prototype.destroy.call(this);
 };
 
+if (Imported.VisuMZ_1_MessageCore)
+  Window_TDAction.prototype.processEscapeCharacter = function (
+    code,
+    textState
+  ) {
+    switch (code) {
+      case "C":
+        this.processColorChange(this.obtainEscapeParam(textState));
+        break;
+      case "I":
+        this.processDrawIcon(this.obtainEscapeParam(textState), textState);
+        break;
+      case "PX":
+        textState.x = this.obtainEscapeParam(textState);
+        break;
+      case "PY":
+        textState.y = this.obtainEscapeParam(textState);
+        break;
+      case "FS":
+        this.contents.fontSize = this.obtainEscapeParam(textState);
+        break;
+      case "{":
+        this.makeFontBigger();
+        break;
+      case "}":
+        this.makeFontSmaller();
+        break;
+    }
+  };
+
 function Window_TDActionUpgrade() {
   this.initialize(...arguments);
 }
@@ -4756,6 +4826,10 @@ Window_TDActionUpgrade.prototype.onTouchSelect = function (trigger) {
 };
 
 Window_TDActionUpgrade.prototype.refreshStatus = function () {
+  if (this._tmpIndex >= this._upgradeData.length) {
+    if (this.index() == -1) this._tmpIndex = 0;
+    else this._tmpIndex = this.index();
+  }
   this.status.drawDefaultStatus(
     new ufcTowerData(this._upgradeData[this._tmpIndex].data)
   );
@@ -4803,6 +4877,36 @@ Window_TDActionUpgrade.prototype.setLineHeight = function (lineheight) {
 Window_TDActionUpgrade.prototype.resetLineHeight = function () {
   this._lineHeight = this._defaultLineHeight;
 };
+
+if (Imported.VisuMZ_1_MessageCore)
+  Window_TDActionUpgrade.prototype.processEscapeCharacter = function (
+    code,
+    textState
+  ) {
+    switch (code) {
+      case "C":
+        this.processColorChange(this.obtainEscapeParam(textState));
+        break;
+      case "I":
+        this.processDrawIcon(this.obtainEscapeParam(textState), textState);
+        break;
+      case "PX":
+        textState.x = this.obtainEscapeParam(textState);
+        break;
+      case "PY":
+        textState.y = this.obtainEscapeParam(textState);
+        break;
+      case "FS":
+        this.contents.fontSize = this.obtainEscapeParam(textState);
+        break;
+      case "{":
+        this.makeFontBigger();
+        break;
+      case "}":
+        this.makeFontSmaller();
+        break;
+    }
+  };
 
 function Window_TDGold() {
   this.initialize(...arguments);

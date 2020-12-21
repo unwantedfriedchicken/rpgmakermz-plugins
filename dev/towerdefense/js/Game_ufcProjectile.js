@@ -43,7 +43,8 @@ Game_ufcProjectile.prototype.screenY = function (y = this._y) {
 };
 
 Game_ufcProjectile.prototype.update = function () {
-  Game_Character.prototype.update.call(this);
+  if (Imported.VisuMZ_1_EventsMoveCore) this.baseUpdate();
+  else Game_Character.prototype.update.call(this);
   let targetY = this.screenY(this._target._realY);
   let targetX = this.screenX(this._target._realX);
 
@@ -82,3 +83,41 @@ Game_ufcProjectile.prototype.isMoving = function () {
 Game_ufcProjectile.prototype.isDestroyed = function () {
   return this._destroy;
 };
+
+if (Imported.VisuMZ_1_EventsMoveCore) {
+  Game_ufcProjectile.prototype.setDirection = function (d) {
+    this._direction = d;
+  };
+
+  Game_ufcProjectile.prototype.pattern = function () {
+    return this._pattern < 3 ? this._pattern : 1;
+  };
+  Game_ufcProjectile.prototype.direction = function () {
+    return this._direction;
+  };
+
+  Game_ufcProjectile.prototype.baseUpdate = function () {
+    if (this.isStopping()) {
+      this.updateStop();
+    }
+    if (this.isJumping()) {
+      this.updateJump();
+    } else if (this.isMoving()) {
+      this.updateMove();
+    }
+    this.updateAnimation();
+  };
+
+  Game_ufcProjectile.prototype.isSpriteVS8dir = function () {
+    return false;
+  };
+  Game_ufcProjectile.prototype.isPosing = function () {
+    return false;
+  };
+  Game_ufcProjectile.prototype.hasStepAnime = function () {
+    return false;
+  };
+  Game_ufcProjectile.prototype.updatePatternEventsMoveCore = function () {
+    return;
+  };
+}

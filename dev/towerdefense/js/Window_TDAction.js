@@ -343,3 +343,33 @@ Window_TDAction.prototype.destroy = function () {
   );
   Window_Command.prototype.destroy.call(this);
 };
+
+if (Imported.VisuMZ_1_MessageCore)
+  Window_TDAction.prototype.processEscapeCharacter = function (
+    code,
+    textState
+  ) {
+    switch (code) {
+      case "C":
+        this.processColorChange(this.obtainEscapeParam(textState));
+        break;
+      case "I":
+        this.processDrawIcon(this.obtainEscapeParam(textState), textState);
+        break;
+      case "PX":
+        textState.x = this.obtainEscapeParam(textState);
+        break;
+      case "PY":
+        textState.y = this.obtainEscapeParam(textState);
+        break;
+      case "FS":
+        this.contents.fontSize = this.obtainEscapeParam(textState);
+        break;
+      case "{":
+        this.makeFontBigger();
+        break;
+      case "}":
+        this.makeFontSmaller();
+        break;
+    }
+  };

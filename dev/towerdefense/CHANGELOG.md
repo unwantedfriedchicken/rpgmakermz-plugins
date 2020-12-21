@@ -2,6 +2,7 @@
 
 ## Version 1.2.2 - 21/12/2020
 
+- BUGFIX: Fix crash in upgrade tower
 - ADD: add visustella compatibility
 
 ## Version 1.2.1 - 20/12/2020

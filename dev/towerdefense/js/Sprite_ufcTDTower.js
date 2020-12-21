@@ -97,6 +97,7 @@ Sprite_ufcTDTower.prototype.update = function () {
   if (this._towerData._placeMode) return;
   this.updatePosition();
   if (this._tower.isDestroyed()) this.destroySprite();
+  if (Imported.VisuMZ_1_EventsMoveCore) this._tower.update();
 };
 
 Sprite_ufcTDTower.prototype.destroySprite = function () {
