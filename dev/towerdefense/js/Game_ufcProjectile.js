@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-redeclare
 function Game_ufcProjectile() {
   this.initialize(...arguments);
 }

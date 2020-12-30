@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-redeclare
 const Window_GUIItemSlot = function () {
   this.initialize(...arguments);
 };
@@ -266,13 +267,6 @@ Window_GUIItemSlot.prototype.onTouchSelect = function () {
     if (this.index() !== lastIndex) {
       this.playCursorSound();
     }
-  }
-};
-
-Window_GUIItemSlot.prototype.isTouchInWindow = function () {
-  const touchPos = new Point(TouchInput.x, TouchInput.y);
-  const localPos = this.worldTransform.applyInverse(touchPos);
-  if (this.innerRect.contains(localPos.x, localPos.y)) {
   }
 };
 

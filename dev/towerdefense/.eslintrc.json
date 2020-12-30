@@ -1,0 +1,46 @@
+{
+  "plugins": ["rpgmaker"],
+  "env": {
+    "browser": true,
+    "es2021": true,
+    "rpgmaker/mz": true
+  },
+  "extends": "eslint:recommended",
+  "parserOptions": {
+    "ecmaVersion": 12
+  },
+  "rules": {
+    "no-undefined": "error",
+    "comma-style": "warn",
+    "no-unused-vars": "warn",
+    "no-extra-bind": "error"
+  },
+  "globals": {
+    "UFC": true,
+    "$dataTDEnemy": true,
+    "$dataTDTrigger": true,
+    "$dataTDSpawnLocation": true,
+    "TowerDefenseManager": true,
+    "Window_GUIItemSlot": true,
+    "Window_TDAction": true,
+    "Window_TDHealth": true,
+    "Window_TDShop": true,
+    "Window_TDStatus": true,
+    "Window_TDActionUpgrade": true,
+    "Data_ufcGrid": true,
+    "Window_TDGold": true,
+    "Game_TDEnemy": true,
+    "Game_ufcProjectile": true,
+    "Game_TDTower": true,
+    "ufcTowerWaveData": true,
+    "ufcTowerSpawnData": true,
+    "ufcTowerEffects": true,
+    "ufcTowerData": true,
+    "Sprite_ufcGrid": true,
+    "Sprite_ufcTDEnemyEffect": true,
+    "Sprite_ufcTDEnemy": true,
+    "Sprite_ufcTDTower": true,
+    "Sprite_ufcProjectile": true,
+    "Window_BaseExtend": true
+  }
+}

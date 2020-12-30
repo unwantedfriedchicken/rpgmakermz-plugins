@@ -213,6 +213,11 @@ Game_Player.prototype.moveByInput = function () {
 
 UFC.UFCTD.ALIAS._Game_Player_executeMove = Game_Player.prototype.executeMove;
 Game_Player.prototype.executeMove = function () {
+  if (this.towerAction()) return;
+  return UFC.UFCTD.ALIAS._Game_Player_executeMove.call(this, ...arguments);
+};
+
+Game_Player.prototype.towerAction = function () {
   if (
     TowerDefenseManager.isActive &&
     $gameTemp.isDestinationValid() &&
@@ -232,10 +237,10 @@ Game_Player.prototype.executeMove = function () {
         $gameTemp.clearDestination();
       }
       this.getGuideAction().clearTrigger();
-      return;
+      return true;
     }
   }
-  UFC.UFCTD.ALIAS._Game_Player_executeMove.call(this, ...arguments);
+  return false;
 };
 
 UFC.UFCTD.ALIAS._Game_Player_update = Game_Player.prototype.update;
@@ -629,30 +634,10 @@ Game_Party.prototype.towers = function () {
 
 if (Imported.VisuMZ_1_EventsMoveCore) {
   Game_Player.prototype.executeMoveDir8 = function () {
-    if (
-      TowerDefenseManager.isActive &&
-      $gameTemp.isDestinationValid() &&
-      TowerDefenseManager.getState == TowerDefenseManager.STATE.BUILD
-    ) {
-      const destX = $gameTemp.destinationX();
-      const destY = $gameTemp.destinationY();
-      let dist = $gameMap.distance(this.x, this.y, destX, destY);
-      if (dist <= 1) {
-        this.turnTowardCharacter({ x: destX, y: destY });
-        this.getGuideAction().updateBlocked();
-        if (!this.getGuideAction().isBlocked()) {
-          // Double check incase the map is scrolled
-          this.getGuideAction().updateBlocked(true);
-          if (!this.getGuideAction().isBlocked())
-            TowerDefenseManager.placeTower();
-          $gameTemp.clearDestination();
-        }
-        this.getGuideAction().clearTrigger();
-        return;
-      }
-    }
+    if (this.towerAction()) return;
     return Game_Character.prototype.executeMoveDir8.call(this, ...arguments);
   };
+
   UFC.UFCTD.ALIAS._Game_Player_canPass = Game_Player.prototype.canPass;
   Game_Player.prototype.canPass = function (x, y, d) {
     const x2 = $gameMap.roundXWithDirection(x, d);

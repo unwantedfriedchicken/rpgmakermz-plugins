@@ -10,6 +10,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "eslint-plugin-rpgmaker": "^2.0.0",
     "grunt": "^1.3.0",
     "grunt-cli": "^1.3.2",
     "grunt-contrib-concat": "^1.0.1",
@@ -17,6 +18,8 @@
     "grunt-contrib-watch": "^1.1.0"
   },
   "devDependencies": {
-    "grunt-contrib-uglify-es": "git://github.com/gruntjs/grunt-contrib-uglify.git#harmony"
+    "eslint": "^7.15.0",
+    "grunt-contrib-uglify-es": "git://github.com/gruntjs/grunt-contrib-uglify.git#harmony",
+    "grunt-remove-comments": "^0.1.6"
   }
 }

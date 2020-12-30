@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-redeclare
 function Window_TDActionUpgrade() {
   this.initialize(...arguments);
 }
@@ -216,7 +217,7 @@ Window_TDActionUpgrade.prototype.drawItem = function (index) {
 };
 
 // Enable sound when cursor hover the button
-Window_TDActionUpgrade.prototype.onTouchSelect = function (trigger) {
+Window_TDActionUpgrade.prototype.onTouchSelect = function () {
   this._doubleTouch = false;
   if (this.isCursorMovable()) {
     const lastIndex = this.index();
@@ -249,19 +250,6 @@ Window_TDActionUpgrade.prototype.select = function (index) {
     this.refreshStatus();
   }
   Window_Command.prototype.select.call(this, index);
-};
-
-Window_TDActionUpgrade.prototype.update = function () {
-  Window_Command.prototype.update.call(this);
-  this.updateChildren();
-};
-
-Window_TDActionUpgrade.prototype.updateChildren = function () {
-  for (const child of this.children) {
-    if (child.update) {
-      child.update();
-    }
-  }
 };
 
 Window_TDActionUpgrade.prototype.refresh = function () {

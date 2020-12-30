@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-redeclare
 function Sprite_ufcTDEnemyEffect() {
   this.initialize(...arguments);
 }

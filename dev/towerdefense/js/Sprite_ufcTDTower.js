@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-redeclare
 const Sprite_ufcTDTower = function () {
   this.initialize(...arguments);
 };
@@ -63,6 +64,30 @@ Sprite_ufcTDTower.prototype.resetRangeGraphics = function () {
       );
     }
   }
+
+  // TODO: make option for circle radius
+  // https://www.redblobgames.com/grids/circle-drawing/
+  // https://en.wikipedia.org/wiki/Midpoint_circle_algorithm
+  // let pos = {
+  //   x: 0,
+  //   y: 0,
+  // };
+  // let radius = this._range;
+  // for (let y = -radius; y <= radius; y++) {
+  //   let dy = y - pos.y,
+  //     dx = Math.floor(Math.sqrt(radius * radius - dy * dy));
+  //   let left = pos.x - dx,
+  //     right = pos.x + dx;
+  //   for (let x = left; x <= right; x++) {
+  //     _rangeGraphics.drawRect(
+  //       this.posX(x) + lineSize / 2,
+  //       this.posY(y) + lineSize / 2,
+  //       $gameMap.tileWidth() - lineSize,
+  //       $gameMap.tileHeight() - lineSize
+  //     );
+  //   }
+  // }
+
   _rangeGraphics.endFill();
   let rangeSprite = Graphics.app.renderer.generateTexture(_rangeGraphics);
   if (!this._rangeGraphics) {
@@ -193,5 +218,6 @@ Sprite_ufcTDTower.prototype.destroy = function (options) {
     this.setRangeVisibility,
     this
   );
+  this._rangeGraphics.destroy({ texture: true, baseTexture: true });
   Sprite.prototype.destroy.call(this, options);
 };

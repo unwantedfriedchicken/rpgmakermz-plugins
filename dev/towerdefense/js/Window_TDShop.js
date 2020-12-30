@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-redeclare
 function Window_TDShop() {
   this.initialize(...arguments);
 }

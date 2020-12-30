@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-redeclare
 function Window_BaseExtend() {
   this.initialize(...arguments);
 }

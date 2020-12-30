@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-redeclare
 function Window_TDHealth() {
   this.initialize(...arguments);
 }
@@ -50,10 +51,6 @@ Window_TDHealth.prototype.gaugeRate = function (val, max) {
   const value = val;
   const maxValue = max;
   return maxValue > 0 ? value / maxValue : 0;
-};
-
-Window_TDHealth.prototype.value = function () {
-  return $gameParty.gold();
 };
 
 Window_TDHealth.prototype.open = function () {

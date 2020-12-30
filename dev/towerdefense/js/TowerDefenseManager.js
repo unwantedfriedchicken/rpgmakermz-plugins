@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-redeclare
 function TowerDefenseManager() {
   throw new Error("This is a static class");
 }

@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-redeclare
 const Data_ufcGrid = function () {
   this.initialize(...arguments);
 };

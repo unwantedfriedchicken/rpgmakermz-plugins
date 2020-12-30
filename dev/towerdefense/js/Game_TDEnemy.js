@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-redeclare
 function Game_TDEnemy() {
   this.initialize(...arguments);
 }
@@ -305,7 +306,7 @@ Game_TDEnemy.prototype.checkResistance = function (effect) {
 
 Game_TDEnemy.prototype.getDropItem = function () {
   if (this._itemDrop.length > 0)
-    for (item of this._itemDrop) {
+    for (let item of this._itemDrop) {
       if (item.chance < 100) {
         let chance = Math.randomInt(100);
         if (item.chance < chance) continue;

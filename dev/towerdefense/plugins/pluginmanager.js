@@ -68,7 +68,6 @@ UFC.UFCTD.DEBUGMODE = {
 PluginManager.registerCommand("UFCTowerDefense", "setupEnemy", function (args) {
   args.characterName = $gameMap._events[this._eventId]._characterName;
   args.characterIndex = $gameMap._events[this._eventId]._characterIndex;
-  args["enemyType"] = args["enemyType"];
   TowerDefenseManager.addDBEnemy(args);
 });
 

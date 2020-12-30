@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-redeclare
 const Sprite_ufcTDEnemy = function () {
   this.initialize(...arguments);
 };

@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-redeclare
 const ufcTowerWaveData = function () {
   this.initialize(...arguments);
 };

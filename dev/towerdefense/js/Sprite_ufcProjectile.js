@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-redeclare
 const Sprite_ufcProjectile = function () {
   this.initialize(...arguments);
 };

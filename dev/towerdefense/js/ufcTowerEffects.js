@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-redeclare
 const ufcTowerEffects = function () {
   this.initialize(...arguments);
 };

@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-redeclare
 function Window_TDGold() {
   this.initialize(...arguments);
 }
