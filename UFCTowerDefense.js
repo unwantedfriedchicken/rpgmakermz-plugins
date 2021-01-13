@@ -52,6 +52,11 @@ unwantedfriedchicken<at>gmail.com
 @desc When health <= 0 this switch will change to ON
 @type switch
 
+@param setting_soundSettings
+@text Sound Settings
+@desc Setting sounds for tower defense
+@type struct<SoundSettings>
+
 @param hudguiSettings
 @text HUD/GUI Settings
 
@@ -628,6 +633,50 @@ unwantedfriedchicken<at>gmail.com
 @default 100
 */
 
+/*~struct~SoundSettings:
+@param effectSteal
+@text Effect Steal
+@desc Effect Steal sound
+@type file
+@dir audio/se/
+@default Coin
+
+@param towerDestroy
+@text Destroy Tower
+@desc Destroy Tower sound
+@type file
+@dir audio/se/
+@default Door2
+
+@param towerCancel
+@text Cancel Tower Select
+@desc Cancel Tower Select sound
+@type file
+@dir audio/se/
+@default Cancel1
+
+@param towerPlace
+@text Place Tower
+@desc Place Tower sound
+@type file
+@dir audio/se/
+@default Equip1
+
+@param towerUpgrade
+@text Upgrade Tower
+@desc Upgrade Tower sound
+@type file
+@dir audio/se/
+@default Coin
+
+@param towerSell
+@text Sell Tower
+@desc Sell Tower sound
+@type file
+@dir audio/se/
+@default Coin
+*/
+
 var Imported = Imported || {};
 Imported.UFCTowerDefense = true;
 
@@ -648,6 +697,7 @@ UFC.UFCTD.CONFIG = {
   healthMaxVarId: +UFC.UFCTD.PARAMETERS["setting_towerMaxHealthVarId"],
   gameOverSwitchId: +UFC.UFCTD.PARAMETERS["setting_gameoverSwitchId"],
   crystalName: UFC.UFCTD.PARAMETERS["setting_crystalName"],
+  sound: JSON.parse(UFC.UFCTD.PARAMETERS["setting_soundSettings"]),
 };
 
 UFC.UFCTD.HUDGUI = {
@@ -1170,7 +1220,7 @@ Game_TDEnemy.prototype.updateEffects = function () {
           break;
         case TowerDefenseManager.EFFECTS.STEAL:
           AudioManager.playSe({
-            name: "Coin",
+            name: UFC.UFCTD.CONFIG.sound.effectSteal,
             volume: 40,
             pitch: 100,
             pan: 0,
@@ -1449,7 +1499,7 @@ Game_TDTower.prototype.attack = function (enemy) {
 Game_TDTower.prototype.destroy = function (onlyDestroy = false) {
   if (!onlyDestroy)
     AudioManager.playSe({
-      name: "Door2",
+      name: UFC.UFCTD.CONFIG.sound.towerDestroy,
       volume: 25,
       pitch: 100,
       pan: 0,
@@ -4167,7 +4217,7 @@ Window_TDAction.prototype.selectUpgradeWindow = function (isSelect) {
 
 Window_TDAction.prototype.upgradeTower = function (upgradeIndex) {
   AudioManager.playSe({
-    name: "Coin",
+    name: UFC.UFCTD.CONFIG.sound.towerUpgrade,
     volume: 80,
     pitch: 100,
     pan: 0,
@@ -4211,7 +4261,7 @@ Window_TDAction.prototype.callOkHandler = function () {
       break;
     case 3:
       AudioManager.playSe({
-        name: "Coin",
+        name: UFC.UFCTD.CONFIG.sound.towerSell,
         volume: 80,
         pitch: 100,
         pan: 0,

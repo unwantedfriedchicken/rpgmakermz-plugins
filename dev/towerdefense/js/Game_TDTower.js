@@ -127,7 +127,7 @@ Game_TDTower.prototype.attack = function (enemy) {
 Game_TDTower.prototype.destroy = function (onlyDestroy = false) {
   if (!onlyDestroy)
     AudioManager.playSe({
-      name: "Door2",
+      name: UFC.UFCTD.CONFIG.sound.towerDestroy,
       volume: 25,
       pitch: 100,
       pan: 0,

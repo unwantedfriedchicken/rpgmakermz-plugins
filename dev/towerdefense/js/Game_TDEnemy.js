@@ -180,7 +180,7 @@ Game_TDEnemy.prototype.updateEffects = function () {
           break;
         case TowerDefenseManager.EFFECTS.STEAL:
           AudioManager.playSe({
-            name: "Coin",
+            name: UFC.UFCTD.CONFIG.sound.effectSteal,
             volume: 40,
             pitch: 100,
             pan: 0,

@@ -45,6 +45,8 @@ Sprite_ufcTDTower.prototype.resetRangeGraphics = function () {
       UFC.UFCTD.TOWERSETTINGS.attackRangeColor,
       UFC.UFCTD.TOWERSETTINGS.attackRangeOpacity
     );
+
+  // TODO: Add option for display range grid or plain fill
   // _rangeGraphics.drawRect(
   //   0,
   //   0,

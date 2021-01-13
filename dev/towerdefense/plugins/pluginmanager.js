@@ -6,6 +6,7 @@ UFC.UFCTD.CONFIG = {
   healthMaxVarId: +UFC.UFCTD.PARAMETERS["setting_towerMaxHealthVarId"],
   gameOverSwitchId: +UFC.UFCTD.PARAMETERS["setting_gameoverSwitchId"],
   crystalName: UFC.UFCTD.PARAMETERS["setting_crystalName"],
+  sound: JSON.parse(UFC.UFCTD.PARAMETERS["setting_soundSettings"]),
 };
 
 UFC.UFCTD.HUDGUI = {

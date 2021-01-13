@@ -70,7 +70,7 @@ Window_TDAction.prototype.selectUpgradeWindow = function (isSelect) {
 
 Window_TDAction.prototype.upgradeTower = function (upgradeIndex) {
   AudioManager.playSe({
-    name: "Coin",
+    name: UFC.UFCTD.CONFIG.sound.towerUpgrade,
     volume: 80,
     pitch: 100,
     pan: 0,
@@ -119,7 +119,7 @@ Window_TDAction.prototype.callOkHandler = function () {
     // Sell
     case 3:
       AudioManager.playSe({
-        name: "Coin",
+        name: UFC.UFCTD.CONFIG.sound.towerSell,
         volume: 80,
         pitch: 100,
         pan: 0,

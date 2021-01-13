@@ -52,6 +52,11 @@ unwantedfriedchicken<at>gmail.com
 @desc When health <= 0 this switch will change to ON
 @type switch
 
+@param setting_soundSettings
+@text Sound Settings
+@desc Setting sounds for tower defense
+@type struct<SoundSettings>
+
 @param hudguiSettings
 @text HUD/GUI Settings
 
@@ -626,4 +631,48 @@ unwantedfriedchicken<at>gmail.com
 @desc chance drop
 @type number
 @default 100
+*/
+
+/*~struct~SoundSettings:
+@param effectSteal
+@text Effect Steal
+@desc Effect Steal sound
+@type file
+@dir audio/se/
+@default Coin
+
+@param towerDestroy
+@text Destroy Tower
+@desc Destroy Tower sound
+@type file
+@dir audio/se/
+@default Door2
+
+@param towerCancel
+@text Cancel Tower Select
+@desc Cancel Tower Select sound
+@type file
+@dir audio/se/
+@default Cancel1
+
+@param towerPlace
+@text Place Tower
+@desc Place Tower sound
+@type file
+@dir audio/se/
+@default Equip1
+
+@param towerUpgrade
+@text Upgrade Tower
+@desc Upgrade Tower sound
+@type file
+@dir audio/se/
+@default Coin
+
+@param towerSell
+@text Sell Tower
+@desc Sell Tower sound
+@type file
+@dir audio/se/
+@default Coin
 */
