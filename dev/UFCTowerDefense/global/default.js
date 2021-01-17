@@ -1,3 +1,4 @@
+/* eslint-disable no-redeclare */
 var Imported = Imported || {};
 Imported.UFCTowerDefense = true;
 

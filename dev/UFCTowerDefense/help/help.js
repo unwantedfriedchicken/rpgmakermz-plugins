@@ -1,10 +1,8 @@
 /*:
 @target MZ
-
 @plugindesc Add Tower Defense Mechanic
 @author Unwanted Fried Chicken
 @url https://unwantedfriedchicken.itch.io
-
 @help
 Author: UnwantedFriedChicken
 Version: 1.2.2
@@ -263,15 +261,81 @@ unwantedfriedchicken<at>gmail.com
 @text Config Tower Defense
 @desc Configuration
 
+@arg placeTower
+@text Place Tower
+
+@arg placeTowerTerrain
+@parent placeTower
+@text Terrain
+
 @arg onlyTerrain
+@parent placeTowerTerrain
 @text Place building terrain
 @desc Set place building only in this terrain tag, If empty building can be placed anywhere
 @type number[]
 @default []
 
 @arg exceptTerrain
-@text Can't place in this terrain
+@parent placeTowerTerrain
+@text Can't place terrain
 @desc Set place where building can't be set with this terrain tag.
+@type number[]
+@default []
+
+@arg placeTowerRegionID
+@parent placeTower
+@text RegionID
+
+@arg onlyRegionID
+@parent placeTowerRegionID
+@text Place building region ID
+@desc Set place building only in this region ID
+@type number[]
+@default []
+
+@arg exceptRegionID
+@parent placeTowerRegionID
+@text Can't place region ID
+@desc Set place where building can't be set with this region ID.
+@type number[]
+@default []
+
+@arg placeTrap
+@text Place Trap
+
+@arg placeTrapTerrain
+@parent placeTrap
+@text Terrain
+
+@arg onlyTrapTerrain
+@parent placeTrapTerrain
+@text Place trap terrain
+@desc Set place trap only in this terrain tag, If empty trap can be placed anywhere
+@type number[]
+@default []
+
+@arg exceptTrapTerrain
+@parent placeTrapTerrain
+@text Can't place terrain
+@desc Set place where trap can't be set with this terrain tag.
+@type number[]
+@default []
+
+@arg placeTrapRegionID
+@parent placeTrap
+@text RegionID
+
+@arg onlyTrapRegionID
+@parent placeTrapRegionID
+@text Place trap region ID
+@desc Set place trap only in this region ID
+@type number[]
+@default []
+
+@arg exceptTrapRegionID
+@parent placeTrapRegionID
+@text Can't place region ID
+@desc Set place where trap can't be set with this region ID.
 @type number[]
 @default []
 

@@ -289,7 +289,7 @@ TowerDefenseManager.cancelSelect = function (sfx = true) {
   // SFX
   if (sfx)
     AudioManager.playSe({
-      name: "Cancel1",
+      name: UFC.UFCTD.CONFIG.sound.towerCancel,
       volume: 100,
       pitch: 100,
       pan: 0,
@@ -391,7 +391,7 @@ TowerDefenseManager.placeTower = function () {
 
   // SFX
   AudioManager.playSe({
-    name: "Equip1",
+    name: UFC.UFCTD.CONFIG.sound.towerPlace,
     volume: 100,
     pitch: 100,
     pan: 0,

@@ -1,5 +1,6 @@
 const DEFAULTTASK = [
   "concat:source",
+  "concat:ext",
   "concat:plugins",
   "concat:globalVar",
   "remove_comments:target",
@@ -53,6 +54,13 @@ module.exports = function (grunt) {
           "<%= PATHDEST %><%= NAMEPLUGIN %>.js",
         ],
       },
+      ext: {
+        dest: "<%= PATHDEST %><%= NAMEPLUGIN %>.js",
+        src: [
+          "<%= NAMEFOLDER %>ext/*.js",
+          "<%= PATHDEST %><%= NAMEPLUGIN %>.js",
+        ],
+      },
       options: {
         // string to put between concatenated files
         // can be necessary when processing minified js code
@@ -96,12 +104,61 @@ module.exports = function (grunt) {
 
   grunt.config.set("PATHDEST", "../");
 
-  grunt.registerTask("td", "Tower Defense Task", function (dest) {
-    if (dest) {
-      grunt.config.set("PATHDEST", dest);
+  let initTask = function (id, dest) {
+    let listTask = {
+      concat: {},
+      remove_comments: {},
+    };
+    let tasks = [];
+    let files = [];
+    dest = dest || "../";
+    for (let taskid of id) {
+      listTask["concat"][taskid] = {
+        dest: dest + taskid + ".js",
+        src: [
+          taskid + "/global/*.js",
+          taskid + "/plugins/*.js",
+          taskid + "/js/*.js",
+          taskid + "/ext/*.js",
+        ],
+      };
+      listTask["concat"][taskid + "help"] = {
+        dest: dest + taskid + ".js",
+        src: [taskid + "/help/*.js", dest + taskid + ".js"],
+      };
+      listTask["remove_comments"][taskid] = {
+        dest: dest + taskid + ".js",
+        src: [dest + taskid + ".js"],
+      };
+
+      tasks.push(
+        "concat:" + taskid,
+        "remove_comments:" + taskid,
+        "concat:" + taskid + "help"
+      );
+      files.push(taskid + "/**/*.js");
     }
-    grunt.config.set("NAMEPLUGIN", "UFCTowerDefense");
-    grunt.config.set("NAMEFOLDER", "towerdefense/");
+    listTask["watch"] = {
+      files: files,
+      options: { spawn: false },
+      tasks: tasks,
+    };
+    return {
+      init: listTask,
+      files: files,
+    };
+  };
+
+  grunt.registerTask("td", "Tower Defense Task", function (isWatch, dest) {
+    // if (dest) {
+    //   grunt.config.set("PATHDEST", dest);
+    // }
+    // grunt.config.set("NAMEPLUGIN", "UFCTowerDefense");
+    // grunt.config.set("NAMEFOLDER", "towerdefense/");
+    // if (isWatch) grunt.task.run("watch");
+    // else grunt.task.run(DEFAULTTASK);
+    let init = initTask(["UFCTowerDefense", "UFCGuideAction"]);
+    grunt.config.init(init.init);
     grunt.task.run("watch");
   });
 

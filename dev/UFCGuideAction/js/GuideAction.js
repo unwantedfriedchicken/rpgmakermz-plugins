@@ -1,19 +1,3 @@
-/*:
-@target MZ
-
-@plugindesc Add guide action
-@author Unwanted Fried Chicken
-
-*/
-
-var Imported = Imported || {};
-Imported.UFCGuideAction = true;
-
-var UFC = UFC || {};
-UFC.GUIDEACTION = UFC.GUIDEACTION || {};
-UFC.GUIDEACTION.VERSION = 1.0;
-UFC.GUIDEACTION.ALIAS = UFC.GUIDEACTION.ALIAS || {};
-
 function GuideAction() {
   this.initialize(...arguments);
 }
@@ -34,7 +18,10 @@ GuideAction.prototype.initialize = function () {
   this._active = false;
   this._perciseMode = true;
   this._blocked = false;
-  this._color = "0x5BFF54";
+  this._color = {
+    color: UFC.UFCGA.CONFIG.openColor,
+    alpha: UFC.UFCGA.CONFIG.openColorAlpha,
+  };
   this._x = 0;
   this._y = 0;
   this._d = 2;
@@ -112,9 +99,11 @@ GuideAction.prototype.isBlocked = function () {
 
 GuideAction.prototype.setBlocked = function (block) {
   if (block) {
-    this._color = "0xe63946";
+    this._color.color = UFC.UFCGA.CONFIG.blockColor;
+    this._color.alpha = UFC.UFCGA.CONFIG.blockColorAlpha;
   } else {
-    this._color = "0x5BFF54";
+    this._color.color = UFC.UFCGA.CONFIG.openColor;
+    this._color.alpha = UFC.UFCGA.CONFIG.openColorAlpha;
   }
   this.createSharp();
   this._blocked = block;
@@ -129,7 +118,7 @@ GuideAction.prototype.createSharp = function (shape = "rectangle") {
   }
   switch (shape) {
     case "rectangle":
-      this._graphics.beginFill(this._color);
+      this._graphics.beginFill(this._color.color, this._color.alpha);
       this._graphics.drawRect(0, 0, this._tileWidth, this._tileHeight);
       this._graphics.endFill();
       break;
@@ -382,59 +371,4 @@ GuideAction.prototype.getPosition = function () {
     x: $gameMap.roundXWithDirection(this._x, this._d),
     y: $gameMap.roundYWithDirection(this._y, this._d),
   };
-};
-
-UFC.GUIDEACTION.ALIAS._Game_Player_update = Game_Player.prototype.update;
-Game_Player.prototype.update = function () {
-  UFC.GUIDEACTION.ALIAS._Game_Player_update.apply(this, arguments);
-  this._guideAction.update();
-};
-
-UFC.GUIDEACTION.ALIAS._Game_Player_initMembers =
-  Game_Player.prototype.initMembers;
-Game_Player.prototype.initMembers = function () {
-  UFC.GUIDEACTION.ALIAS._Game_Player_initMembers.apply(this, arguments);
-  this._guideAction = new GuideAction();
-};
-
-UFC.GUIDEACTION.ALIAS._Game_Player_clearTransferInfo =
-  Game_Player.prototype.clearTransferInfo;
-Game_Player.prototype.clearTransferInfo = function () {
-  UFC.GUIDEACTION.ALIAS._Game_Player_clearTransferInfo.apply(this, arguments);
-  this.getGuideAction().setDirection(this._direction, this._x, this._y);
-};
-
-UFC.GUIDEACTION.ALIAS._Game_Player_setDirection =
-  Game_Player.prototype.setDirection;
-Game_Player.prototype.setDirection = function (d) {
-  UFC.GUIDEACTION.ALIAS._Game_Player_setDirection.apply(this, arguments);
-  this._guideAction.setDirection(d, this._x, this._y);
-};
-
-UFC.GUIDEACTION.ALIAS._Game_Player_moveStraight =
-  Game_Player.prototype.moveStraight;
-Game_Player.prototype.moveStraight = function (d) {
-  UFC.GUIDEACTION.ALIAS._Game_Player_moveStraight.apply(this, arguments);
-  this._guideAction.setDirection(d, this._x, this._y);
-};
-
-Game_Player.prototype.getGuideActionGraphics = function () {
-  return this._guideAction.getGraphics();
-};
-
-Game_Player.prototype.getGuideAction = function () {
-  return this._guideAction;
-};
-
-UFC.GUIDEACTION.ALIAS._Spriteset_Map_createCharacters =
-  Spriteset_Map.prototype.createCharacters;
-Spriteset_Map.prototype.createCharacters = function () {
-  UFC.GUIDEACTION.ALIAS._Spriteset_Map_createCharacters.call(this, arguments);
-
-  for (let character of this._characterSprites) {
-    if (character._character == $gamePlayer) {
-      character.addChild(character._character.getGuideActionGraphics());
-      break;
-    }
-  }
 };

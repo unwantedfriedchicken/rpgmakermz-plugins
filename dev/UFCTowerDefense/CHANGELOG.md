@@ -1,5 +1,9 @@
 # Change Log
 
+## Version 1.3 - dev
+
+- ADD: add sound settings in plugin parameters
+
 ## Version 1.2.2 - 21/12/2020
 
 - BUGFIX: Fix crash in upgrade tower
