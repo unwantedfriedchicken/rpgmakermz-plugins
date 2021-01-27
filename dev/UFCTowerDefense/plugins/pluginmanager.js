@@ -29,6 +29,7 @@ UFC.UFCTD.HUDGUI = {
 };
 
 UFC.UFCTD.TOWERSETTINGS = {
+  animateTower: UFC.UFCTD.PARAMETERS["animateTower"] == "true",
   attackRangeOpacity: +UFC.UFCTD.PARAMETERS["attackRangeOpacity"],
   auraRangeOpacity: +UFC.UFCTD.PARAMETERS["auraRangeOpacity"],
   attackRangeColor: PIXI.utils.string2hex(
@@ -37,6 +38,8 @@ UFC.UFCTD.TOWERSETTINGS = {
   auraRangeColor: PIXI.utils.string2hex(UFC.UFCTD.PARAMETERS["auraRangeColor"]),
   gridColor: UFC.UFCTD.PARAMETERS["gridColor"],
   gridColorOpacity: +UFC.UFCTD.PARAMETERS["gridColorOpacity"] * 255,
+  gridTrapColor: UFC.UFCTD.PARAMETERS["gridTrapColor"],
+  gridTrapColorOpacity: +UFC.UFCTD.PARAMETERS["gridTrapColorOpacity"] * 255,
 };
 
 UFC.UFCTD.TOOLTIPSETTINGS = {

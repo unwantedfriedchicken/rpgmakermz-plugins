@@ -149,8 +149,8 @@ Sprite_ufcTDTower.prototype.updatePosition = function () {
 Sprite_ufcTDTower.prototype.updateCharacterFrame = function () {
   const pw = this.patternWidth();
   const ph = this.patternHeight();
-  const sx = (this.characterBlockX() + 1) * pw;
-  const sy = (this.characterBlockY() + 0) * ph;
+  const sx = (this.characterBlockX() + this.characterPatternX()) * pw;
+  const sy = (this.characterBlockY() + this.characterPatternY()) * ph;
   this.setFrame(sx, sy, pw, ph);
 };
 
@@ -190,6 +190,14 @@ Sprite_ufcTDTower.prototype.characterBlockY = function () {
     const index = this._towerData._characterIndex;
     return Math.floor(index / 4) * 4;
   }
+};
+
+Sprite_ufcTDTower.prototype.characterPatternX = function () {
+  return this._tower.pattern();
+};
+
+Sprite_ufcTDTower.prototype.characterPatternY = function () {
+  return this._tower.getYPattern();
 };
 
 Sprite_ufcTDTower.prototype.setRangeVisibility = function (visible) {

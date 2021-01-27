@@ -11,11 +11,32 @@ ufcTowerData.prototype.initialize = function (data) {
   this._character = data["character"];
   this._characterIndex = data["characterindex"];
   this._attackSpeed = +data["attackspeed"];
-  this._bulletSpeed = data["bulletspeed"];
+  this._bulletSpeed = +data["bulletspeed"] || 600;
   this._bulletAnimationId = data["bulletanimationid"];
-  this._bulletCharacterName = data["bulletspritename"];
-  this._bulletCharacterIndex = data["bulletspriteindex"];
-  this._bulletCharacterIndexY = data["bulletspriteindexy"];
+  this._type = data["type"] || TowerDefenseManager.TOWERTYPE.TOWER;
+  this._through = data["through"] == "true";
+  this._health = +data["health"] || 1;
+  this._se = {
+    Destroy: data["sedestroy"] || null,
+    DestroyVolume: data["sedestroyvolume"] || 25,
+  };
+  switch (this._type) {
+    case TowerDefenseManager.TOWERTYPE.TRAP:
+      this._durability = data["durability"] == "true";
+      this._durabilityValue = +data["durabilityvalue"] || 1;
+      this._characterIndexX = +data["characterindexx"] || 0;
+      this._attackIndexY = +data["attackindexy"] || 0;
+      break;
+    case TowerDefenseManager.TOWERTYPE.TOWER:
+      this._bulletCharacterName = data["bulletspritename"] || "?";
+      this._bulletCharacterIndex = data["bulletspriteindex"]
+        ? +data["bulletspriteindex"]
+        : 0;
+      this._bulletCharacterIndexY = data["bulletspriteindexy"]
+        ? +data["bulletspriteindexy"]
+        : 0;
+      break;
+  }
   this._upgrade = [];
   let listUpgrade = Object.keys(data).filter(
     (item) => item.slice(0, 7) == "upgrade"
@@ -88,11 +109,11 @@ ufcTowerData.prototype.getBulletData = function () {
       damage: this.getAttack(),
       effects: this._effects,
     },
-    speed: +this._bulletSpeed,
+    speed: this._bulletSpeed,
     animationId: this._bulletAnimationId,
     characterName: this._bulletCharacterName,
-    characterIndex: +this._bulletCharacterIndex,
-    characterIndexY: +this._bulletCharacterIndexY,
+    characterIndex: this._bulletCharacterIndex,
+    characterIndexY: this._bulletCharacterIndexY,
   };
 };
 
@@ -181,6 +202,7 @@ ufcTowerData.prototype.checkGetBuffs = function () {
     (event) =>
       event instanceof Game_TDTower &&
       event.getTowerData() !== this &&
+      event.getTowerData().getType === TowerDefenseManager.TOWERTYPE.TOWER && // Type trap don't have aura/buffs so exclude
       event.getTowerData().isHaveAura() &&
       PIXI.utils.isInRange(
         this._x,
@@ -217,5 +239,11 @@ Object.defineProperty(ufcTowerData.prototype, "getBaseAttackSpeed", {
 Object.defineProperty(ufcTowerData.prototype, "getPlaceMode", {
   get: function () {
     return this._placeMode;
+  },
+});
+
+Object.defineProperty(ufcTowerData.prototype, "getType", {
+  get: function () {
+    return this._type;
   },
 });

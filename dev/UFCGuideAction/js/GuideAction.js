@@ -25,8 +25,11 @@ GuideAction.prototype.initialize = function () {
   this._x = 0;
   this._y = 0;
   this._d = 2;
-  this._onlyTerrain = [];
-  this._exceptTerrain = [];
+  this._type = "default";
+  this._onlyTerrain = {};
+  this._exceptTerrain = {};
+  this._onlyRegion = {};
+  this._exceptRegion = {};
   this.createSharp();
   this.setDirection(2); // set direction default to down
   this.setVisible(false);
@@ -38,6 +41,43 @@ Object.defineProperty(GuideAction.prototype, "isMouseMode", {
     return this._mouseMode;
   },
 });
+
+Object.defineProperty(GuideAction.prototype, "getOnlyTerrain", {
+  get: function () {
+    if (this._onlyTerrain[this._type] === undefined)
+      this._onlyTerrain[this._type] = [];
+    return this._onlyTerrain[this._type];
+  },
+});
+
+Object.defineProperty(GuideAction.prototype, "getExceptTerrain", {
+  get: function () {
+    if (this._exceptTerrain[this._type] === undefined)
+      this._exceptTerrain[this._type] = [];
+    return this._exceptTerrain[this._type];
+  },
+});
+
+Object.defineProperty(GuideAction.prototype, "getExceptRegion", {
+  get: function () {
+    if (this._exceptRegion[this._type] === undefined)
+      this._exceptRegion[this._type] = [];
+    return this._exceptRegion[this._type];
+  },
+});
+
+Object.defineProperty(GuideAction.prototype, "getOnlyRegion", {
+  get: function () {
+    if (this._onlyRegion[this._type] === undefined)
+      this._onlyRegion[this._type] = [];
+    return this._onlyRegion[this._type];
+  },
+});
+
+GuideAction.prototype.setType = function (value) {
+  this._type = value;
+  return this;
+};
 
 GuideAction.prototype.setMouseMode = function (mode) {
   this._mouseMode = mode;
@@ -58,12 +98,21 @@ GuideAction.prototype.resetParent = function () {
     this.clearMouseEvent();
   }
 };
+
 GuideAction.prototype.setOnlyTerrain = function (terrain) {
-  this._onlyTerrain.push(...terrain);
+  this.getOnlyTerrain.push(...terrain);
 };
 
 GuideAction.prototype.setExceptTerrain = function (terrain) {
-  this._exceptTerrain.push(...terrain);
+  this.getExceptTerrain.push(...terrain);
+};
+
+GuideAction.prototype.setOnlyRegion = function (terrain) {
+  this.getOnlyRegion.push(...terrain);
+};
+
+GuideAction.prototype.setExceptRegion = function (terrain) {
+  this.getExceptRegion.push(...terrain);
 };
 
 GuideAction.prototype.setActive = function (active) {
@@ -194,9 +243,10 @@ GuideAction.prototype.canPass = function (x, y, d) {
   if (this.isCollidedWithCharacters(x2, y2)) {
     return false;
   }
-  if (this.checkTerrainTag(x2, y2)) {
+  if (this.checkGrid(x2, y2)) {
     return false;
   }
+
   return true;
 };
 
@@ -211,9 +261,10 @@ GuideAction.prototype.canPassMouse = function (x, y) {
   if (this.isCollidedWithCharacters(x, y)) {
     return false;
   }
-  if (this.checkTerrainTag(x, y)) {
+  if (this.checkGrid(x, y)) {
     return false;
   }
+
   return true;
 };
 
@@ -223,19 +274,54 @@ GuideAction.prototype.checkTDTower = function (x, y) {
   return towers;
 };
 
-GuideAction.prototype.checkTerrainTag = function (x, y) {
-  if (this._onlyTerrain.length <= 0 && this._exceptTerrain.length <= 0)
+GuideAction.prototype.checkGrid = function (x, y) {
+  if (
+    this.getOnlyTerrain.length <= 0 &&
+    this.getExceptTerrain.length <= 0 &&
+    this.getOnlyRegion.length <= 0 &&
+    this.getExceptRegion.length <= 0
+  )
     return false;
 
   let terrainTag = $gameMap.terrainTag(x, y);
+  let regionID = $gameMap.regionId(x, y);
+
+  //allows for Place everywhere, except exceptTerrain or exceptRegion
+  if (
+    this.getOnlyTerrain.length <= 0 &&
+    this.getOnlyRegion.length <= 0 &&
+    (this.getExceptTerrain.length > 0 || this.getExceptRegion.length > 0)
+  ) {
+    if (
+      this.getExceptTerrain.includes(terrainTag) &&
+      this.getExceptTerrain.length >= 0
+    ) {
+      return true;
+    }
+    if (
+      this.getExceptRegion.includes(regionID) &&
+      this.getExceptRegion.length >= 0
+    ) {
+      return true;
+    }
+    return false;
+  }
 
   if (
-    this._exceptTerrain.includes(terrainTag) &&
-    this._exceptTerrain.length >= 0
+    this.getExceptTerrain.includes(terrainTag) &&
+    this.getExceptTerrain.length >= 0
   )
     return true;
 
-  if (this._onlyTerrain.includes(terrainTag)) return false;
+  if (
+    this.getExceptRegion.includes(regionID) &&
+    this.getExceptRegion.length >= 0
+  )
+    return true;
+
+  if (this.getOnlyTerrain.includes(terrainTag)) return false;
+
+  if (this.getOnlyRegion.includes(regionID)) return false;
 
   return true;
 };

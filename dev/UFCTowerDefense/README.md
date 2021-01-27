@@ -102,7 +102,7 @@ you can delete any **optional** note
 > > The duration effect in the enemy, using 1s/60
 
 > > **CHANCE**  
-> > Chance of the enemy have this effect
+> > Chance of the enemy have this effect, if not stated default is 100%
 
 > **Example**  
 > `<effects:cold|60|240|40,rage|40|120|60>`  

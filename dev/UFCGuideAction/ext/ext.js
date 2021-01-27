@@ -1,7 +1,7 @@
 UFC.UFCGA.ALIAS._Game_Player_update = Game_Player.prototype.update;
 Game_Player.prototype.update = function () {
   UFC.UFCGA.ALIAS._Game_Player_update.apply(this, arguments);
-  this._guideAction.update();
+  this.getGuideAction().update();
 };
 
 UFC.UFCGA.ALIAS._Game_Player_initMembers = Game_Player.prototype.initMembers;
@@ -20,17 +20,17 @@ Game_Player.prototype.clearTransferInfo = function () {
 UFC.UFCGA.ALIAS._Game_Player_setDirection = Game_Player.prototype.setDirection;
 Game_Player.prototype.setDirection = function (d) {
   UFC.UFCGA.ALIAS._Game_Player_setDirection.apply(this, arguments);
-  this._guideAction.setDirection(d, this._x, this._y);
+  this.getGuideAction().setDirection(d, this._x, this._y);
 };
 
 UFC.UFCGA.ALIAS._Game_Player_moveStraight = Game_Player.prototype.moveStraight;
 Game_Player.prototype.moveStraight = function (d) {
   UFC.UFCGA.ALIAS._Game_Player_moveStraight.apply(this, arguments);
-  this._guideAction.setDirection(d, this._x, this._y);
+  this.getGuideAction().setDirection(d, this._x, this._y);
 };
 
 Game_Player.prototype.getGuideActionGraphics = function () {
-  return this._guideAction.getGraphics();
+  return this.getGuideAction().getGraphics();
 };
 
 Game_Player.prototype.getGuideAction = function () {

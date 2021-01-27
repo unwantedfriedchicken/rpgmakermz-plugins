@@ -38,6 +38,12 @@ Game_TDEnemy.prototype.initialize = function (enemyName, spawnId) {
   this._event = new PIXI.utils.EventEmitter();
   this._triggerInit = false;
   this._triggerWait = 0;
+  this._target = null;
+  this._attack = {
+    Damage: +this._enemyData.attackDamage,
+    Time: 0,
+  };
+  this._forceMove = false;
 };
 
 Game_TDEnemy.prototype.isSameType = function (type) {
@@ -118,6 +124,7 @@ Game_TDEnemy.prototype.update = function () {
                 this.setDirection(
                   TowerDefenseManager.convertDirection(getTrigger[trigger])
                 );
+                this._triggerInit = true;
                 break;
               case TowerDefenseManager.TRIGGERTYPE.DESTROY:
                 this.triggerDestroy(getTrigger[trigger]);
@@ -134,9 +141,61 @@ Game_TDEnemy.prototype.update = function () {
       }
     }
 
+    if (this.updateTrap()) return;
+
     this.moveStraight(this._direction);
     this._triggerInit = false;
+    if (this._forceMove) this.setThrough(false);
   }
+};
+
+Game_TDEnemy.prototype.updateTrap = function () {
+  let trap = this.getTrap();
+  if (!trap) return false;
+
+  // Check infront of trap
+  if (!trap.isThrough()) {
+    // Trap Blocking
+    this._attack.Time--;
+    if (this._attack.Time <= 0) {
+      this._attack.Time = this._enemyData.attackSpeed;
+      this.attack(trap);
+    }
+    return true;
+  } else {
+    // Trap In grid
+    trap.attackTrap(this);
+    this._target = null;
+    return false;
+  }
+};
+
+Game_TDEnemy.prototype.getTrap = function () {
+  if (this._target) {
+    if (this._target.isDestroyed()) this._target = null;
+    else return this._target;
+  }
+
+  const x2 = $gameMap.roundXWithDirection(this._x, this._direction);
+  const y2 = $gameMap.roundYWithDirection(this._y, this._direction);
+  let trap = $gameMap.ufcGetTrap(x2, y2);
+  if (trap && !trap.isThrough()) {
+    if (!this.isSameType(trap._towerData._attackType)) {
+      this._forceMove = true;
+      this.setThrough(true);
+      return null;
+    }
+    this._target = trap;
+    return this._target;
+  }
+
+  trap = $gameMap.ufcGetTrap(this._x, this._y);
+  if (trap && this.isSameType(trap._towerData._attackType)) {
+    this._target = trap;
+    return this._target;
+  }
+
+  return null;
 };
 
 Game_TDEnemy.prototype.updateEffects = function () {
@@ -257,7 +316,7 @@ Game_TDEnemy.prototype.distancePerFrame = function () {
 
 Game_TDEnemy.prototype.triggerDestroy = function (destroyData) {
   if (destroyData.attack) {
-    this.attack(destroyData.attackEventId);
+    this.attackTrigger(destroyData.attackEventId);
   }
   if (+destroyData.animationId != 0) {
     TowerDefenseManager.requestAnimation([this], +destroyData.animationId);
@@ -266,12 +325,12 @@ Game_TDEnemy.prototype.triggerDestroy = function (destroyData) {
   this.destroy(true);
 };
 
-Game_TDEnemy.prototype.attack = function (eventid) {
+Game_TDEnemy.prototype.attackTrigger = function (eventid) {
   TowerDefenseManager.requestAnimation(
     [$gameMap._events[eventid]],
     +this._enemyData.attackAnimation
   );
-  TowerDefenseManager.attackTower(+this._enemyData.attackDamage);
+  TowerDefenseManager.attackTrigger(this._attack.Damage);
 };
 
 Game_TDEnemy.prototype.attacked = function (damage) {
@@ -296,6 +355,16 @@ Game_TDEnemy.prototype.attacked = function (damage) {
       this._effects[_ef[effect].name].effect = new ufcTowerEffects(_ef[effect]);
     }
   }
+};
+
+Game_TDEnemy.prototype.attack = function (target) {
+  TowerDefenseManager.requestAnimation(
+    [target],
+    +this._enemyData.attackAnimation
+  );
+  target.attacked({
+    damage: this._attack.Damage,
+  });
 };
 
 Game_TDEnemy.prototype.checkResistance = function (effect) {
@@ -335,5 +404,11 @@ Game_TDEnemy.prototype.isDestroyed = function () {
 Object.defineProperty(Game_TDEnemy.prototype, "health", {
   get: function () {
     return this._enemyData.health;
+  },
+});
+
+Object.defineProperty(Game_TDEnemy.prototype, "attackSpeed", {
+  get: function () {
+    return this._enemyData.attackSpeed;
   },
 });

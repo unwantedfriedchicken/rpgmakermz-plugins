@@ -6,17 +6,26 @@ const Sprite_ufcGrid = function () {
 Sprite_ufcGrid.prototype = Object.create(Sprite.prototype);
 Sprite_ufcGrid.prototype.constructor = Sprite_ufcGrid;
 
-Sprite_ufcGrid.prototype.initialize = function (data) {
-  Sprite.prototype.initialize.call(this, data._bitmap);
-  this._data = data;
-  this.opacity = UFC.UFCTD.TOWERSETTINGS.gridColorOpacity;
-  this.z = 20;
-  this._data._event.on("showGrid", this.setVisible, this);
-  this.setVisible(false);
+Sprite_ufcGrid.prototype.initialize = function (type) {
+  this._gridData = $gameMap.ufcGetGrid();
+  Sprite.prototype.initialize.call(this, this._gridData.getBitmapType(type));
+  this._type = type;
+  switch (this._type) {
+    case TowerDefenseManager.TOWERTYPE.TRAP:
+      this.opacity = UFC.UFCTD.TOWERSETTINGS.gridTrapColorOpacity;
+      break;
+    default:
+      this.opacity = UFC.UFCTD.TOWERSETTINGS.gridColorOpacity;
+  }
+  this._gridData._event.on("showGrid", this.setVisible, this);
+  this.visible = false;
+  this.z = 1;
 };
 
 Sprite_ufcGrid.prototype.setVisible = function (visible) {
-  this.visible = visible;
+  if (this._gridData.getType === this._type) {
+    this.visible = visible;
+  }
 };
 
 Sprite_ufcGrid.prototype.update = function () {
@@ -25,9 +34,9 @@ Sprite_ufcGrid.prototype.update = function () {
   this.x = this.screenX(-0.5);
   this.y = this.screenY(-0.5);
 
-  this._data.updateEvents();
+  // this._gridData.updateEvents();
 
-  if (this._data.isDestroyed()) {
+  if (this._gridData.isDestroyed()) {
     this.destroy();
   }
 };
@@ -43,6 +52,6 @@ Sprite_ufcGrid.prototype.screenY = function (y) {
 };
 
 Sprite_ufcGrid.prototype.destroy = function () {
-  this._data._event.removeListener("showGrid", this.setVisible, this);
+  this._gridData._event.removeListener("showGrid", this.setVisible, this);
   PIXI.Sprite.prototype.destroy.call(this, { children: true, texture: true });
 };

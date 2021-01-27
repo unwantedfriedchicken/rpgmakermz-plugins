@@ -2,7 +2,28 @@
 
 ## Version 1.3 - dev
 
-- ADD: add sound settings in plugin parameters
+- ADD: Add sound settings in plugin parameters
+- ADD: Add `Animate Tower` in plugin parameters, if set to `true` this will animate tower when idle
+- ADD: Add `Attack Speed` to `Setup enemy data`, this will define attack speed for the enemy when attacking (1/60 sec)
+- ADD: Add `Grid Trap Color` and `Grid Trap Color Opacity` to plugin parameters, for trap grid color
+- ADD: Add `Tower Trap` trap can be used for blocking or damage enemy. this will add `type` to tower note for make tower trap set `<type:trap>`. Current trap only attack if `through` is `false`, if is `true` then the trap is only used for blocking enemy
+- ADD & CHANGE: Add and change some in tower note
+
+```markdown
+<bulletspritename:?> -> become optional. Default: ?
+<bulletspriteindex:0> -> become optional. Default: 0
+<bulletspriteindexy:0> -> become optional. Default: 0
+<bulletspeed:600> -> bulletspeed become optional. Default: 600
+<type:tower>(optional) -> Add tower type , has 2 type tower/trap. Default: tower
+<through:false>(optional) -> Add through option for tower . This make if the tower is through or not. Default: false
+<health:1>(optional) -> Add health to the tower . This is used for trap. Default: 1
+<sedestroy>(optional) -> Add custom sound effect when tower is destroyed, if not stated destroy se using destroy sound in plugin parameter. Default:null
+<sedestroyvolume:25>(optional) -> Setting volume for destroyed volume. Default: 25
+<characterindexx:0>(optional) -> Setting for X index in character sprite, used for TRAP. Default: 0
+<durability:false>(optional) -> Setting if trap through has durability or not. Default: false
+<durabilityvalue:1>(optional) -> If `durability` set true, then when trap attacking this value will decrease, and reach 0 the trap is destroyed. Default: 1
+<attackspritey:3>(optional) -> When trap through attacking, the sprite will change to this Y index. Default: 0
+```
 
 ## Version 1.2.2 - 21/12/2020
 

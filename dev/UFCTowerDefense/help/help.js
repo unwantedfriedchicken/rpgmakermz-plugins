@@ -54,6 +54,7 @@ unwantedfriedchicken<at>gmail.com
 @text Sound Settings
 @desc Setting sounds for tower defense
 @type struct<SoundSettings>
+@default {"effectSteal":"Coin","towerDestroy":"Door2","towerCancel":"Cancel1","towerPlace":"Equip1","towerUpgrade":"Coin","towerSell":"Coin"}
 
 @param hudguiSettings
 @text HUD/GUI Settings
@@ -95,6 +96,13 @@ unwantedfriedchicken<at>gmail.com
 @param towerSettings
 @text Tower Settings
 
+@param animateTower
+@parent towerSettings
+@text Animate Tower
+@type boolean
+@desc Animate tower idle
+@default false
+
 @param attackRangeColor
 @parent towerSettings
 @text Attack Range Color
@@ -127,14 +135,29 @@ unwantedfriedchicken<at>gmail.com
 
 @param gridColor
 @parent towerSettings
-@text Grid Color
+@text Grid Tower Color
 @type text
 @desc Set the color of grid. Default = #61FFB4
 @default #61FFB4
 
 @param gridColorOpacity
 @parent towerSettings
-@text Grid Color Opcaity
+@text Grid Tower Color Opcaity
+@type number
+@desc Set the opacity of grid 
+@decimals 1
+@default 0.4
+
+@param gridTrapColor
+@parent towerSettings
+@text Grid Trap Color
+@type text
+@desc Set the color of grid. Default = #F20505
+@default #F20505
+
+@param gridTrapColorOpacity
+@parent towerSettings
+@text Grid Trap Color Opcaity
 @type number
 @desc Set the opacity of grid 
 @decimals 1
@@ -185,7 +208,7 @@ unwantedfriedchicken<at>gmail.com
 @text Default Items
 @type item[]
 @desc Default items appear in shop
-@default ["41","42","43","44","45","46","47"]
+@default []
 
 @param shopguiMultiplier
 @parent shopgui
@@ -250,9 +273,9 @@ unwantedfriedchicken<at>gmail.com
 @param limitAnimation
 @parent debugMode
 @text Limit Animation
-@type number
 @desc Limit Animation
 @default 5
+@type number
 
 
 
@@ -546,6 +569,12 @@ unwantedfriedchicken<at>gmail.com
 @type number
 @default 10
 @desc Defines attack damage
+
+@arg attackSpeed
+@text Attack Speed
+@type number
+@default 120
+@desc Defines attack speed
 
 @arg moveSpeed
 @text Move Speed

@@ -93,6 +93,7 @@ if (Imported.VisuMZ_1_EventsMoveCore) {
   Game_ufcProjectile.prototype.pattern = function () {
     return this._pattern < 3 ? this._pattern : 1;
   };
+
   Game_ufcProjectile.prototype.direction = function () {
     return this._direction;
   };

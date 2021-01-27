@@ -63,6 +63,11 @@ TowerDefenseManager.debugMode = function () {
   );
 };
 
+TowerDefenseManager.TOWERTYPE = {
+  TOWER: "tower",
+  TRAP: "trap",
+};
+
 TowerDefenseManager.AURATYPEMODE = {
   FIXED: "fixed",
   PERCENTAGE: "percentage",
@@ -105,7 +110,7 @@ TowerDefenseManager.setLimitAnimation = function (limit) {
   this._limitAnimation = limit;
 };
 
-TowerDefenseManager.attackTower = function (damage) {
+TowerDefenseManager.attackTrigger = function (damage) {
   let _curHealth = this.getHUDHealthValue;
   $gameVariables.setValue(UFC.UFCTD.CONFIG.healthVarId, _curHealth - damage);
 
@@ -179,11 +184,19 @@ TowerDefenseManager.updateHUD = function () {
 
 TowerDefenseManager.config = function (args) {
   SceneManager.getScene().createHUDTD();
-  $gameMap.setupTDGrid();
+  let listTowerType = Object.keys(TowerDefenseManager.TOWERTYPE).map(
+    (item) => TowerDefenseManager.TOWERTYPE[item]
+  );
+  $gameMap.setupTDGrid(listTowerType);
 
   const _spriteSet = SceneManager.getSpriteSetMap();
-  _spriteSet._tilemap.addChild(new Sprite_ufcGrid($gameMap.ufcGetGrid()));
 
+  for (let type of listTowerType) {
+    _spriteSet._tilemap.addChild(new Sprite_ufcGrid(type));
+  }
+
+  // Set Terrain Tower
+  $gamePlayer.getGuideAction().setType(TowerDefenseManager.TOWERTYPE.TOWER);
   let ot = JSON.parse(args["onlyTerrain"]);
   if (ot && ot.length > 0) {
     ot = ot.map(Number);
@@ -194,6 +207,46 @@ TowerDefenseManager.config = function (args) {
   if (et && et.length > 0) {
     et = et.map(Number);
     $gamePlayer.getGuideAction().setExceptTerrain(et);
+  }
+
+  // Set Region Tower
+  let or = JSON.parse(args["onlyRegionID"]);
+  if (or && or.length > 0) {
+    or = or.map(Number);
+    $gamePlayer.getGuideAction().setOnlyRegion(or);
+  }
+
+  let er = JSON.parse(args["exceptRegionID"]);
+  if (er && er.length > 0) {
+    er = er.map(Number);
+    $gamePlayer.getGuideAction().setExceptRegion(er);
+  }
+
+  // Set Terrain Trap
+  $gamePlayer.getGuideAction().setType(TowerDefenseManager.TOWERTYPE.TRAP);
+  let ott = JSON.parse(args["onlyTrapTerrain"]);
+  if (ott && ott.length > 0) {
+    ott = ott.map(Number);
+    $gamePlayer.getGuideAction().setOnlyTerrain(ott);
+  }
+
+  let ett = JSON.parse(args["exceptTrapTerrain"]);
+  if (ett && ett.length > 0) {
+    ett = ett.map(Number);
+    $gamePlayer.getGuideAction().setExceptTerrain(ett);
+  }
+
+  // Set Region Trap
+  let ort = JSON.parse(args["onlyTrapRegionID"]);
+  if (ort && ort.length > 0) {
+    ort = ort.map(Number);
+    $gamePlayer.getGuideAction().setOnlyRegion(ort);
+  }
+
+  let ert = JSON.parse(args["exceptTrapRegionID"]);
+  if (ert && ert.length > 0) {
+    ert = ert.map(Number);
+    $gamePlayer.getGuideAction().setExceptRegion(ert);
   }
 
   if (args["limitAnimation"] != "0") {
@@ -282,6 +335,7 @@ TowerDefenseManager.selectTower = function (towerData) {
   this._state = TowerDefenseManager.STATE.BUILD;
   this._selectedUFCTD = new ufcTowerData(towerData);
   this._selectedUFCTD.setPlaceMode(true);
+  $gamePlayer.getGuideAction().setType(this._selectedUFCTD.getType);
 };
 
 TowerDefenseManager.cancelSelect = function (sfx = true) {
@@ -315,7 +369,10 @@ TowerDefenseManager.selectTowerMode = function () {
   $gamePlayer.getGuideAction().setActive(true);
 
   $gamePlayer.getGuideActionGraphics().addChild(selectedTower);
-  $gameMap.ufcGetGrid().setVisible(true);
+  $gameMap
+    .ufcGetGrid()
+    .setType(this.getSelectedTowerData().getType)
+    .setVisible(true);
   UFC.UFCTD.HUDGUI.ITEMSLOT.close();
 };
 

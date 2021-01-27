@@ -407,15 +407,20 @@ Game_Map.prototype.initialize = function () {
   this._towerDefenseWave = [];
   this._towerDefenseEnemy = [];
   this._towerDefenseProjectile = [];
+  this._towerDefenseTraps = [];
   this._towerDefenseGrid = null;
 };
 
-Game_Map.prototype.setupTDGrid = function () {
-  this._towerDefenseGrid = new Data_ufcGrid();
+Game_Map.prototype.setupTDGrid = function (type) {
+  this._towerDefenseGrid = new Data_ufcGrid(type);
 };
 
 Game_Map.prototype.ufcGetGrid = function () {
-  if (this._towerDefenseGrid && !this._towerDefenseGrid._bitmap._canvas) {
+  if (
+    this._towerDefenseGrid &&
+    this._towerDefenseGrid.getType !== null &&
+    !this._towerDefenseGrid.getBitmap._canvas
+  ) {
     this._towerDefenseGrid.refreshBitmap();
   }
   return this._towerDefenseGrid;
@@ -450,7 +455,7 @@ Game_Map.prototype.ufcAddProjectile = function (projectileData) {
 
 Game_Map.prototype.ufcAddTower = function (towerData) {
   let newTowerIndex = this._events.push(
-    new Game_TDTower(towerData, this._mapId)
+    new Game_TDTower(towerData, this._mapId, true)
   );
   this.ufcAddCharacterSprites(
     new Sprite_ufcTDTower(this._events[newTowerIndex - 1])
@@ -480,6 +485,19 @@ Game_Map.prototype.ufcDestroyEnemy = function (enemy) {
 
 Game_Map.prototype.ufcDestroyTower = function (tower) {
   return this._events.remove(tower);
+};
+
+Game_Map.prototype.ufcDestroyTrap = function (tower) {
+  delete this._towerDefenseTraps[tower._x][tower._y];
+};
+
+Game_Map.prototype.ufcGetTrap = function (x, y) {
+  if (!this.ufcTraps()[x]) return null;
+  else return this.ufcTraps()[x][y];
+};
+
+Game_Map.prototype.ufcTraps = function () {
+  return this._towerDefenseTraps;
 };
 
 Game_Map.prototype.ufcEnemies = function () {
@@ -513,6 +531,7 @@ Game_Map.prototype.update = function (sceneActive) {
     this.updateTowerDefenseWave();
     this.updateTowerDefenseEnemy();
     this.updateProjectile();
+    this.updateGrid();
   }
 };
 
@@ -547,6 +566,9 @@ Game_Map.prototype.updateProjectile = function () {
   for (const projectile of this.ufcProjectiles()) {
     if (!projectile.isDestroyed()) projectile.update();
   }
+};
+Game_Map.prototype.updateGrid = function () {
+  this._towerDefenseGrid.updateEvents();
 };
 
 UFC.UFCTD.ALIAS._Game_Map_refresh = Game_Map.prototype.refresh;
@@ -607,7 +629,12 @@ Spriteset_Map.prototype.createCharacters = function () {
     this._tilemap.addChild(new Sprite_ufcProjectile(projectile));
   }
 
-  this._tilemap.addChild(new Sprite_ufcGrid($gameMap.ufcGetGrid()));
+  let grid = $gameMap.ufcGetGrid();
+  let tmpType = grid.getType;
+  for (let type of grid.getListType) {
+    this._tilemap.addChild(new Sprite_ufcGrid(type));
+  }
+  grid.setType(tmpType);
 
   if (TowerDefenseManager.getState != TowerDefenseManager.STATE.IDLE) {
     TowerDefenseManager.selectTowerMode();
