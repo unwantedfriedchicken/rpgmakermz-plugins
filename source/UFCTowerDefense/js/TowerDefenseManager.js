@@ -106,6 +106,12 @@ TowerDefenseManager.EFFECTS = {
   CRITICAL: "critical",
 };
 
+TowerDefenseManager.UIHEALTHENEMY = {
+  SHOW: "show",
+  ONLYWHENDAMAGED: "onlyWhenDamaged",
+  HIDE: "hide",
+};
+
 TowerDefenseManager.setLimitAnimation = function (limit) {
   this._limitAnimation = limit;
 };

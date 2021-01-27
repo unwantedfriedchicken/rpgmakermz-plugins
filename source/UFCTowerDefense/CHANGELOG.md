@@ -25,6 +25,8 @@
 <attackspritey:3>(optional) -> When trap through attacking, the sprite will change to this Y index. Default: 0
 ```
 
+- ADD: Add enemy health GUI and add new configuration in plugin parameters
+
 ## Version 1.2.2 - 21/12/2020
 
 - BUGFIX: Fix crash in upgrade tower

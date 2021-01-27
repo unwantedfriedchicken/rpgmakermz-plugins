@@ -25,12 +25,49 @@ Sprite_ufcTDEnemy.prototype.initMembers = function (enemyData) {
   this.scale.y = this._enemyData.scale;
   this._enemy._event.on("addEffect", this.addEffect, this);
   this._enemy._event.on("removeEffect", this.removeEffect, this);
+  this._enemy._event.on("updateHealth", this.updateHealthGUI, this);
   this.setCharacterBitmap();
+
+  if (
+    UFC.UFCTD.ENEMYSETTINGS.enemyHealthUI !==
+    TowerDefenseManager.UIHEALTHENEMY.HIDE
+  )
+    this.createHealthGUI();
+};
+
+Sprite_ufcTDEnemy.prototype.createHealthGUI = function () {
+  this._healthGUI = new PIXI.Graphics();
+  if (
+    UFC.UFCTD.ENEMYSETTINGS.enemyHealthUI ===
+    TowerDefenseManager.UIHEALTHENEMY.SHOW
+  )
+    this.updateHealthGUI();
+  this.addChild(this._healthGUI);
+};
+
+Sprite_ufcTDEnemy.prototype.updateHealthGUI = function (healthScale = 1) {
+  if (!this._healthGUI) return;
+
+  this._healthGUI.clear();
+  this._healthGUI.beginFill(
+    UFC.UFCTD.ENEMYSETTINGS.enemyHealthColor,
+    UFC.UFCTD.ENEMYSETTINGS.enemyHealthColorOpacity
+  );
+  this._healthGUI.drawRect(
+    -UFC.UFCTD.ENEMYSETTINGS.enemyHealthWidth / 2,
+    0,
+    UFC.UFCTD.ENEMYSETTINGS.enemyHealthWidth * healthScale,
+    UFC.UFCTD.ENEMYSETTINGS.enemyHealthHeight
+  );
+  this._healthGUI.endFill();
 };
 
 Sprite_ufcTDEnemy.prototype.destroy = function () {
   this._enemy._event.removeListener("addEffect", this.addEffect, this);
   this._enemy._event.removeListener("removeEffect", this.removeEffect, this);
+  this._enemy._event.removeListener("updateHealth", this.updateHealthGUI, this);
+  if (this._healthGUI)
+    this._healthGUI.destroy({ texture: true, baseTexture: true });
   Sprite.prototype.destroy.call(this);
 };
 

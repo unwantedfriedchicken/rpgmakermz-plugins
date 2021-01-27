@@ -163,6 +163,51 @@ unwantedfriedchicken<at>gmail.com
 @decimals 1
 @default 0.4
 
+@param enemySettings
+@text Enemy Settings
+
+@param enemyHealthUI
+@parent enemySettings
+@text Enemy Health UI
+@desc Configuration for enemy health UI
+@type select
+@option Show
+@value show
+@option Only When Damaged
+@value onlyWhenDamaged
+@option Hide
+@value hide
+@default hide
+
+@param enemyHealthWidth
+@parent enemySettings
+@text Enemy Health Width
+@desc Enemy Health
+@default 48
+@type number
+
+@param enemyHealthHeight
+@parent enemySettings
+@text Enemy Health Height
+@desc Enemy Health
+@default 5
+@type number
+
+@param enemyHealthColor
+@parent enemySettings
+@text Enemy Health Color
+@type text
+@desc Set the color of health enemy. Default = #85DB18
+@default #85DB18
+
+@param enemyHealthColorOpacity
+@parent enemySettings
+@text Enemy Health Color Opcaity
+@type number
+@desc Set the opacity of health enemy 
+@decimals 1
+@default 1
+
 @param tooltip
 @text Tooltip
 @type boolean

@@ -3,6 +3,8 @@ config.gruntconfig.json
 
 .vscode
 
+jsconfig.json
+types
 # Logs
 logs
 *.log

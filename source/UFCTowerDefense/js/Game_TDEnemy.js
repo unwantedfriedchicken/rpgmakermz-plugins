@@ -10,6 +10,7 @@ Game_TDEnemy.prototype.initialize = function (enemyName, spawnId) {
   Game_Character.prototype.initialize.call(this);
   this._mapId = $gameMap._mapId;
   this._enemyData = Object.assign({}, $dataTDEnemy[enemyName]);
+  this._enemyData.maxHealth = this._enemyData.health;
   this._resistance = this._enemyData.resistance;
   this._itemDrop = this._enemyData.itemDrop;
   this._spawn = $dataTDSpawnLocation[this._mapId][spawnId];
@@ -335,6 +336,10 @@ Game_TDEnemy.prototype.attackTrigger = function (eventid) {
 
 Game_TDEnemy.prototype.attacked = function (damage) {
   this._enemyData.health -= damage.damage;
+  this._event.emit(
+    "updateHealth",
+    this._enemyData.health / this._enemyData.maxHealth
+  );
   if (this._enemyData.health <= 0 && !this._destroy) {
     if (this._enemyData.seDead)
       AudioManager.playSe({

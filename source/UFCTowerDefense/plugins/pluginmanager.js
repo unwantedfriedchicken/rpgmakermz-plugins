@@ -42,6 +42,16 @@ UFC.UFCTD.TOWERSETTINGS = {
   gridTrapColorOpacity: +UFC.UFCTD.PARAMETERS["gridTrapColorOpacity"] * 255,
 };
 
+UFC.UFCTD.ENEMYSETTINGS = {
+  enemyHealthUI: UFC.UFCTD.PARAMETERS["enemyHealthUI"],
+  enemyHealthWidth: +UFC.UFCTD.PARAMETERS["enemyHealthWidth"],
+  enemyHealthHeight: +UFC.UFCTD.PARAMETERS["enemyHealthHeight"],
+  enemyHealthColor: PIXI.utils.string2hex(
+    UFC.UFCTD.PARAMETERS["enemyHealthColor"]
+  ),
+  enemyHealthColorOpacity: UFC.UFCTD.PARAMETERS["enemyHealthColorOpacity"],
+};
+
 UFC.UFCTD.TOOLTIPSETTINGS = {
   enable: UFC.UFCTD.PARAMETERS["tooltip"] == "true",
   yPosition: +UFC.UFCTD.PARAMETERS["tooltipYPosition"],

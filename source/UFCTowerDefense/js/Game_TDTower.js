@@ -83,11 +83,20 @@ Game_TDTower.prototype.refresh = function () {
 };
 
 Game_TDTower.prototype.update = function () {
+  if (this.getTowerData().getType === TowerDefenseManager.TOWERTYPE.TRAP) {
+    if (this._trapAttack) {
+      this._trapAttackTime--;
+      if (this._trapAttackTime <= 0) this._trapAttack = false;
+    }
+    return;
+  }
+
   if (
     UFC.UFCTD.TOWERSETTINGS.animateTower &&
     this.getTowerData().getType === TowerDefenseManager.TOWERTYPE.TOWER
   )
     Game_Character.prototype.update.call(this);
+
   this._attackTime--;
   if (
     !this._target &&
@@ -131,11 +140,6 @@ Game_TDTower.prototype.update = function () {
         this.attack(this._target);
       }
     }
-  }
-
-  if (this._trapAttack) {
-    this._trapAttackTime--;
-    if (this._trapAttackTime <= 0) this._trapAttack = false;
   }
 };
 
