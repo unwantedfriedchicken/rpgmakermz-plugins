@@ -148,7 +148,7 @@ module.exports = function (grunt) {
     };
   };
 
-  const CONFIG = grunt.file.readJSON("config.json");
+  const CONFIG = grunt.file.readJSON("config.gruntconfig.json");
 
   grunt.registerTask("td", "Tower Defense Task", function () {
     // if (dest) {
