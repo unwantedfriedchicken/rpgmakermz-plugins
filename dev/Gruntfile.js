@@ -102,7 +102,7 @@ module.exports = function (grunt) {
   grunt.loadNpmTasks("grunt-contrib-uglify-es");
   grunt.loadNpmTasks("grunt-remove-comments");
 
-  grunt.config.set("PATHDEST", "../");
+  // grunt.config.set("PATHDEST", "../dist/");
 
   let initTask = function (id, dest) {
     let listTask = {
@@ -111,7 +111,6 @@ module.exports = function (grunt) {
     };
     let tasks = [];
     let files = [];
-    dest = dest || "../";
     for (let taskid of id) {
       listTask["concat"][taskid] = {
         dest: dest + taskid + ".js",
@@ -149,7 +148,9 @@ module.exports = function (grunt) {
     };
   };
 
-  grunt.registerTask("td", "Tower Defense Task", function (isWatch, dest) {
+  const CONFIG = grunt.file.readJSON("config.json");
+
+  grunt.registerTask("td", "Tower Defense Task", function () {
     // if (dest) {
     //   grunt.config.set("PATHDEST", dest);
     // }
@@ -157,7 +158,7 @@ module.exports = function (grunt) {
     // grunt.config.set("NAMEFOLDER", "towerdefense/");
     // if (isWatch) grunt.task.run("watch");
     // else grunt.task.run(DEFAULTTASK);
-    let init = initTask(["UFCTowerDefense", "UFCGuideAction"]);
+    let init = initTask(["UFCTowerDefense", "UFCGuideAction"], CONFIG.dest);
     grunt.config.init(init.init);
     grunt.task.run("watch");
   });
