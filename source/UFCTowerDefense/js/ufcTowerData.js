@@ -6,11 +6,11 @@ const ufcTowerData = function () {
 ufcTowerData.prototype.initialize = function (data) {
   this._id = data["id"];
   this._name = data["name"];
-  this._attack = +data["attack"];
-  this._range = +data["range"];
+  this._attack = +data["attack"] || 0;
+  this._attackSpeed = +data["attackspeed"] || 240;
+  this._range = +data["range"] || 0;
   this._character = data["character"];
   this._characterIndex = data["characterindex"];
-  this._attackSpeed = +data["attackspeed"];
   this._bulletSpeed = +data["bulletspeed"] || 600;
   this._bulletAnimationId = data["bulletanimationid"];
   this._type = data["type"] || TowerDefenseManager.TOWERTYPE.TOWER;
@@ -29,12 +29,8 @@ ufcTowerData.prototype.initialize = function (data) {
       break;
     case TowerDefenseManager.TOWERTYPE.TOWER:
       this._bulletCharacterName = data["bulletspritename"] || "?";
-      this._bulletCharacterIndex = data["bulletspriteindex"]
-        ? +data["bulletspriteindex"]
-        : 0;
-      this._bulletCharacterIndexY = data["bulletspriteindexy"]
-        ? +data["bulletspriteindexy"]
-        : 0;
+      this._bulletCharacterIndex = +data["bulletspriteindex"] || 0;
+      this._bulletCharacterIndexY = +data["bulletspriteindexy"] || 0;
       break;
   }
   this._upgrade = [];

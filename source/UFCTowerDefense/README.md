@@ -50,17 +50,19 @@ you can delete any **optional** note
 
 ## Explanation For Setup Tower Note
 
-**attack** : Damage inflicted to the enemy, set to 0 if you want this tower not searching for target  
-**attackspeed** : Attack speed of the tower  
-**bulletspeed** : Bullet speed when go to the target, don't make it too fast since it will become like orbit, if you want make seem like fast just make it invisible  
-**bulletspritename** : Sprite name in Character folder, this is using standard character sprite with seperator X by 3 sprite but Y by 1  
-**bulletspriteindex** : X index from bulletspritename  
-**bulletspriteindexy** : Y index from bulletspritename  
-**range** : Range of the tower  
-**character** : Character name in character folder
+**type** (optional) : Tower type, has 2 type `tower | trap`. **_Default : tower_**  
+**attack** (optional) : Damage inflicted to the enemy, set to 0 if you want this tower not searching for target. **_Default : 0_**  
+**attackspeed** (optional) : Attack speed of the tower **_Default : 240_**  
+**bulletspeed** (optional) : Bullet speed when go to the target, don't make it too fast since it will become like orbit, if you want make seem like fast just make it invisible **_Default : 600_**  
+**bulletspritename** (optional) : Sprite name in Character folder, this is using standard character sprite with seperator X by 3 sprite but Y by 1 **_Default : ?_**  
+**bulletspriteindex** (optional) : X index from bulletspritename **_Default : 0_**  
+**bulletspriteindexy** (optional) : Y index from bulletspritename **_Default : 0_**  
+**range** (optional) : Range of the tower **_Default : 0_**  
+**through** (optional) : Through option for tower . This make if the tower is through or not. **_Default : false_**  
+**character** : Character name in character folder  
 **characterindex** : Index of the character 0 ~ 7  
-**attacktype** : What monster type that this tower can attack the mode is  
-`all | air | ground` all mean the tower can attack any types  
+**attacktype** (optional) : What monster type that this tower can attack the mode is  
+`all | air | ground` all mean the tower can attack any types **_Default : all_**  
 **upgrade** (optional) : Upgrade id for the tower, you can add multiple upgrade, for multiple upgrade add number in upgrade ex: `<upgrade2:23><upgrade3:34>` you can have many upgrade you want
 
 > `ID TOWER | UPGRADE PRICE (OPTIONAL)`
@@ -81,7 +83,7 @@ you can delete any **optional** note
 > Have 2 upgrade from this tower and the second upgrade price is 200
 
 **note** : Note when tower is selected / in upgrade  
-**sellprice** (optional) : if you want custom sellprice set here otherwise the sell price is half of the price item  
+**sellprice** (optional) : if you want custom sellprice set here otherwise the sell price is half of the price item **_Default : Half of buy price_**  
 **effects** (optional) : the effect this tower can inflict to the enemy, for multiple effects use , seprator.
 
 > `ID EFFECT | EFFECT VALUE | DURATION | CHANCE (OPTIONAL)`
@@ -131,6 +133,15 @@ you can delete any **optional** note
 > `<auras:attack|6|fixed,range|-2|fixed,attackspeed|-30|percentage>`  
 > Give +6 attack damage but -2 range and attack speed slower 30%
 
+**sedestroy** (optional): Custom sound effect when tower is destroyed, if not stated destroy se using destroy sound in plugin parameter  
+**sedestroyvolume** (optional): Setting volume for destroyed volume. **_Default : 25_**
+
+**TRAP NOTE** Only for trap  
+**health** (optional) (trap only): Health to the tower. This is used for trap. **_Default : 1_**  
+**characterindexx** (optional) (trap only): Setting for X index in character sprite, used for TRAP. **_Default : 0_**  
+**durability** (optional) (trap only): Setting if through trap has durability or not **_Default : false_**  
+**durabilityvalue** (optional) (trap only): If `durability` set true, then when trap attacking this value will decrease, and when reach 0 the trap is destroyed **_Default : 1_**  
+**attackspritey** (optional) (trap only): When trap through attacking, the sprite will change to this Y index, then go back to 0 **_Default : 0_**  
 <br>
 
 ---

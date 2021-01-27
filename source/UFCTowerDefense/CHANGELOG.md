@@ -20,7 +20,7 @@
 <sedestroy>(optional) -> Add custom sound effect when tower is destroyed, if not stated destroy se using destroy sound in plugin parameter. Default:null
 <sedestroyvolume:25>(optional) -> Setting volume for destroyed volume. Default: 25
 <characterindexx:0>(optional) -> Setting for X index in character sprite, used for TRAP. Default: 0
-<durability:false>(optional) -> Setting if trap through has durability or not. Default: false
+<durability:false>(optional) -> Setting if through trap has durability or not. Default: false
 <durabilityvalue:1>(optional) -> If `durability` set true, then when trap attacking this value will decrease, and reach 0 the trap is destroyed. Default: 1
 <attackspritey:3>(optional) -> When trap through attacking, the sprite will change to this Y index. Default: 0
 ```
