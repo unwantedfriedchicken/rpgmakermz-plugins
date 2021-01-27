@@ -108,8 +108,10 @@ module.exports = function (grunt) {
     let listTask = {
       concat: {},
       remove_comments: {},
+      uglify: {},
     };
     let tasks = [];
+    let tasksBuild = [];
     let files = [];
     for (let taskid of id) {
       listTask["concat"][taskid] = {
@@ -129,6 +131,12 @@ module.exports = function (grunt) {
         dest: dest + taskid + ".js",
         src: [dest + taskid + ".js"],
       };
+      listTask["uglify"][taskid] = {
+        dest: dest + taskid + ".min.js",
+        src: [dest + taskid + ".js"],
+      };
+
+      tasksBuild.push("concat:" + taskid, "uglify:" + taskid);
 
       tasks.push(
         "concat:" + taskid,
@@ -144,13 +152,14 @@ module.exports = function (grunt) {
     };
     return {
       init: listTask,
+      build: tasksBuild,
       files: files,
     };
   };
 
   const CONFIG = grunt.file.readJSON("config.gruntconfig.json");
 
-  grunt.registerTask("td", "Tower Defense Task", function () {
+  grunt.registerTask("td", "Tower Defense Task", function (dist) {
     // if (dest) {
     //   grunt.config.set("PATHDEST", dest);
     // }
@@ -158,17 +167,22 @@ module.exports = function (grunt) {
     // grunt.config.set("NAMEFOLDER", "towerdefense/");
     // if (isWatch) grunt.task.run("watch");
     // else grunt.task.run(DEFAULTTASK);
-    let init = initTask(["UFCTowerDefense", "UFCGuideAction"], CONFIG.dest);
+    let init = initTask(
+      ["UFCTowerDefense", "UFCGuideAction"],
+      dist || CONFIG.dest
+    );
     grunt.config.init(init.init);
     grunt.task.run("watch");
   });
 
   // register what to do when using the default 'grunt' command
   grunt.registerTask("default", DEFAULTTASK);
-  grunt.registerTask("build", [
-    "concat:source",
-    "uglify:build",
-    "uglify:buildwAddon",
-    "concat:globalVar",
-  ]);
+  grunt.registerTask("build", "Build Task", function (dist) {
+    let init = initTask(
+      ["UFCTowerDefense", "UFCGuideAction"],
+      dist || CONFIG.dest
+    );
+    grunt.config.init(init.init);
+    grunt.task.run(init.build);
+  });
 };
