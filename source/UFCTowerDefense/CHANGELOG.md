@@ -26,6 +26,7 @@
 ```
 
 - ADD: Add enemy health GUI and add new configuration in plugin parameters
+- CHANGE: Change BSPD in tower action to ATK Type
 
 ## Version 1.2.2 - 21/12/2020
 

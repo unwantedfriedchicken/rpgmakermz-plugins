@@ -243,3 +243,16 @@ Object.defineProperty(ufcTowerData.prototype, "getType", {
     return this._type;
   },
 });
+
+Object.defineProperty(ufcTowerData.prototype, "getAttackTypeAsName", {
+  get: function () {
+    switch (this._attackType) {
+      case TowerDefenseManager.ENEMYTYPE.AIR:
+        return "Air";
+      case TowerDefenseManager.ENEMYTYPE.GROUND:
+        return "Ground";
+      default:
+        return "All";
+    }
+  },
+});

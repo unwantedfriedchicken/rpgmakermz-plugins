@@ -50,13 +50,14 @@ Window_TDStatus.prototype.drawDefaultStatus = function (towerData) {
   let textX = statusX;
   let textX2 = 110;
   let textXValue = 20;
+  let textXValueOffset2 = 30;
   let textHeight = 24;
-  let status = ["Attack", "Range", "ASPD", "BSPD"];
+  let status = ["Attack", "Range", "ASPD", "ATK Type"];
   let statusValue = [
     towerData.getBaseAttack,
     towerData.getBaseRange,
     towerData.getBaseAttackSpeed,
-    towerData._bulletSpeed,
+    towerData.getAttackTypeAsName,
   ];
   this.contents.fontSize = 14;
 
@@ -73,7 +74,7 @@ Window_TDStatus.prototype.drawDefaultStatus = function (towerData) {
   for (let i = 0; i < statusValue.length; i++) {
     this.drawText(
       statusValue[i],
-      textX + (i % 2) * (textXValue + textX2),
+      textX + (i % 2) * (textXValue + textX2) + (i % 2) * textXValueOffset2,
       textY + Math.floor(i / 2) * textHeight,
       80,
       "right"
