@@ -1,6 +1,8 @@
 # grunt config
 config.gruntconfig.json
 
+.vscode
+
 # Logs
 logs
 *.log
