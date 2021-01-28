@@ -75,31 +75,13 @@ module.exports = function (grunt) {
         },
       },
     },
-    uglify: {
-      options: {
-        banner:
-          '/*! <%= pkg.name %> <%= grunt.template.today("yyyy-mm-dd") %> */\n',
-      },
-      build: {
-        dest: "<%= PATHDEST %><%= NAMEPLUGIN %>.min.js",
-        src: "<%= PATHDEST %><%= NAMEPLUGIN %>.js",
-      },
-
-      buildwAddon: {
-        dest: "<%= PATHDEST %><%= NAMEPLUGIN %>.min.js",
-        src: [
-          "<%= NAMEFOLDER %>addon/*.js",
-          "<%= PATHDEST %><%= NAMEPLUGIN %>.js",
-        ],
-      },
-    },
   });
 
   // load contrib task files
   // note: these should be installed from npm
   grunt.loadNpmTasks("grunt-contrib-concat");
   grunt.loadNpmTasks("grunt-contrib-watch");
-  grunt.loadNpmTasks("grunt-contrib-uglify-es");
+  grunt.loadNpmTasks("grunt-terser");
   grunt.loadNpmTasks("grunt-remove-comments");
 
   // grunt.config.set("PATHDEST", "../dist/");
@@ -108,7 +90,11 @@ module.exports = function (grunt) {
     let listTask = {
       concat: {},
       remove_comments: {},
-      uglify: {},
+      terser: {
+        options: {
+          ecma: 2015,
+        },
+      },
     };
     let tasks = [];
     let tasksBuild = [];
@@ -131,12 +117,12 @@ module.exports = function (grunt) {
         dest: dest + taskid + ".js",
         src: [dest + taskid + ".js"],
       };
-      listTask["uglify"][taskid] = {
+      listTask["terser"][taskid] = {
         dest: dest + taskid + ".min.js",
         src: [dest + taskid + ".js"],
       };
 
-      tasksBuild.push("concat:" + taskid, "uglify:" + taskid);
+      tasksBuild.push("concat:" + taskid, "terser:" + taskid);
 
       tasks.push(
         "concat:" + taskid,

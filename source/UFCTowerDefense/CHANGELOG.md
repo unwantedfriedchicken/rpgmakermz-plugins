@@ -26,7 +26,7 @@
 ```
 
 - ADD: Add enemy health GUI and add new configuration in plugin parameters
-- CHANGE: Change BSPD in tower action to ATK Type
+- CHANGE: Change BSPD in tower action to ATK Type, Status will also change if the tower is trap type
 
 ## Version 1.2.2 - 21/12/2020
 

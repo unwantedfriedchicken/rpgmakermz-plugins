@@ -48,23 +48,50 @@ Window_TDStatus.prototype.drawDefaultStatus = function (towerData) {
   // let textY = ph * scale + 30;
   let textY = h;
   let textX = statusX;
-  let textX2 = 110;
-  let textXValue = 20;
-  let textXValueOffset2 = 30;
+  let textX2 = 120;
+  let textXValue = 75;
+  let textXValueOffset2 = 10;
   let textHeight = 24;
-  let status = ["Attack", "Range", "ASPD", "ATK Type"];
-  let statusValue = [
-    towerData.getBaseAttack,
-    towerData.getBaseRange,
-    towerData.getBaseAttackSpeed,
-    towerData.getAttackTypeAsName,
-  ];
+  let status, statusValue;
+  if (towerData.getType === TowerDefenseManager.TOWERTYPE.TOWER) {
+    status = ["Attack", "Range", "ASPD", "ATK Type"];
+    statusValue = [
+      towerData.getBaseAttack,
+      towerData.getBaseRange,
+      towerData.getBaseAttackSpeed,
+      towerData.getAttackTypeAsName,
+    ];
+  } else if (towerData.getType === TowerDefenseManager.TOWERTYPE.TRAP) {
+    if (towerData._through) {
+      status = [
+        "Attack",
+        "Trap Type",
+        towerData._durability ? "Durability" : "",
+        "",
+      ];
+      statusValue = [
+        towerData.getBaseAttack,
+        towerData.getAttackTypeAsName,
+        towerData._durability ? towerData._durabilityValue : "",
+        "",
+      ];
+    } else {
+      status = ["Attack", "Trap Type", "Health", ""];
+      statusValue = [
+        towerData.getBaseAttack,
+        towerData.getAttackTypeAsName,
+        towerData._health,
+        "",
+      ];
+    }
+  }
+
   this.contents.fontSize = 14;
 
   for (let i = 0; i < status.length; i++) {
     this.drawText(
       status[i],
-      textX + (i % 2) * (textXValue + textX2),
+      textX + (i % 2) * textX2,
       textY + Math.floor(i / 2) * textHeight,
       100
     );
@@ -74,10 +101,9 @@ Window_TDStatus.prototype.drawDefaultStatus = function (towerData) {
   for (let i = 0; i < statusValue.length; i++) {
     this.drawText(
       statusValue[i],
-      textX + (i % 2) * (textXValue + textX2) + (i % 2) * textXValueOffset2,
+      textX + textXValue + (i % 2) * textX2 + (i % 2) * textXValueOffset2,
       textY + Math.floor(i / 2) * textHeight,
-      80,
-      "right"
+      80
     );
   }
   this.resetTextColor();
