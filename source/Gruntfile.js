@@ -154,7 +154,7 @@ module.exports = function (grunt) {
     // if (isWatch) grunt.task.run("watch");
     // else grunt.task.run(DEFAULTTASK);
     let init = initTask(
-      ["UFCTowerDefense", "UFCGuideAction"],
+      ["UFCTowerDefense", "UFCGuideAction", "UFCTextHelper"],
       dist || CONFIG.dest
     );
     grunt.config.init(init.init);

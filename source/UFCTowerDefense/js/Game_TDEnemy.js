@@ -335,6 +335,13 @@ Game_TDEnemy.prototype.attackTrigger = function (eventid) {
 };
 
 Game_TDEnemy.prototype.attacked = function (damage) {
+  if (Imported.UFCTextHelper)
+    TextHelper.spawnText(damage.damage, this._realX, this._realY, {
+      animate: {
+        start: true,
+        time: 80,
+      },
+    });
   this._enemyData.health -= damage.damage;
   this._event.emit(
     "updateHealth",

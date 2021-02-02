@@ -41,6 +41,7 @@
     "Sprite_ufcTDEnemy": true,
     "Sprite_ufcTDTower": true,
     "Sprite_ufcProjectile": true,
-    "Window_BaseExtend": true
+    "Window_BaseExtend": true,
+    "TextHelper": true
   }
 }

@@ -241,7 +241,12 @@ Window_Command.prototype.commandIconIndex = function (index) {
 
 Window_GUIItemSlot.prototype.processTouch = function () {
   Window_Command.prototype.processTouch.call(this);
-  if (this.isClosed() || !this.visible) return;
+  if (
+    this.isClosed() ||
+    !this.visible ||
+    TowerDefenseManager.getState !== TowerDefenseManager.STATE.IDLE
+  )
+    return;
   if (this.isTouchedInsideFrame()) {
     UFC.UFCTD.HUDGUI.MESSAGE.isHoverHUDItem = true;
     this.activate();

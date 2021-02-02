@@ -23,21 +23,20 @@ TowerDefenseManager.debugMode = function () {
   if (UFC.UFCTD.DEBUGMODE.CONFIG) return;
   UFC.UFCTD.DEBUGMODE.CONFIG = {
     showRange: false,
+    ticker: false,
   };
-  window.addEventListener(
-    "keydown",
-    (e) => {
-      if (e.key == 1) {
-        Graphics.app.ticker.speed = UFC.UFCTD.DEBUGMODE.tickerSpeed;
-      }
-    },
-    false
-  );
+  // window.addEventListener("keydown", (e) => {}, false);
   window.addEventListener(
     "keyup",
     (e) => {
       if (e.key == 1) {
-        Graphics.app.ticker.speed = 1;
+        if (UFC.UFCTD.DEBUGMODE.ticker) {
+          Graphics.app.ticker.speed = 1;
+          UFC.UFCTD.DEBUGMODE.ticker = false;
+        } else {
+          Graphics.app.ticker.speed = UFC.UFCTD.DEBUGMODE.tickerSpeed;
+          UFC.UFCTD.DEBUGMODE.ticker = true;
+        }
       }
       if (e.key == 2) {
         UFC.UFCTD.DEBUGMODE.CONFIG.showRange = !UFC.UFCTD.DEBUGMODE.CONFIG
@@ -57,6 +56,18 @@ TowerDefenseManager.debugMode = function () {
       }
       if (e.key == 4) {
         this.setLimitAnimation(UFC.UFCTD.DEBUGMODE.limitAnimation);
+      }
+      if (e.key == 5 && Imported.UFCTextHelper) {
+        for (let i = 1; i < 1000; i++) {
+          setTimeout(() => {
+            TextHelper.spawnText(i, $gamePlayer._realX, $gamePlayer._realY, {
+              animate: {
+                start: true,
+                time: 60,
+              },
+            });
+          }, i * 100);
+        }
       }
     },
     false
