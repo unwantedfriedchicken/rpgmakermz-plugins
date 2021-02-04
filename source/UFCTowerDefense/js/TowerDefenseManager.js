@@ -66,7 +66,7 @@ TowerDefenseManager.debugMode = function () {
                 time: 60,
               },
             });
-          }, i * 100);
+          }, i * 50);
         }
       }
     },
@@ -549,6 +549,8 @@ TowerDefenseManager.addTower = function (itemid, item) {
   let note = "";
   let data = null;
   for (let i = 0; i < lines.length; i++) {
+    if (lines[i].match(/<ufcTDMaterial>/)) item.ufcTowerMaterial = true;
+
     if (lines[i].match(/<ufcTD>/)) {
       tdMode = true;
       data = {};
@@ -582,7 +584,7 @@ TowerDefenseManager.addTower = function (itemid, item) {
     data.istowerdata = true;
     data.id = itemid;
     data.name = item.name;
-    data.iconindex = item.iconIndex;
+    data.iconIndex = item.iconIndex;
     data.bulletanimationid = item.animationId;
     data.note = note;
     item.ufcTower = data;

@@ -248,6 +248,15 @@ unwantedfriedchicken<at>gmail.com
 @desc Add shop button gui
 @default true
 
+@param shopguiType
+@parent shopgui
+@type select
+@option Quick Buy
+@option Open Shop
+@text Shop Type
+@default Open Shop
+@desc Type shop when press shop button
+
 @param shopguiDefaultItems
 @parent shopgui
 @text Default Items

@@ -659,6 +659,12 @@ Game_Party.prototype.towers = function () {
   return Object.keys(this._towers).map((id) => $dataItems[id].ufcTower);
 };
 
+Game_Party.prototype.towersMaterial = function () {
+  return Object.keys(this._items)
+    .map((id) => $dataItems[id])
+    .filter((item) => item.ufcTowerMaterial);
+};
+
 if (Imported.VisuMZ_1_EventsMoveCore) {
   Game_Player.prototype.executeMoveDir8 = function () {
     if (this.towerAction()) return;

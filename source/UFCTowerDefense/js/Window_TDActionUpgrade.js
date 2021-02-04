@@ -111,7 +111,12 @@ Window_TDActionUpgrade.prototype.drawTitle = function () {
 
 Window_TDActionUpgrade.prototype.processTouch = function () {
   Window_Command.prototype.processTouch.call(this);
-  if (this.isClosed()) return;
+  if (
+    this.isClosed() ||
+    !this.visible ||
+    TowerDefenseManager.getState !== TowerDefenseManager.STATE.IDLE
+  )
+    return;
   if ((this.isTouchedInsideFrame() || this._selected) && !this.active) {
     this.windowHovered(true);
   } else if (!this.isTouchedInsideFrame() && !this._selected && this.active) {

@@ -25,6 +25,7 @@
     "Window_TDAction": true,
     "Window_TDHealth": true,
     "Window_TDShop": true,
+    "Window_TDShopQuick": true,
     "Window_TDStatus": true,
     "Window_TDActionUpgrade": true,
     "Data_ufcGrid": true,

@@ -89,7 +89,12 @@ Window_GUIItemSlot.prototype.select = function (index) {
 Window_GUIItemSlot.prototype.callOkHandler = function () {
   this.activate();
   let tower = this._towers[this.index()];
-  if (!tower || ($gameMessage.isBusy() && !this._selectKeyboard)) return;
+  if (
+    !tower ||
+    ($gameMessage.isBusy() && !this._selectKeyboard) ||
+    tower.ufcTowerMaterial
+  )
+    return;
   $gamePlayer.getGuideAction().resetParent();
   TowerDefenseManager.gainItem(tower.id, -1);
   TowerDefenseManager.clearSelect();
@@ -108,6 +113,12 @@ Window_GUIItemSlot.prototype.activeKeyboard = function () {
 };
 
 Window_GUIItemSlot.prototype.deactiveKeyboard = function () {
+  if (UFC.UFCTD.HUDGUI.QUICKSHOP.isOpen()) {
+    UFC.UFCTD.HUDGUI.QUICKSHOP.close();
+    UFC.UFCTD.HUDGUI.SHOP.selected();
+    return;
+  }
+
   this._selectKeyboard = false;
   $gameMessage.setWindowTower(false);
   this.deselect();
@@ -243,6 +254,7 @@ Window_GUIItemSlot.prototype.processTouch = function () {
   Window_Command.prototype.processTouch.call(this);
   if (
     this.isClosed() ||
+    !this.isOpen() ||
     !this.visible ||
     TowerDefenseManager.getState !== TowerDefenseManager.STATE.IDLE
   )
@@ -328,13 +340,14 @@ Window_GUIItemSlot.prototype.refresh = function () {
 
 Window_GUIItemSlot.prototype.makeCommandTowers = function () {
   this._towers = $gameParty.towers();
+  this._towers.push(...$gameParty.towersMaterial());
   let length =
     this._towers.length < this.maxCols() ? this.maxCols() : this._towers.length;
   for (let i = 0; i < length; i++) {
     if (this._towers[i]) {
       this.addCommand(
         this._towers[i].name,
-        this._towers[i].iconindex,
+        this._towers[i].iconIndex,
         $gameParty.numItems(this._towers[i]),
         true
       );

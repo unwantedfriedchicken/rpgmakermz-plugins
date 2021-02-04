@@ -2,6 +2,10 @@
 
 ## Version 1.3 - dev
 
+- ADD: Add new note for item, if want to get displayed in backpack add `<ufcTDMaterial>`
+- ADD: Add Quick Shop option for Shop Button, new plugin parameters `Shop Type`
+- ADD: Add damage text, if plugin `UFCTextHelper` is imported
+- ADD: Add enemy health GUI and add new configuration in plugin parameters
 - ADD: Add sound settings in plugin parameters
 - ADD: Add `Animate Tower` in plugin parameters, if set to `true` this will animate tower when idle
 - ADD: Add `Attack Speed` to `Setup enemy data`, this will define attack speed for the enemy when attacking (1/60 sec)
@@ -25,7 +29,6 @@
 <attackspritey:3>(optional) -> When trap through attacking, the sprite will change to this Y index. Default: 0
 ```
 
-- ADD: Add enemy health GUI and add new configuration in plugin parameters
 - CHANGE: Change BSPD in tower action to ATK Type, Status will also change if the tower is trap type
 
 ## Version 1.2.2 - 21/12/2020

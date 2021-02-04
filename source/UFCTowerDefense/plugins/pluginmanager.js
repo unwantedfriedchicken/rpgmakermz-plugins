@@ -19,10 +19,12 @@ UFC.UFCTD.HUDGUI = {
   MESSAGE: {
     isHoverHUDItem: false,
     isHoverGUIShop: false,
+    isHoverGUIQuickShop: false,
     isBusy: function () {
       return (
         UFC.UFCTD.HUDGUI.MESSAGE.isHoverHUDItem ||
-        UFC.UFCTD.HUDGUI.MESSAGE.isHoverGUIShop
+        UFC.UFCTD.HUDGUI.MESSAGE.isHoverGUIShop ||
+        UFC.UFCTD.HUDGUI.MESSAGE.isHoverGUIQuickShop
       );
     },
   },
@@ -60,6 +62,7 @@ UFC.UFCTD.TOOLTIPSETTINGS = {
 };
 
 UFC.UFCTD.SHOPGUISETTINGS = {
+  type: UFC.UFCTD.PARAMETERS["shopguiType"],
   enable: UFC.UFCTD.PARAMETERS["shopgui"] == "true",
   defaultItems: JSON.parse(
     UFC.UFCTD.PARAMETERS["shopguiDefaultItems"]

@@ -27,6 +27,16 @@ Window_TDShop.prototype.initialize = function () {
 
   this.addCommand("shop", "TDShopIcon", true);
   this.drawItem(0);
+  if (UFC.UFCTD.SHOPGUISETTINGS.type == "Quick Buy") this.createQuickBuy();
+};
+
+Window_TDShop.prototype.createQuickBuy = function () {
+  let upgradeWidth = 250;
+  let upgradeHeight = 250;
+  UFC.UFCTD.HUDGUI.QUICKSHOP = new Window_TDShopQuick(
+    new Rectangle(0, -upgradeHeight, upgradeWidth, upgradeHeight)
+  );
+  this.addChild(UFC.UFCTD.HUDGUI.QUICKSHOP);
 };
 
 Window_TDShop.prototype.lineHeight = function () {
@@ -42,12 +52,24 @@ Window_TDShop.prototype.maxRows = function () {
 };
 
 Window_TDShop.prototype.callOkHandler = function () {
-  let items = UFC.UFCTD.SHOPGUISETTINGS.defaultItems;
-  if (UFC.UFCTD.SHOPGUISETTINGS.itemsEdit.length > 0)
-    items = UFC.UFCTD.SHOPGUISETTINGS.itemsEdit;
-  TowerDefenseManager.openShop(true);
-  SceneManager.push(Scene_Shop);
-  SceneManager.prepareNextScene(items, true);
+  if (UFC.UFCTD.SHOPGUISETTINGS.type == "Quick Buy") {
+    if (UFC.UFCTD.HUDGUI.QUICKSHOP.isOpenAndActive()) {
+      UFC.UFCTD.HUDGUI.QUICKSHOP.close();
+      return;
+    }
+    if (!this.isTouchOkEnabled()) UFC.UFCTD.HUDGUI.QUICKSHOP.selected();
+    else UFC.UFCTD.HUDGUI.QUICKSHOP.deselect();
+    UFC.UFCTD.HUDGUI.QUICKSHOP.open();
+    UFC.UFCTD.HUDGUI.QUICKSHOP.show();
+    UFC.UFCTD.HUDGUI.QUICKSHOP.activate();
+  } else {
+    let items = UFC.UFCTD.SHOPGUISETTINGS.defaultItems;
+    if (UFC.UFCTD.SHOPGUISETTINGS.itemsEdit.length > 0)
+      items = UFC.UFCTD.SHOPGUISETTINGS.itemsEdit;
+    TowerDefenseManager.openShop(true);
+    SceneManager.push(Scene_Shop);
+    SceneManager.prepareNextScene(items, true);
+  }
 };
 
 Window_TDShop.prototype.processTouch = function () {
