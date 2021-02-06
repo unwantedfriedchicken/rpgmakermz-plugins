@@ -2,6 +2,7 @@ function GuideAction() {
   this.initialize(...arguments);
 }
 
+GuideAction.prototype.constructor = GuideAction;
 GuideAction.prototype.initialize = function () {
   this._mouseMode = false;
   this._tmpMouseData = { x: TouchInput.x, y: TouchInput.y };
@@ -31,9 +32,7 @@ GuideAction.prototype.initialize = function () {
   this._onlyRegion = {};
   this._exceptRegion = {};
   this.createSharp();
-  this.setDirection(2); // set direction default to down
   this.setVisible(false);
-  this._event = new PIXI.utils.EventEmitter();
 };
 
 Object.defineProperty(GuideAction.prototype, "isMouseMode", {
@@ -81,22 +80,6 @@ GuideAction.prototype.setType = function (value) {
 
 GuideAction.prototype.setMouseMode = function (mode) {
   this._mouseMode = mode;
-  this.resetParent();
-};
-
-GuideAction.prototype.resetParent = function () {
-  const _spritesetmap = SceneManager.getSpriteSetMap();
-  if (this.isMouseMode) {
-    this._graphics.setParent(_spritesetmap._tilemap);
-  } else {
-    for (const character of _spritesetmap._characterSprites) {
-      if (character._character == $gamePlayer) {
-        this._graphics.setParent(character);
-        break;
-      }
-    }
-    this.clearMouseEvent();
-  }
 };
 
 GuideAction.prototype.setOnlyTerrain = function (terrain) {
@@ -147,6 +130,7 @@ GuideAction.prototype.isBlocked = function () {
 };
 
 GuideAction.prototype.setBlocked = function (block) {
+  if (block === this._blocked) return;
   if (block) {
     this._color.color = UFC.UFCGA.CONFIG.blockColor;
     this._color.alpha = UFC.UFCGA.CONFIG.blockColorAlpha;
@@ -161,6 +145,7 @@ GuideAction.prototype.setBlocked = function (block) {
 GuideAction.prototype.createSharp = function (shape = "rectangle") {
   if (!this._graphics || this._graphics._destroyed) {
     this._graphics = new PIXI.Graphics();
+    this._graphics.pivot.set(0.5);
   } else {
     this._graphics.clear();
     this._graphics.removeAllListeners();
@@ -194,19 +179,28 @@ GuideAction.prototype.setDirection = function (
   let offsetY = 6;
   switch (d) {
     case 2:
-      this.setPosition(-this._tileWidth / 2, offsetY);
+      this.setPosition(
+        $gamePlayer.screenX() + -this._tileWidth / 2,
+        $gamePlayer.screenY() + offsetY
+      );
       break;
     case 4:
       this.setPosition(
-        -(this._tileWidth / 2) - this._tileWidth,
-        -this._tileHeight + offsetY
+        $gamePlayer.screenX() + -(this._tileWidth / 2) - this._tileWidth,
+        $gamePlayer.screenY() + -this._tileHeight + offsetY
       );
       break;
     case 6:
-      this.setPosition(this._tileWidth / 2, -this._tileHeight + offsetY);
+      this.setPosition(
+        $gamePlayer.screenX() + this._tileWidth / 2,
+        $gamePlayer.screenY() + -this._tileHeight + offsetY
+      );
       break;
     case 8:
-      this.setPosition(-(this._tileWidth / 2), -this._tileHeight * 2 + offsetY);
+      this.setPosition(
+        $gamePlayer.screenX() + -(this._tileWidth / 2),
+        $gamePlayer.screenY() + -this._tileHeight * 2 + offsetY
+      );
       break;
   }
 };
@@ -351,6 +345,8 @@ GuideAction.prototype.update = function () {
         this._mouseTrigger.y = this._y;
       }
     }
+  } else {
+    this.setDirection();
   }
   if (this._perciseMode) {
     this.updateBlocked();

@@ -180,11 +180,12 @@ Game_Player.prototype.triggerButtonAction = function () {
     TowerDefenseManager.isActive &&
     Input.isTriggered("ok") &&
     TowerDefenseManager.getState == TowerDefenseManager.STATE.BUILD &&
-    !this.getGuideAction().isBlocked()
+    !GuideActionManager.getGuideAction.isBlocked()
   ) {
     // Doublecheck incase using mouse
-    this.getGuideAction().updateBlocked(true);
-    if (!this.getGuideAction().isBlocked()) TowerDefenseManager.placeTower();
+    GuideActionManager.getGuideAction.updateBlocked(true);
+    if (!GuideActionManager.getGuideAction.isBlocked())
+      TowerDefenseManager.placeTower();
     return true;
   }
 
@@ -204,9 +205,9 @@ Game_Player.prototype.moveByInput = function () {
     TowerDefenseManager.isActive &&
     TowerDefenseManager.getState == TowerDefenseManager.STATE.BUILD &&
     this.getInputDirection() > 0 &&
-    this.getGuideAction().isMouseMode
+    GuideActionManager.getGuideAction.isMouseMode
   ) {
-    this.getGuideAction().setMouseMode(false);
+    GuideActionManager.getGuideAction.setMouseMode(false);
   }
   UFC.UFCTD.ALIAS._Game_Player_moveByInput.call(this);
 };
@@ -228,15 +229,15 @@ Game_Player.prototype.towerAction = function () {
     let dist = $gameMap.distance(this.x, this.y, destX, destY);
     if (dist <= 1) {
       this.turnTowardCharacter({ x: destX, y: destY });
-      this.getGuideAction().updateBlocked();
-      if (!this.getGuideAction().isBlocked()) {
+      GuideActionManager.getGuideAction.updateBlocked();
+      if (!GuideActionManager.getGuideAction.isBlocked()) {
         // Double check incase the map is scrolled
-        this.getGuideAction().updateBlocked(true);
-        if (!this.getGuideAction().isBlocked())
+        GuideActionManager.getGuideAction.updateBlocked(true);
+        if (!GuideActionManager.getGuideAction.isBlocked())
           TowerDefenseManager.placeTower();
         $gameTemp.clearDestination();
       }
-      this.getGuideAction().clearTrigger();
+      GuideActionManager.getGuideAction.clearTrigger();
       return true;
     }
   }

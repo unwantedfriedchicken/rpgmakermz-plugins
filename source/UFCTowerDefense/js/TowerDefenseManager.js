@@ -213,57 +213,57 @@ TowerDefenseManager.config = function (args) {
   }
 
   // Set Terrain Tower
-  $gamePlayer.getGuideAction().setType(TowerDefenseManager.TOWERTYPE.TOWER);
+  GuideActionManager.getGuideAction.setType(TowerDefenseManager.TOWERTYPE.TOWER);
   let ot = JSON.parse(args["onlyTerrain"]);
   if (ot && ot.length > 0) {
     ot = ot.map(Number);
-    $gamePlayer.getGuideAction().setOnlyTerrain(ot);
+    GuideActionManager.getGuideAction.setOnlyTerrain(ot);
   }
 
   let et = JSON.parse(args["exceptTerrain"]);
   if (et && et.length > 0) {
     et = et.map(Number);
-    $gamePlayer.getGuideAction().setExceptTerrain(et);
+    GuideActionManager.getGuideAction.setExceptTerrain(et);
   }
 
   // Set Region Tower
   let or = JSON.parse(args["onlyRegionID"]);
   if (or && or.length > 0) {
     or = or.map(Number);
-    $gamePlayer.getGuideAction().setOnlyRegion(or);
+    GuideActionManager.getGuideAction.setOnlyRegion(or);
   }
 
   let er = JSON.parse(args["exceptRegionID"]);
   if (er && er.length > 0) {
     er = er.map(Number);
-    $gamePlayer.getGuideAction().setExceptRegion(er);
+    GuideActionManager.getGuideAction.setExceptRegion(er);
   }
 
   // Set Terrain Trap
-  $gamePlayer.getGuideAction().setType(TowerDefenseManager.TOWERTYPE.TRAP);
+  GuideActionManager.getGuideAction.setType(TowerDefenseManager.TOWERTYPE.TRAP);
   let ott = JSON.parse(args["onlyTrapTerrain"]);
   if (ott && ott.length > 0) {
     ott = ott.map(Number);
-    $gamePlayer.getGuideAction().setOnlyTerrain(ott);
+    GuideActionManager.getGuideAction.setOnlyTerrain(ott);
   }
 
   let ett = JSON.parse(args["exceptTrapTerrain"]);
   if (ett && ett.length > 0) {
     ett = ett.map(Number);
-    $gamePlayer.getGuideAction().setExceptTerrain(ett);
+    GuideActionManager.getGuideAction.setExceptTerrain(ett);
   }
 
   // Set Region Trap
   let ort = JSON.parse(args["onlyTrapRegionID"]);
   if (ort && ort.length > 0) {
     ort = ort.map(Number);
-    $gamePlayer.getGuideAction().setOnlyRegion(ort);
+    GuideActionManager.getGuideAction.setOnlyRegion(ort);
   }
 
   let ert = JSON.parse(args["exceptTrapRegionID"]);
   if (ert && ert.length > 0) {
     ert = ert.map(Number);
-    $gamePlayer.getGuideAction().setExceptRegion(ert);
+    GuideActionManager.getGuideAction.setExceptRegion(ert);
   }
 
   if (args["limitAnimation"] != "0") {
@@ -352,7 +352,7 @@ TowerDefenseManager.selectTower = function (towerData) {
   this._state = TowerDefenseManager.STATE.BUILD;
   this._selectedUFCTD = new ufcTowerData(towerData);
   this._selectedUFCTD.setPlaceMode(true);
-  $gamePlayer.getGuideAction().setType(this._selectedUFCTD.getType);
+  GuideActionManager.getGuideAction.setType(this._selectedUFCTD.getType);
 };
 
 TowerDefenseManager.cancelSelect = function (sfx = true) {
@@ -372,9 +372,9 @@ TowerDefenseManager.cancelSelect = function (sfx = true) {
 TowerDefenseManager.clearSelect = function () {
   this._state = TowerDefenseManager.STATE.IDLE;
   this._selectedUFCTD = null;
-  $gamePlayer.getGuideAction().setActive(false);
-  if ($gamePlayer.getGuideActionGraphics().children.length > 0)
-    $gamePlayer.getGuideActionGraphics().removeChildAt(0);
+  GuideActionManager.getGuideAction.setActive(false);
+  if (GuideActionManager.getGuideActionGraphics.children.length > 0)
+    GuideActionManager.getGuideActionGraphics.removeChildAt(0);
   $gameMap.ufcGetGrid().setVisible(false);
 };
 
@@ -383,9 +383,9 @@ TowerDefenseManager.selectTowerMode = function () {
     new Game_TDTower(this.getSelectedTowerData(), $gameMap._mapId)
   );
   selectedTower.setRangeVisibility(true);
-  $gamePlayer.getGuideAction().setActive(true);
+  GuideActionManager.getGuideAction.setActive(true);
 
-  $gamePlayer.getGuideActionGraphics().addChild(selectedTower);
+  GuideActionManager.getGuideActionGraphics.addChild(selectedTower);
   $gameMap
     .ufcGetGrid()
     .setType(this.getSelectedTowerData().getType)
@@ -452,7 +452,7 @@ TowerDefenseManager.getTrigger = function (mapid, x, y) {
 };
 
 TowerDefenseManager.placeTower = function () {
-  let _gPosition = $gamePlayer.getGuideAction().getPosition();
+  let _gPosition = GuideActionManager.getGuideAction.getPosition();
   this._selectedUFCTD._x = _gPosition.x;
   this._selectedUFCTD._y = _gPosition.y;
   this._selectedUFCTD.setPlaceMode(false);

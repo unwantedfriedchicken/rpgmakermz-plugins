@@ -3,6 +3,7 @@ const ufcTowerEffects = function () {
   this.initialize(...arguments);
 };
 
+ufcTowerEffects.prototype.constructor = ufcTowerEffects;
 ufcTowerEffects.prototype.initialize = function (data) {
   this._name = data.name;
   this._effect = data.effect;

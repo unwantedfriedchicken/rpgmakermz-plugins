@@ -63,7 +63,6 @@ Window_TDShopQuick.prototype.callOkHandler = function () {
     return;
   }
   this.close();
-  $gamePlayer.getGuideAction().resetParent();
   TowerDefenseManager.gainGold(-+this._listItems[this._index].price);
   TowerDefenseManager.clearSelect();
   TowerDefenseManager.selectTower(this._listItems[this._index].ufcTower);

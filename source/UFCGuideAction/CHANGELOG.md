@@ -14,6 +14,8 @@ this.setType("trap"); // Change current type to ""trap""
 this.checkGrid(1, 1); // So now when checking grid this only checking for ""trap"" type
 ```
 
+- CHANGE: Change placement Guide action data outside $gameplayer, because of the saving system
+
 ## Version 1.0
 
 - First Release

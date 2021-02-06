@@ -3,6 +3,7 @@ const Data_ufcGrid = function () {
   this.initialize(...arguments);
 };
 
+Data_ufcGrid.prototype.constructor = Data_ufcGrid;
 Data_ufcGrid.prototype.initialize = function (types) {
   this._listType = types;
   this._destroy = false;
@@ -62,7 +63,7 @@ Data_ufcGrid.prototype.calcGrid = function () {
   let bit = 0x0f;
   for (let type of this._listType) {
     this.setType(type);
-    $gamePlayer.getGuideAction().setType(type);
+    GuideActionManager.getGuideAction.setType(type);
     for (let x = 0; x < $gameMap.width(); x++) {
       for (let y = 0; y < $gameMap.height(); y++) {
         if (!this.getGridData()[x]) {
@@ -72,7 +73,7 @@ Data_ufcGrid.prototype.calcGrid = function () {
         this.getGridData()[x][y] = true;
         if (
           !$gameMap.checkPassage(x, y, bit) ||
-          $gamePlayer.getGuideAction().checkGrid(x, y)
+          GuideActionManager.getGuideAction.checkGrid(x, y)
         ) {
           this.getGridData()[x][y] = false;
           this.clearGrid(x, y);

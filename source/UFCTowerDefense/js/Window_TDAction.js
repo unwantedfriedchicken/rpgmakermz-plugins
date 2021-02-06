@@ -77,7 +77,6 @@ Window_TDAction.prototype.upgradeTower = function (upgradeIndex) {
   });
   TowerDefenseManager.gainGold(-+this._towerData._upgrade[upgradeIndex].price);
   // Upgrade
-  $gamePlayer.getGuideAction().resetParent();
   TowerDefenseManager.selectTower(
     $dataItems[this._towerData._upgrade[upgradeIndex].id].ufcTower
   );
@@ -91,7 +90,6 @@ Window_TDAction.prototype.callOkHandler = function () {
   switch (this.index()) {
     // Move
     case 0:
-      $gamePlayer.getGuideAction().resetParent();
       TowerDefenseManager.clearSelect();
       TowerDefenseManager.selectTower($dataItems[this._towerData._id].ufcTower);
       TowerDefenseManager.selectTowerMode();

@@ -57,13 +57,26 @@ Window_TDActionUpgrade.prototype.close = function () {
 
 Window_TDActionUpgrade.prototype.callOkHandler = function () {
   let upgradeData = this._upgradeData[this.index()];
-  if ($gameParty.gold() >= upgradeData.price) {
-    this.emit("upgradeTower", this.index());
-    this._selected = false;
-    this.deactivate();
-  } else {
+  if ($gameParty.gold() < upgradeData.price) {
     SoundManager.playBuzzer();
+    return;
   }
+  if (upgradeData.materials.length > 0) {
+    for (let material of upgradeData.materials) {
+      let numItem = $gameParty.numItems($dataItems[material.id]);
+      if (numItem < material.ammount) {
+        SoundManager.playBuzzer();
+        return;
+      }
+    }
+    for (let material of upgradeData.materials) {
+      TowerDefenseManager.gainItem(material.id, -material.ammount);
+    }
+  }
+
+  this.emit("upgradeTower", this.index());
+  this._selected = false;
+  this.deactivate();
 };
 
 Window_TDActionUpgrade.prototype.setUpgrade = function (upgradeData) {
@@ -73,18 +86,19 @@ Window_TDActionUpgrade.prototype.setUpgrade = function (upgradeData) {
   this.setLineHeight(28);
   upgradeData.forEach((item) => {
     let upgradeData = {
-      data: $dataItems[item.id].ufcTower,
+      data: new ufcTowerData($dataItems[item.id].ufcTower),
       price: item.price,
+      materials: item.material,
     };
     this.addCommand(
       "\\FS[20]" +
-        upgradeData.data.name +
-        "\n\\C[14]" +
+        upgradeData.data._name +
+        "\\FS\n\\FS[18]\\C[14]" +
         upgradeData.price +
         "\\C " +
         TextManager.currencyUnit,
-      upgradeData.data.character,
-      upgradeData.data.characterindex,
+      upgradeData.data._character,
+      upgradeData.data._characterIndex,
       true
     );
     this._upgradeData.push(upgradeData);
@@ -181,7 +195,7 @@ Window_TDActionUpgrade.prototype.drawCharacter = function (
     sy,
     pw,
     ph,
-    x,
+    x - 4,
     y,
     pw * scale,
     ph * scale
@@ -218,7 +232,46 @@ Window_TDActionUpgrade.prototype.drawItem = function (index) {
     rect.y
   );
   let textY = rect.y - 10;
-  this.drawTextEx(this.commandName(index), rect.x + 48, textY, 200);
+  this.drawTextEx(this.commandName(index), rect.x + 40, textY, 200);
+  if (this._upgradeData[index].materials.length > 0) {
+    this.drawMaterials(rect.x, rect.y, this._upgradeData[index].materials);
+  }
+};
+
+Window_TDActionUpgrade.prototype.drawMaterials = function (x, y, materials) {
+  const bitmap = ImageManager.loadSystem("IconSet");
+  const pw = ImageManager.iconWidth;
+  const ph = ImageManager.iconHeight;
+  const width = 18;
+  const height = 18;
+  const offset = 62;
+  const offsetIcon = 21;
+  const offsetAmmount = 17;
+  for (let i = 0; i < materials.length; i++) {
+    let material = $dataItems[materials[i].id];
+    const sx = (material.iconIndex % 16) * pw;
+    const sy = Math.floor(material.iconIndex / 16) * ph;
+    const posX = this.width - (offset + i * width + i * offsetIcon);
+    const posY = y + 14;
+    this.contentsBack.blt(
+      bitmap,
+      sx,
+      sy,
+      pw,
+      ph,
+      posX,
+      posY + 5,
+      width,
+      height
+    );
+    this.drawText(
+      materials[i].ammount,
+      posX + offsetAmmount,
+      posY,
+      width,
+      "center"
+    );
+  }
 };
 
 // Enable sound when cursor hover the button
@@ -244,9 +297,7 @@ Window_TDActionUpgrade.prototype.refreshStatus = function () {
     if (this.index() == -1) this._tmpIndex = 0;
     else this._tmpIndex = this.index();
   }
-  this.status.drawDefaultStatus(
-    new ufcTowerData(this._upgradeData[this._tmpIndex].data)
-  );
+  this.status.drawDefaultStatus(this._upgradeData[this._tmpIndex].data);
 };
 
 Window_TDActionUpgrade.prototype.select = function (index) {

@@ -3,6 +3,7 @@ const ufcTowerWaveData = function () {
   this.initialize(...arguments);
 };
 
+ufcTowerWaveData.prototype.constructor = ufcTowerWaveData;
 ufcTowerWaveData.prototype.initialize = function (data) {
   this._spawnLocationId = data["spawnLocationId"];
   this._enemy = data["enemy"];

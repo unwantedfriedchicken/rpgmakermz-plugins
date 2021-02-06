@@ -43,6 +43,7 @@
     "Sprite_ufcTDTower": true,
     "Sprite_ufcProjectile": true,
     "Window_BaseExtend": true,
-    "TextHelper": true
+    "TextHelper": true,
+    "GuideActionManager": true
   }
 }

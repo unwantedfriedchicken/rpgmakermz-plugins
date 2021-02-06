@@ -3,6 +3,7 @@ const ufcTowerData = function () {
   this.initialize(...arguments);
 };
 
+ufcTowerData.prototype.constructor = ufcTowerData;
 ufcTowerData.prototype.initialize = function (data) {
   this._id = data["id"];
   this._name = data["name"];
@@ -34,9 +35,17 @@ ufcTowerData.prototype.initialize = function (data) {
       break;
   }
   this._upgrade = [];
-  let listUpgrade = Object.keys(data).filter(
-    (item) => item.slice(0, 7) == "upgrade"
-  );
+
+  let listUpgrade = [];
+  Object.keys(data).forEach((item) => {
+    if (
+      item == "upgrade" ||
+      (item.slice(0, 7) == "upgrade" && !isNaN(item.slice(-1)))
+    ) {
+      listUpgrade.push(item);
+    }
+  });
+
   if (listUpgrade.length > 0) {
     listUpgrade.forEach((item) => {
       let _data = data[item].split("|");
@@ -46,10 +55,21 @@ ufcTowerData.prototype.initialize = function (data) {
       } else {
         _price = +_data[1];
       }
-
+      let material = [];
+      if (data[item + "material"]) {
+        let _materials = data[item + "material"].split(",");
+        for (const _material of _materials) {
+          let __material = _material.split("|");
+          material.push({
+            id: +__material[0],
+            ammount: +__material[1] || 1,
+          });
+        }
+      }
       this._upgrade.push({
         id: +_data[0],
         price: _price,
+        material: material,
       });
     });
   }
@@ -73,6 +93,7 @@ ufcTowerData.prototype.initialize = function (data) {
       });
     }
   }
+
   this._auras = [];
   if (data["auras"]) {
     let auras = data["auras"].split(",");
@@ -85,6 +106,7 @@ ufcTowerData.prototype.initialize = function (data) {
       });
     }
   }
+
   this._attackType = data["attacktype"] || TowerDefenseManager.ENEMYTYPE.ALL;
   this._note = data["note"];
   this._buffs = {};
@@ -241,6 +263,12 @@ Object.defineProperty(ufcTowerData.prototype, "getPlaceMode", {
 Object.defineProperty(ufcTowerData.prototype, "getType", {
   get: function () {
     return this._type;
+  },
+});
+
+Object.defineProperty(ufcTowerData.prototype, "getUpgradeMaterial", {
+  get: function () {
+    return this._upgradeMaterial;
   },
 });
 

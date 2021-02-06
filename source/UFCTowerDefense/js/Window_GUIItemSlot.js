@@ -95,7 +95,6 @@ Window_GUIItemSlot.prototype.callOkHandler = function () {
     tower.ufcTowerMaterial
   )
     return;
-  $gamePlayer.getGuideAction().resetParent();
   TowerDefenseManager.gainItem(tower.id, -1);
   TowerDefenseManager.clearSelect();
   TowerDefenseManager.selectTower(tower);
