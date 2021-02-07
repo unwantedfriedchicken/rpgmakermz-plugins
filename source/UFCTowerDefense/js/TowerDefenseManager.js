@@ -62,16 +62,27 @@ TowerDefenseManager.debugMode = function () {
         this.setLimitAnimation(UFC.UFCTD.DEBUGMODE.limitAnimation);
       }
       if (e.key == 5 && Imported.UFCTextHelper) {
-        for (let i = 1; i < 1000; i++) {
-          setTimeout(() => {
-            TextHelper.spawnText(i, $gamePlayer._realX, $gamePlayer._realY, {
-              animate: {
-                start: true,
-                time: 60,
-              },
-            });
-          }, i * 50);
-        }
+        TextHelper.spawnText(
+          $gamePlayer._x + "," + $gamePlayer._y,
+          $gamePlayer._realX,
+          $gamePlayer._realY,
+          {
+            animate: {
+              start: true,
+              time: 60,
+            },
+          }
+        );
+        // for (let i = 1; i < 1000; i++) {
+        //   setTimeout(() => {
+        //     TextHelper.spawnText(i, $gamePlayer._realX, $gamePlayer._realY, {
+        //       animate: {
+        //         start: true,
+        //         time: 60,
+        //       },
+        //     });
+        //   }, i * 50);
+        // }
       }
     },
     false

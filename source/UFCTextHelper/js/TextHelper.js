@@ -32,8 +32,8 @@ Text_UFCTextHelper.prototype.initialize = function (
     start: option.animate.start || false,
     time: option.animate.time || 60,
     timeMax: option.animate.time || 60,
-    timeScale: option.animate.time / 4 || 60,
-    timeScaleMax: option.animate.time / 4 || 60,
+    timeScale: option.animate.time / 6 || 60,
+    timeScaleMax: option.animate.time / 6 || 60,
     randomX: option.animate.randomX || true,
     destroy: option.animate.destroy || true,
   };
@@ -69,11 +69,13 @@ Text_UFCTextHelper.prototype.updateAnimation = function () {
   let half = this._animate.timeMax / 2;
   if (this._animate.time <= half) this.alpha = this._animate.time / half;
 
-  this._animate.timeScale--;
-  if (this._animate.timeScale <= 0) return;
+  if (this._animate.timeScale < 0) {
+    return;
+  }
 
-  let scale = this._animate.timeScale / (this._animate.timeMax / 4);
-  this.scale.set(1 - scale);
+  let scale = this._animate.timeScale / this._animate.timeScaleMax;
+  this.scale.set(1 + scale * 1.3);
+  this._animate.timeScale--;
 };
 
 Text_UFCTextHelper.prototype.screenX = function () {
