@@ -347,7 +347,7 @@ Game_TDEnemy.prototype.attacked = function (damage) {
     TextHelper.spawnText(damage.damage, this._realX, this._realY, {
       animate: {
         start: true,
-        time: 80,
+        time: 40,
       },
     });
   this._enemyData.health -= damage.damage;

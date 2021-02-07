@@ -338,9 +338,8 @@ Scene_Map.prototype.onMapLoaded = function () {
   UFC.UFCTD.ALIAS._Scene_Map_onMapLoaded.call(this);
   if ($gameSystem.isTowerDefenseMode() && !_tmpActive) {
     let config = $gameSystem.getTowerDefenseConfig();
-    TowerDefenseManager.config(config.data);
     TowerDefenseManager.setGuiSettings = config.guiSettings;
-    console.log(TowerDefenseManager.setGuiSettings);
+    TowerDefenseManager.config(config.data);
     TowerDefenseManager.showGUIItemSlot();
     TowerDefenseManager.showHUDTDGold();
     TowerDefenseManager.showHUDTDHealth();
@@ -615,7 +614,7 @@ Game_System.prototype.initialize = function () {
 
 Game_System.prototype.setTowerDefense = function (value, config) {
   this._ufcTowerDefense = value;
-  this._ufcTowerDefenseConfig = config;
+  if (config) this._ufcTowerDefenseConfig = config;
 };
 
 Game_System.prototype.isTowerDefenseMode = function () {
