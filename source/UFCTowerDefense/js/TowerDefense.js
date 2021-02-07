@@ -263,6 +263,17 @@ Game_Player.prototype.update = function () {
 };
 
 // Touch input, check event there (check function Game_Player.prototype.triggerTouchAction)
+UFC.UFCTD.ALIAS._Game_Player_triggerTouchActionD1 =
+  Game_Player.prototype.triggerTouchActionD1;
+Game_Player.prototype.triggerTouchActionD1 = function (x1, y1) {
+  if (this.checkEventTower(x1, y1)) return true;
+
+  return UFC.UFCTD.ALIAS._Game_Player_triggerTouchActionD1.call(
+    this,
+    ...arguments
+  );
+};
+
 UFC.UFCTD.ALIAS._Game_Player_triggerTouchActionD2 =
   Game_Player.prototype.triggerTouchActionD2;
 Game_Player.prototype.triggerTouchActionD2 = function (x2, y2) {
