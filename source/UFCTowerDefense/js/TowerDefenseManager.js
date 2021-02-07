@@ -7,14 +7,18 @@ TowerDefenseManager.initialize = function () {
   this._active = false;
   this._config = false;
   this._shopOpen = false;
-  this._HUDGold = false;
-  this._HUDHealth = false;
-  this._GUIItemSlot = false;
+  this._GUISettings = {
+    gold: false,
+    health: false,
+    itemSlot: false,
+  };
   this._state = TowerDefenseManager.STATE.IDLE;
   this._selectedUFCTD = null;
   this._limitAnimation = 0;
   this._controlBuildingMouse = false;
   this._cacheSprite = [];
+  this._mapId = 0;
+  this._grid = null;
   this.addTowerList();
   if (UFC.UFCTD.DEBUGMODE.enable) this.debugMode();
 };
@@ -145,24 +149,24 @@ TowerDefenseManager.requestAnimation = function (targets, animation) {
 
 TowerDefenseManager.showGUIItemSlot = function (args) {
   if (!this.isActive) return;
-  this._GUIItemSlot = args["show"] == "true";
-  UFC.UFCTD.HUDGUI.ITEMSLOT.visible = this._GUIItemSlot;
+  if (args) this._GUISettings.itemSlot = args["show"] == "true";
+  UFC.UFCTD.HUDGUI.ITEMSLOT.visible = this._GUISettings.itemSlot;
   if (UFC.UFCTD.SHOPGUISETTINGS.enable)
-    UFC.UFCTD.HUDGUI.SHOP.visible = this._GUIItemSlot;
-  if (this._GUIItemSlot) UFC.UFCTD.HUDGUI.ITEMSLOT.open();
+    UFC.UFCTD.HUDGUI.SHOP.visible = this._GUISettings.itemSlot;
+  if (this._GUISettings.itemSlot) UFC.UFCTD.HUDGUI.ITEMSLOT.open();
   else UFC.UFCTD.HUDGUI.ITEMSLOT.close();
 };
 
 TowerDefenseManager.showHUDTDGold = function (args) {
   if (!this.isActive) return;
-  this._HUDGold = args["show"] == "true";
-  UFC.UFCTD.HUDGUI.GOLDWINDOW.visible = this._HUDGold;
+  if (args) this._GUISettings.gold = args["show"] == "true";
+  UFC.UFCTD.HUDGUI.GOLDWINDOW.visible = this._GUISettings.gold;
 };
 
 TowerDefenseManager.showHUDTDHealth = function (args) {
   if (!this.isActive) return;
-  this._HUDHealth = args["show"] == "true";
-  UFC.UFCTD.HUDGUI.HEALTHWINDOW.visible = this._HUDHealth;
+  if (args) this._GUISettings.health = args["show"] == "true";
+  UFC.UFCTD.HUDGUI.HEALTHWINDOW.visible = this._GUISettings.health;
 };
 
 TowerDefenseManager.gainGold = function (gold) {
@@ -200,11 +204,17 @@ TowerDefenseManager.updateHUD = function () {
 };
 
 TowerDefenseManager.config = function (args) {
+  $gameSystem.setTowerDefense(true, {
+    data: args,
+    guiSettings: this._GUISettings,
+  });
+
   SceneManager.getScene().createHUDTD();
+
   let listTowerType = Object.keys(TowerDefenseManager.TOWERTYPE).map(
     (item) => TowerDefenseManager.TOWERTYPE[item]
   );
-  $gameMap.setupTDGrid(listTowerType);
+  this.grid = new Data_ufcGrid(listTowerType);
 
   const _spriteSet = SceneManager.getSpriteSetMap();
 
@@ -213,7 +223,9 @@ TowerDefenseManager.config = function (args) {
   }
 
   // Set Terrain Tower
-  GuideActionManager.getGuideAction.setType(TowerDefenseManager.TOWERTYPE.TOWER);
+  GuideActionManager.getGuideAction.setType(
+    TowerDefenseManager.TOWERTYPE.TOWER
+  );
   let ot = JSON.parse(args["onlyTerrain"]);
   if (ot && ot.length > 0) {
     ot = ot.map(Number);
@@ -299,6 +311,8 @@ TowerDefenseManager.disableTowerDefense = function (
   destroyEnemy = false,
   destroyTDItems = true
 ) {
+  $gameSystem.setTowerDefense(false);
+
   this._config = false;
 
   this.setActive(false);
@@ -490,19 +504,19 @@ Object.defineProperty(TowerDefenseManager, "getLimitAnimation", {
 
 Object.defineProperty(TowerDefenseManager, "getHUDGold", {
   get: function () {
-    return this._HUDGold;
+    return this._GUISettings.gold;
   },
 });
 
 Object.defineProperty(TowerDefenseManager, "getHUDHealth", {
   get: function () {
-    return this._HUDHealth;
+    return this._GUISettings.health;
   },
 });
 
 Object.defineProperty(TowerDefenseManager, "getGUIItemSlot", {
   get: function () {
-    return this._GUIItemSlot;
+    return this._GUISettings.itemSlot;
   },
 });
 
@@ -533,6 +547,32 @@ Object.defineProperty(TowerDefenseManager, "isConfigured", {
 Object.defineProperty(TowerDefenseManager, "isShopOpen", {
   get: function () {
     return this._shopOpen && this.isActive && UFC.UFCTD.SHOPGUISETTINGS.enable;
+  },
+});
+
+Object.defineProperty(TowerDefenseManager, "getTDData", {
+  get: function () {
+    if (!this._tdData[this._mapId]) return null;
+
+    return this._tdData[this._mapId];
+  },
+});
+
+Object.defineProperty(TowerDefenseManager, "grid", {
+  get: function () {
+    return this._grid;
+  },
+  set: function (value) {
+    this._grid = value;
+  },
+});
+
+Object.defineProperty(TowerDefenseManager, "setGuiSettings", {
+  get: function () {
+    return this._GUISettings;
+  },
+  set: function (value) {
+    this._GUISettings = value;
   },
 });
 

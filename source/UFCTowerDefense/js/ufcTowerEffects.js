@@ -1,7 +1,7 @@
 // eslint-disable-next-line no-redeclare
-const ufcTowerEffects = function () {
+function ufcTowerEffects() {
   this.initialize(...arguments);
-};
+}
 
 ufcTowerEffects.prototype.constructor = ufcTowerEffects;
 ufcTowerEffects.prototype.initialize = function (data) {

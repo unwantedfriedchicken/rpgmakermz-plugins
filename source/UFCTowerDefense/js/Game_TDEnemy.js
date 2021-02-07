@@ -36,13 +36,19 @@ Game_TDEnemy.prototype.initialize = function (enemyName, spawnId) {
   this._isStun = false;
   this._animationPlaying = false;
   this._through = this._enemyData.isThrough == "true";
-  this._event = new PIXI.utils.EventEmitter();
   this._triggerInit = false;
   this._triggerWait = 0;
   this._target = null;
   this._attack = {
     Damage: +this._enemyData.attackDamage,
     Time: 0,
+  };
+  // this._event = new PIXI.utils.EventEmitter();
+  this._eventTmp = {
+    addEffect: [],
+    removeEffect: [],
+    updateHealth: false,
+    updateHealthValue: false,
   };
   this._forceMove = false;
 };
@@ -262,7 +268,8 @@ Game_TDEnemy.prototype.updateEffects = function () {
         this._effects[effect].effect = null;
         continue;
       }
-      this._event.emit("addEffect", effect);
+      this._eventTmp.addEffect.push(effect);
+      // this._event.emit("addEffect", effect);
       this._effects[effect].enable = true;
     }
     this._effects[effect].effect.update();
@@ -278,7 +285,8 @@ Game_TDEnemy.prototype.updateEffects = function () {
       }
       this._effects[effect].enable = false;
       this._effects[effect].effect = null;
-      this._event.emit("removeEffect", effect);
+      this._eventTmp.removeEffect.push(effect);
+      // this._event.emit("removeEffect", effect);
     }
   }
 };
@@ -343,10 +351,13 @@ Game_TDEnemy.prototype.attacked = function (damage) {
       },
     });
   this._enemyData.health -= damage.damage;
-  this._event.emit(
-    "updateHealth",
-    this._enemyData.health / this._enemyData.maxHealth
-  );
+  // this._event.emit(
+  //   "updateHealth",
+  //   this._enemyData.health / this._enemyData.maxHealth
+  // );
+  this._eventTmp.updateHealth = true;
+  this._eventTmp.updateHealthValue =
+    this._enemyData.health / this._enemyData.maxHealth;
   if (this._enemyData.health <= 0 && !this._destroy) {
     if (this._enemyData.seDead)
       AudioManager.playSe({

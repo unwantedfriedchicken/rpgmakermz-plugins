@@ -1,7 +1,7 @@
 // eslint-disable-next-line no-redeclare
-const Sprite_ufcGrid = function () {
+function Sprite_ufcGrid() {
   this.initialize(...arguments);
-};
+}
 
 Sprite_ufcGrid.prototype = Object.create(Sprite.prototype);
 Sprite_ufcGrid.prototype.constructor = Sprite_ufcGrid;

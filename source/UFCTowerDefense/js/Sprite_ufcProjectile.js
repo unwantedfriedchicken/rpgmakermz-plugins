@@ -1,7 +1,7 @@
 // eslint-disable-next-line no-redeclare
-const Sprite_ufcProjectile = function () {
+function Sprite_ufcProjectile() {
   this.initialize(...arguments);
-};
+}
 
 Sprite_ufcProjectile.prototype = Object.create(Sprite.prototype);
 Sprite_ufcProjectile.prototype.constructor = Sprite_ufcProjectile;

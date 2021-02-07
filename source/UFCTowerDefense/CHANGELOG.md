@@ -2,6 +2,21 @@
 
 ## Version 1.3 - dev
 
+- ADD: Add ability to using save/load function, now you can save during gameplay
+- ADD: Add upgrade with material, with `<upgradematerial>` to require multiple material use `,` seprator and to set ammount use `|` after the item ID
+
+```markdown
+<upgrade:32|200> -> upgrade ID | Price
+<upgradematerial:2,3|3>
+-> upgrade material need:
+-> ITEM ID 2 ammount 1
+-> ITEM ID 3 ammount 3
+<upgrade2:33> -> upgrade 2 ID | Price
+<upgrade2material:3>
+-> upgrade 2 material need:
+-> ITEM ID 3 ammount 1
+```
+
 - ADD: Add new note for item, if want to get displayed in backpack add `<ufcTDMaterial>`
 - ADD: Add Quick Shop option for Shop Button, new plugin parameters `Shop Type`
 - ADD: Add damage text, if plugin `UFCTextHelper` is imported

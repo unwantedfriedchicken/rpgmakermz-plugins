@@ -1,7 +1,7 @@
 // eslint-disable-next-line no-redeclare
-const ufcTowerWaveData = function () {
+function ufcTowerWaveData() {
   this.initialize(...arguments);
-};
+}
 
 ufcTowerWaveData.prototype.constructor = ufcTowerWaveData;
 ufcTowerWaveData.prototype.initialize = function (data) {

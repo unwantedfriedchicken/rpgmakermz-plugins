@@ -1,7 +1,7 @@
 // eslint-disable-next-line no-redeclare
-const ufcTowerSpawnData = function () {
+function ufcTowerSpawnData() {
   this.initialize(...arguments);
-};
+}
 
 ufcTowerSpawnData.prototype.constructor = ufcTowerSpawnData;
 ufcTowerSpawnData.prototype.initialize = function (data) {

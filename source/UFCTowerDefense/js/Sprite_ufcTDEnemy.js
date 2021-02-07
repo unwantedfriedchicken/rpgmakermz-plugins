@@ -1,7 +1,7 @@
 // eslint-disable-next-line no-redeclare
-const Sprite_ufcTDEnemy = function () {
+function Sprite_ufcTDEnemy() {
   this.initialize(...arguments);
-};
+}
 
 Sprite_ufcTDEnemy.prototype = Object.create(Sprite.prototype);
 Sprite_ufcTDEnemy.prototype.constructor = Sprite_ufcTDEnemy;
@@ -23,9 +23,9 @@ Sprite_ufcTDEnemy.prototype.initMembers = function (enemyData) {
   this._destroy = false;
   this.scale.x = this._enemyData.scale;
   this.scale.y = this._enemyData.scale;
-  this._enemy._event.on("addEffect", this.addEffect, this);
-  this._enemy._event.on("removeEffect", this.removeEffect, this);
-  this._enemy._event.on("updateHealth", this.updateHealthGUI, this);
+  // this._enemy._event.on("addEffect", this.addEffect, this);
+  // this._enemy._event.on("removeEffect", this.removeEffect, this);
+  // this._enemy._event.on("updateHealth", this.updateHealthGUI, this);
   this.setCharacterBitmap();
 
   if (
@@ -63,9 +63,9 @@ Sprite_ufcTDEnemy.prototype.updateHealthGUI = function (healthScale = 1) {
 };
 
 Sprite_ufcTDEnemy.prototype.destroy = function () {
-  this._enemy._event.removeListener("addEffect", this.addEffect, this);
-  this._enemy._event.removeListener("removeEffect", this.removeEffect, this);
-  this._enemy._event.removeListener("updateHealth", this.updateHealthGUI, this);
+  // this._enemy._event.removeListener("addEffect", this.addEffect, this);
+  // this._enemy._event.removeListener("removeEffect", this.removeEffect, this);
+  // this._enemy._event.removeListener("updateHealth", this.updateHealthGUI, this);
   if (this._healthGUI)
     this._healthGUI.destroy({ texture: true, baseTexture: true });
   Sprite.prototype.destroy.call(this);
@@ -117,17 +117,39 @@ Sprite_ufcTDEnemy.prototype.update = function () {
     return;
   }
   Sprite.prototype.update.call(this);
+  this.updateEventTmp();
   this.updateCharacterFrame();
   this.updatePosition();
   if (this._enemy.isDestroyed()) {
     this.hide();
   }
-
   if (!this._enemy.isAnimationPlaying() && this._enemy.isDestroyed()) {
     this.destroyEnemy();
   }
 };
 
+Sprite_ufcTDEnemy.prototype.updateEventTmp = function () {
+  if (this._enemy._eventTmp.addEffect.length > 0) {
+    const effect = this._enemy._eventTmp.addEffect;
+    for (let i = 0; i < effect.length; i++) {
+      this.addEffect(effect[i]);
+      effect.splice(i, 1);
+      i--;
+    }
+  }
+  if (this._enemy._eventTmp.removeEffect.length > 0) {
+    const effect = this._enemy._eventTmp.removeEffect;
+    for (let i = 0; i < effect.length; i++) {
+      this.removeEffect(effect[i]);
+      effect.splice(i, 1);
+      i--;
+    }
+  }
+  if (this._enemy._eventTmp.updateHealth) {
+    this.updateHealthGUI(this._enemy._eventTmp.updateHealthValue);
+    this._enemy._eventTmp.updateHealth = false;
+  }
+};
 Sprite_ufcTDEnemy.prototype.destroyEnemy = function () {
   $gameMap.ufcDestroyCharacterSprite(this);
   this._destroy = true;

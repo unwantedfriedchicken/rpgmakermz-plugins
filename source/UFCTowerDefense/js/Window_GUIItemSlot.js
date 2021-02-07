@@ -1,7 +1,7 @@
 // eslint-disable-next-line no-redeclare
-const Window_GUIItemSlot = function () {
+function Window_GUIItemSlot() {
   this.initialize(...arguments);
-};
+}
 
 Window_GUIItemSlot.prototype = Object.create(Window_Command.prototype);
 Window_GUIItemSlot.prototype.constructor = Window_GUIItemSlot;

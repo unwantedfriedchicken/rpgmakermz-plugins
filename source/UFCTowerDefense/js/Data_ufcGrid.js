@@ -1,7 +1,7 @@
 // eslint-disable-next-line no-redeclare
-const Data_ufcGrid = function () {
+function Data_ufcGrid() {
   this.initialize(...arguments);
-};
+}
 
 Data_ufcGrid.prototype.constructor = Data_ufcGrid;
 Data_ufcGrid.prototype.initialize = function (types) {

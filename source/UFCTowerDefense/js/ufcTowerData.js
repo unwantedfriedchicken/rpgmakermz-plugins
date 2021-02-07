@@ -1,7 +1,7 @@
 // eslint-disable-next-line no-redeclare
-const ufcTowerData = function () {
+function ufcTowerData() {
   this.initialize(...arguments);
-};
+}
 
 ufcTowerData.prototype.constructor = ufcTowerData;
 ufcTowerData.prototype.initialize = function (data) {
@@ -113,12 +113,15 @@ ufcTowerData.prototype.initialize = function (data) {
   this.resetBuffs();
   this._x = 0;
   this._y = 0;
-  this._event = new PIXI.utils.EventEmitter();
+  // Can't use event emitter because of how rpgmaker mz save works ):
+  // this._event = new PIXI.utils.EventEmitter();
   this._placeMode = false;
+  this._rangeVisibility = true;
 };
 
 ufcTowerData.prototype.setRangeVisibility = function (visible) {
-  this._event.emit("setRangeVisibility", visible);
+  this._rangeVisibility = visible;
+  // this._event.emit("setRangeVisibility", visible);
 };
 
 ufcTowerData.prototype.getBulletData = function () {
@@ -269,6 +272,12 @@ Object.defineProperty(ufcTowerData.prototype, "getType", {
 Object.defineProperty(ufcTowerData.prototype, "getUpgradeMaterial", {
   get: function () {
     return this._upgradeMaterial;
+  },
+});
+
+Object.defineProperty(ufcTowerData.prototype, "getRangeVisibility", {
+  get: function () {
+    return this._rangeVisibility;
   },
 });
 

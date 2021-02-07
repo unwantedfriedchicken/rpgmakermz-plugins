@@ -1,7 +1,7 @@
 // eslint-disable-next-line no-redeclare
-const Sprite_ufcTDTower = function () {
+function Sprite_ufcTDTower() {
   this.initialize(...arguments);
-};
+}
 
 Sprite_ufcTDTower.prototype = Object.create(Sprite.prototype);
 Sprite_ufcTDTower.prototype.constructor = Sprite_ufcTDTower;
@@ -25,11 +25,11 @@ Sprite_ufcTDTower.prototype.initMembers = function (ufcTD) {
   this.setCharacterBitmap();
   if (this._towerData._placeMode) this.setSelectPosition();
 
-  this._towerData._event.on(
-    "setRangeVisibility",
-    this.setRangeVisibility,
-    this
-  );
+  // this._towerData._event.on(
+  //   "setRangeVisibility",
+  //   this.setRangeVisibility,
+  //   this
+  // );
 };
 
 Sprite_ufcTDTower.prototype.resetRangeGraphics = function () {
@@ -120,6 +120,10 @@ Sprite_ufcTDTower.prototype.checkCharacter = function (character) {
 
 Sprite_ufcTDTower.prototype.update = function () {
   Sprite.prototype.update.call(this);
+  // console.log(this._towerData.getRangeVisibility);
+  if (this._rangeGraphics.visible != this._towerData.getRangeVisibility) {
+    this.setRangeVisibility(this._towerData.getRangeVisibility);
+  }
   this.updateCharacterFrame();
   if (this._towerData._placeMode) return;
   this.updatePosition();
@@ -223,11 +227,11 @@ Sprite_ufcTDTower.prototype.posY = function (y) {
 };
 
 Sprite_ufcTDTower.prototype.destroy = function (options) {
-  this._towerData._event.removeListener(
-    "setRangeVisibility",
-    this.setRangeVisibility,
-    this
-  );
+  // this._towerData._event.removeListener(
+  //   "setRangeVisibility",
+  //   this.setRangeVisibility,
+  //   this
+  // );
   this._rangeGraphics.destroy({ texture: true, baseTexture: true });
   Sprite.prototype.destroy.call(this, options);
 };
