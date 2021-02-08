@@ -13,6 +13,8 @@ Window_TDStatus.prototype.initialize = function (rect) {
 Window_TDStatus.prototype.drawDefaultStatus = function (towerData) {
   this.contents.clear();
   this.contentsBack.clear();
+
+  // Character Image
   let x = 0;
   let y = 0;
   let characterImage = ImageManager.loadCharacter(towerData._character);
@@ -34,6 +36,8 @@ Window_TDStatus.prototype.drawDefaultStatus = function (towerData) {
     pw * scale,
     ph * scale
   );
+
+  // Name Character
   let xCharacter = pw * scale;
   this.contents.fontSize = 23;
   const c1 = ColorManager.itemBackColor1();
@@ -46,12 +50,11 @@ Window_TDStatus.prototype.drawDefaultStatus = function (towerData) {
   this.drawText(towerData._name, statusX, 0, w, "center");
 
   // let textY = ph * scale + 30;
-  let textY = h;
-  let textX = statusX;
-  let textX2 = 120;
-  let textXValue = 75;
-  let textXValueOffset2 = 10;
-  let textHeight = 24;
+  let textY = h - 4;
+  let textX = statusX + 10;
+  let textX2 = 60;
+  let textYValue = 20;
+  let textHeight = 0;
   let status, statusValue;
   if (towerData.getType === TowerDefenseManager.TOWERTYPE.TOWER) {
     status = ["Attack", "Range", "ASPD", "ATK Type"];
@@ -65,49 +68,48 @@ Window_TDStatus.prototype.drawDefaultStatus = function (towerData) {
     if (towerData._through) {
       status = [
         "Attack",
-        "Trap Type",
         towerData._durability ? "Durability" : "",
+        "Trap Type",
         "",
       ];
       statusValue = [
         towerData.getBaseAttack,
-        towerData.getAttackTypeAsName,
         towerData._durability ? towerData._durabilityValue : "",
+        towerData.getAttackTypeAsName,
         "",
       ];
     } else {
-      status = ["Attack", "Trap Type", "Health", ""];
+      status = ["Attack", "Health", "Trap Type", ""];
       statusValue = [
         towerData.getBaseAttack,
-        towerData.getAttackTypeAsName,
         towerData._health,
+        towerData.getAttackTypeAsName,
         "",
       ];
     }
   }
 
-  this.contents.fontSize = 14;
-
+  // Draw title Status
+  this.contents.fontSize = 12;
+  this.changeTextColor(ColorManager.systemColor());
   for (let i = 0; i < status.length; i++) {
-    this.drawText(
-      status[i],
-      textX + (i % 2) * textX2,
-      textY + Math.floor(i / 2) * textHeight,
-      100
-    );
+    this.drawText(status[i], textX + i * textX2, textY + textHeight, 100);
   }
 
-  this.changeTextColor(ColorManager.systemColor());
+  this.contents.fontSize = 18;
+  // Draw title Status value
+  this.resetTextColor();
   for (let i = 0; i < statusValue.length; i++) {
     this.drawText(
       statusValue[i],
-      textX + textXValue + (i % 2) * textX2 + (i % 2) * textXValueOffset2,
-      textY + Math.floor(i / 2) * textHeight,
+      textX + i * textX2,
+      textY + textHeight + textYValue,
       80
     );
   }
   this.resetTextColor();
 
+  let buffY = 40;
   let statusBuff = [];
   let buffSymbol = "+";
   let buffColor = ColorManager.powerUpColor();
@@ -149,8 +151,8 @@ Window_TDStatus.prototype.drawDefaultStatus = function (towerData) {
       this.changeTextColor(statusBuff[i].color);
       this.drawText(
         statusBuff[i].value,
-        textX + 88 + (i % 2) * (textXValue + textX2),
-        textY + Math.floor(i / 2) * textHeight,
+        textX + i * textX2,
+        textY + textHeight + buffY,
         150
       );
     }

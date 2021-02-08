@@ -354,6 +354,7 @@ Scene_Map.prototype.onMapLoaded = function () {
     TowerDefenseManager.showGUIItemSlot();
     TowerDefenseManager.showHUDTDGold();
     TowerDefenseManager.showHUDTDHealth();
+    TowerDefenseManager.loadMode();
   }
 };
 

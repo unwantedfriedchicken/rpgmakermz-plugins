@@ -369,6 +369,17 @@ TowerDefenseManager.disableTowerDefense = function (
   $gameSystem.enableMenu();
 };
 
+TowerDefenseManager.loadMode = function () {
+  $gameMap._events
+    .filter((event) => event instanceof Game_TDTower)
+    .forEach((tower) => {
+      // Reset buff & aura
+      tower.checkAura(true);
+      // Reset Target
+      tower._target = null;
+    });
+};
+
 TowerDefenseManager.actionTower = function (towerData, callback) {
   UFC.UFCTD.HUDGUI.TOWERACTION.setTower(towerData, callback);
 };

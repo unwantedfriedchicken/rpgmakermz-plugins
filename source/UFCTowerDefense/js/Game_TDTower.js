@@ -21,7 +21,6 @@ Game_TDTower.prototype.initialize = function (
   this._realY = this._towerData._y;
   this._target = null;
   this._destroy = false;
-  this._towerEffectedByAura = [];
   this._trapAttack = false;
   this._trapAttackTimeDefault = 60;
   this._trapAttackTime = this._trapAttackTimeDefault;
@@ -35,11 +34,21 @@ Game_TDTower.prototype.initialize = function (
       trap[this._x][this._y] = this;
     }
   } else {
-    // Buffs And Aura From Type Tower
-    this.getTowerData().checkGetBuffs();
-    if (this.getTowerData().isHaveAura()) {
-      this.addAuraEffects();
-    }
+    this.checkAura();
+  }
+};
+
+Game_TDTower.prototype.checkAura = function (resetBuff = false) {
+  this._towerEffectedByAura = [];
+
+  // This is used for reset the aura, when load the game
+  // because the reference is different
+  if (resetBuff) this.getTowerData().resetBuffs();
+
+  // Buffs And Aura From Type Tower
+  this.getTowerData().checkGetBuffs();
+  if (this.getTowerData().isHaveAura()) {
+    this.addAuraEffects();
   }
 };
 

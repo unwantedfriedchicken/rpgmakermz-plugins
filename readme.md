@@ -6,7 +6,7 @@ This is using grunt to concat the files
 
 ### Configuration
 
-- Open source folder rename _sample.gruntconfig.json_ to _config.gruntconfig.json_
+- Open source folder and rename _sample.gruntconfig.json_ to _config.gruntconfig.json_
 - Open it and set dest to set default destination when export the task
 - example : "D:/rpgmakermz/project/js/plugins/"
 
