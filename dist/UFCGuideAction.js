@@ -1,48 +1,10 @@
-/*:
-@target MZ
-
-@plugindesc Add guide action
-@author Unwanted Fried Chicken
-
-@param blockColor
-@text Block Color
-@type text
-@desc Set the color of blocked action. Default = #e63946
-@default #e63946
-
-@param blockColorAlpha
-@text Block Color Alpha
-@type number
-@decimals 1
-@min 0
-@max 1
-@desc Alpha color of blocked action
-@default 1.0
-
-@param openColor
-@text Open Color
-@type text
-@desc Set the color of opened action. Default = #5BFF54
-@default #5BFF54
-
-@param openColorAlpha
-@text Open Color Alpha
-@type number
-@decimals 1
-@min 0
-@max 1
-@desc Alpha color of opened action
-@default 1.0
-
-*/
-
-
+/* eslint-disable no-redeclare */
 var Imported = Imported || {};
 Imported.UFCGuideAction = true;
 
 var UFC = UFC || {};
 UFC.UFCGA = UFC.UFCGA || {};
-UFC.UFCGA.VERSION = 1.2;
+UFC.UFCGA.VERSION = 1.1;
 UFC.UFCGA.ALIAS = UFC.UFCGA.ALIAS || {};
 
 UFC.UFCGA.PARAMETERS = PluginManager.parameters("UFCGuideAction");
@@ -335,6 +297,8 @@ GuideAction.prototype.checkGrid = function (x, y) {
 
   let terrainTag = $gameMap.terrainTag(x, y);
   let regionID = $gameMap.regionId(x, y);
+
+  //allows for Place everywhere, except exceptTerrain or exceptRegion
   if (
     this.getOnlyTerrain.length <= 0 &&
     this.getOnlyRegion.length <= 0 &&
@@ -499,6 +463,7 @@ GuideAction.prototype.isCollidedWithVehicles = function (x, y) {
 };
 
 GuideAction.prototype.getPosition = function () {
+  // Update to current gameplayer incase the position not updated
   this._x = $gamePlayer._x;
   this._y = $gamePlayer._y;
   this._d = $gamePlayer._direction;

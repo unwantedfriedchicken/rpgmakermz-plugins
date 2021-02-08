@@ -3,6 +3,13 @@
 
 @plugindesc Add guide action
 @author Unwanted Fried Chicken
+@url https://unwantedfriedchicken.itch.io
+@help
+Author: UnwantedFriedChicken
+Version: 1.1
+Itch.io : https://unwantedfriedchicken.itch.io
+
+Add guide action 
 
 @param blockColor
 @text Block Color
