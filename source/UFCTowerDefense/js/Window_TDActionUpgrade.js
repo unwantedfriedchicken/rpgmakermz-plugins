@@ -23,7 +23,12 @@ Window_TDActionUpgrade.prototype.initialize = function (rect) {
   let statusWidth = 360;
   let statusHeight = 240;
   this.status = new Window_TDStatus(
-    new Rectangle(this.width, 0, statusWidth, statusHeight)
+    new Rectangle(
+      this.width + UFC.UFCTD.HUDGUI.SETTINGS.towerAction.upgradeStatusPositionX,
+      0 + UFC.UFCTD.HUDGUI.SETTINGS.towerAction.upgradeStatusPositionY,
+      statusWidth,
+      statusHeight
+    )
   );
   this.addChild(this.status);
 

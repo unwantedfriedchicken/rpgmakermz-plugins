@@ -22,8 +22,10 @@ Window_TDAction.prototype.initialize = function (rect) {
   let statusHeight = 240;
   this.status = new Window_TDStatus(
     new Rectangle(
-      -statusWidth,
-      this.height - statusHeight,
+      -statusWidth + UFC.UFCTD.HUDGUI.SETTINGS.towerAction.statusPositionX,
+      this.height -
+        statusHeight +
+        UFC.UFCTD.HUDGUI.SETTINGS.towerAction.statusPositionY,
       statusWidth,
       statusHeight
     )
@@ -34,8 +36,10 @@ Window_TDAction.prototype.initialize = function (rect) {
   let upgradeHeight = this.height;
   this.upgradeWindow = new Window_TDActionUpgrade(
     new Rectangle(
-      this.width,
-      this.height - upgradeHeight,
+      this.width + UFC.UFCTD.HUDGUI.SETTINGS.towerAction.upgradeListPositionX,
+      this.height -
+        upgradeHeight +
+        UFC.UFCTD.HUDGUI.SETTINGS.towerAction.upgradeListPositionY,
       upgradeWidth,
       upgradeHeight
     )
@@ -45,6 +49,13 @@ Window_TDAction.prototype.initialize = function (rect) {
   this.upgradeWindow.on("upgradeTower", this.upgradeTower, this);
   this.upgradeWindow.on("selectUpgradeWindow", this.selectUpgradeWindow, this);
 
+  if (
+    UFC.UFCTD.HUDGUI.SETTINGS.towerAction.buttonGroupPositionX != 0 ||
+    UFC.UFCTD.HUDGUI.SETTINGS.towerAction.buttonGroupPositionY != 0
+  ) {
+    this.x += UFC.UFCTD.HUDGUI.SETTINGS.towerAction.buttonGroupPositionX;
+    this.y += UFC.UFCTD.HUDGUI.SETTINGS.towerAction.buttonGroupPositionY;
+  }
   this.hide();
   this.close();
 };

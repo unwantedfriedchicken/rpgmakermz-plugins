@@ -59,6 +59,12 @@ unwantedfriedchicken<at>gmail.com
 @param hudguiSettings
 @text HUD/GUI Settings
 
+@param gui_toweraction
+@parent hudguiSettings
+@text Tower Action Settings
+@type struct<TowerActionSettings>
+@desc Setting for tower action
+
 @param gui_itemBackpackSlotSize
 @parent hudguiSettings
 @text Item Size
@@ -867,4 +873,62 @@ unwantedfriedchicken<at>gmail.com
 @desc Item Text Size
 @type number
 @default 18
+*/
+
+/*~struct~TowerActionSettings:
+@param statusPositionX
+@text Status Position X
+@desc Status Position X
+@type number
+@min -99999
+@default 0
+
+@param statusPositionY
+@text Status Position Y
+@desc Status Position Y
+@type number
+@min -99999
+@default 0
+
+@param buttonGroupPositionX
+@text Button Group Position X
+@desc Button Group Position X
+@type number
+@min -99999
+@default 0
+
+@param buttonGroupPositionY
+@text Button Group Position Y
+@desc Button Group Position Y
+@type number
+@min -99999
+@default 0
+
+@param upgradeListPositionX
+@text Upgrade List Position X
+@desc Upgrade List Position X
+@type number
+@min -99999
+@default 0
+
+@param upgradeListPositionY
+@text Upgrade List Position Y
+@desc Upgrade List Position Y
+@type number
+@min -99999
+@default 0
+
+@param upgradeStatusPositionX
+@text Upgrade Status Position X
+@desc Upgrade Status Position X
+@type number
+@min -99999
+@default 0
+
+@param upgradeStatusPositionY
+@text Upgrade Status Position Y
+@desc Upgrade Status Position Y
+@type number
+@min -99999
+@default 0
 */

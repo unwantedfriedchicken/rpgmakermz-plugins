@@ -2,6 +2,7 @@
 
 ## Version 1.3 - dev
 
+- ADD: Add new parameter `Tower Action Settings` for tower action setting position
 - ADD: Add ability to using save/load function, now you can save during gameplay
 - ADD: Add upgrade with material, with `<upgradematerial>` to require multiple material use `,` seprator and to set ammount use `|` after the item ID
 
@@ -18,7 +19,7 @@
 ```
 
 - ADD: Add new note for item, if want to get displayed in backpack add `<ufcTDMaterial>`
-- ADD: Add Quick Shop option for Shop Button, new plugin parameters `Shop Type`
+- ADD: Add Quick Shop option for Shop Button, new plugin parameters `Shop Type` and `Quick Shop Setting`
 - ADD: Add damage text, if plugin `UFCTextHelper` is imported
 - ADD: Add enemy health GUI and add new configuration in plugin parameters
 - ADD: Add sound settings in plugin parameters
@@ -36,7 +37,7 @@
 <type:tower>(optional) -> Add tower type , has 2 type tower/trap. Default: tower
 <through:false>(optional) -> Add through option for tower . This make if the tower is through or not. Default: false
 <health:1>(optional) -> Add health to the tower . This is used for trap. Default: 1
-<sedestroy>(optional) -> Add custom sound effect when tower is destroyed, if not stated destroy se using destroy sound in plugin parameter. Default:null
+<sedestroy:Blow4>(optional) -> Add custom sound effect when tower is destroyed, if not stated destroy se using destroy sound in plugin parameter. Default:null
 <sedestroyvolume:25>(optional) -> Setting volume for destroyed volume. Default: 25
 <characterindexx:0>(optional) -> Setting for X index in character sprite, used for TRAP. Default: 0
 <durability:false>(optional) -> Setting if through trap has durability or not. Default: false

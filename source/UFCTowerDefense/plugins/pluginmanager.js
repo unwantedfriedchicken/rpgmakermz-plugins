@@ -11,6 +11,7 @@ UFC.UFCTD.CONFIG = {
 
 UFC.UFCTD.HUDGUI = {
   SETTINGS: {
+    towerAction: JSON.parse(UFC.UFCTD.PARAMETERS["gui_toweraction"]),
     itemSize: +UFC.UFCTD.PARAMETERS["gui_itemBackpackSlotSize"],
     itemCol: +UFC.UFCTD.PARAMETERS["gui_itemBackpackSlotCol"],
     itemWindowType: +UFC.UFCTD.PARAMETERS["gui_itemBackpackBackgroundType"],
@@ -87,6 +88,13 @@ UFC.UFCTD.DEBUGMODE = {
 Object.keys(UFC.UFCTD.SHOPGUISETTINGS.QSSetting).forEach((item) => {
   UFC.UFCTD.SHOPGUISETTINGS.QSSetting[item] = parseInt(
     UFC.UFCTD.SHOPGUISETTINGS.QSSetting[item]
+  );
+});
+
+Object.keys(UFC.UFCTD.HUDGUI.SETTINGS.towerAction).forEach((item) => {
+  // if (!isNaN(UFC.UFCTD.HUDGUI.SETTINGS.towerAction[item]))
+  UFC.UFCTD.HUDGUI.SETTINGS.towerAction[item] = parseInt(
+    UFC.UFCTD.HUDGUI.SETTINGS.towerAction[item]
   );
 });
 
