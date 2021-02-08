@@ -31,8 +31,9 @@ Window_TDShop.prototype.initialize = function () {
 };
 
 Window_TDShop.prototype.createQuickBuy = function () {
-  let upgradeWidth = 250;
-  let upgradeHeight = 250;
+  console.log(UFC.UFCTD.SHOPGUISETTINGS.QSSetting);
+  let upgradeWidth = UFC.UFCTD.SHOPGUISETTINGS.QSSetting.width;
+  let upgradeHeight = UFC.UFCTD.SHOPGUISETTINGS.QSSetting.height;
   UFC.UFCTD.HUDGUI.QUICKSHOP = new Window_TDShopQuick(
     new Rectangle(0, -upgradeHeight, upgradeWidth, upgradeHeight)
   );

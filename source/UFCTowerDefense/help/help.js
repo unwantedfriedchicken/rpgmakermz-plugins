@@ -257,6 +257,13 @@ unwantedfriedchicken<at>gmail.com
 @default Open Shop
 @desc Type shop when press shop button
 
+@param shopguiQSSetting
+@parent shopgui
+@default {"backgroundType":"0","width":"280","height":"300","itemHeight":"60","itemTextSize":"18"}
+@type struct<QuickShopSettings>
+@text Quick Shop Setting
+@desc Quick Shop Setting
+
 @param shopguiDefaultItems
 @parent shopgui
 @text Default Items
@@ -822,4 +829,42 @@ unwantedfriedchicken<at>gmail.com
 @type file
 @dir audio/se/
 @default Coin
+*/
+
+/*~struct~QuickShopSettings:
+@param backgroundType
+@text Background Type
+@type select
+@option Default
+@value 0
+@option Dim
+@value 1
+@option Nothing
+@value 2
+@desc Background type for window
+@default 0
+
+@param width
+@text Width
+@desc Width
+@type number
+@default 250
+
+@param height
+@text Height
+@desc Height
+@type number
+@default 250
+
+@param itemHeight
+@text Item Height
+@desc Item Height
+@type number
+@default 60
+
+@param itemTextSize
+@text Item Text Size
+@desc Item Text Size
+@type number
+@default 18
 */

@@ -63,6 +63,7 @@ UFC.UFCTD.TOOLTIPSETTINGS = {
 
 UFC.UFCTD.SHOPGUISETTINGS = {
   type: UFC.UFCTD.PARAMETERS["shopguiType"],
+  QSSetting: JSON.parse(UFC.UFCTD.PARAMETERS["shopguiQSSetting"]),
   enable: UFC.UFCTD.PARAMETERS["shopgui"] == "true",
   defaultItems: JSON.parse(
     UFC.UFCTD.PARAMETERS["shopguiDefaultItems"]
@@ -81,6 +82,13 @@ UFC.UFCTD.DEBUGMODE = {
   tickerSpeed: +UFC.UFCTD.PARAMETERS["tickerSpeed"],
   limitAnimation: +UFC.UFCTD.PARAMETERS["limitAnimation"],
 };
+
+// Convert number
+Object.keys(UFC.UFCTD.SHOPGUISETTINGS.QSSetting).forEach((item) => {
+  UFC.UFCTD.SHOPGUISETTINGS.QSSetting[item] = parseInt(
+    UFC.UFCTD.SHOPGUISETTINGS.QSSetting[item]
+  );
+});
 
 PluginManager.registerCommand("UFCTowerDefense", "setupEnemy", function (args) {
   args.characterName = $gameMap._events[this._eventId]._characterName;

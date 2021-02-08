@@ -35,6 +35,8 @@ Window_TDShopQuick.prototype.initialize = function (rect) {
       true
     );
   });
+  this.setBackgroundType(UFC.UFCTD.SHOPGUISETTINGS.QSSetting.backgroundType);
+
   this.hide();
   this.close();
 };
@@ -48,7 +50,7 @@ Window_TDShopQuick.prototype.maxCols = function () {
 };
 
 Window_TDShopQuick.prototype.itemHeight = function () {
-  return 60;
+  return UFC.UFCTD.SHOPGUISETTINGS.QSSetting.itemHeight;
 };
 
 Window_TDShopQuick.prototype.close = function () {
@@ -101,7 +103,6 @@ Window_TDShopQuick.prototype.windowHovered = function () {
 
 Window_TDShopQuick.prototype.open = function () {
   SoundManager.playOk();
-  this.setBackgroundType(0);
   this.paint();
   Window_Command.prototype.open.call(this);
 };
@@ -172,12 +173,14 @@ Window_TDShopQuick.prototype.drawItem = function (index) {
     rect.y
   );
   let textY = rect.y - 10;
-  this.contents.fontSize = 18;
+  this.contents.fontSize = UFC.UFCTD.SHOPGUISETTINGS.QSSetting.itemTextSize;
   this.drawText(this.commandName(index), rect.x + 48, textY, 200);
 
   textY = rect.y + 13;
   this.drawTextEx(
-    "\\FS[18]\\C[14]" +
+    "\\FS[" +
+      UFC.UFCTD.SHOPGUISETTINGS.QSSetting.itemTextSize +
+      "]\\C[14]" +
       this._listItems[index].price +
       "\\C " +
       TextManager.currencyUnit,
