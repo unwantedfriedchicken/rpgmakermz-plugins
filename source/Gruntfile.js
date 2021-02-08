@@ -115,7 +115,7 @@ module.exports = function (grunt) {
       };
       listTask["remove_comments"][taskid] = {
         dest: dest + taskid + ".js",
-        src: [dest + taskid + ".js"],
+        src: dest + taskid + ".js",
       };
       listTask["terser"][taskid] = {
         dest: dest + taskid + ".min.js",
