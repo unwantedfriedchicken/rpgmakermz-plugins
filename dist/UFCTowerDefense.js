@@ -1,821 +1,4 @@
-/*:
-@target MZ
-@plugindesc Add Tower Defense Mechanic
-@author Unwanted Fried Chicken
-@url https://unwantedfriedchicken.itch.io
-@help
-Author: UnwantedFriedChicken
-Version: 1.2.2
-Itch.io : https://unwantedfriedchicken.itch.io
-Github : https://github.com/unwantedfriedchicken/rpgmakermz-plugins/
-
-This plugin add tower defense mechanic for more detail explaination checkout the documentation
-
-Documentation
-https://github.com/unwantedfriedchicken/rpgmakermz-plugins/blob/master/dev/towerdefense/README.md
-
-Changelog
-https://github.com/unwantedfriedchicken/rpgmakermz-plugins/blob/master/dev/towerdefense/CHANGELOG.md
-
-Found bug? report the bug here:
-https://forums.rpgmakerweb.com/index.php?threads/ufc-tower-defense.130384/
-https://github.com/unwantedfriedchicken/rpgmakermz-plugins/issues
-
-Need support or want private convo? I can easly reachout by email
-unwantedfriedchicken<at>gmail.com
-
-@param setting_crystalName
-@text Crystal Name
-@desc Name of the crystal/gate
-@type string
-@default Crystal Health
-
-@param setting_limitAnimation
-@text Limit Animation
-@desc If frame rate become low because so many effect try limit the animation
-@type number
-
-@param setting_towerHealthVarId
-@text Tower Health variable ID
-@desc This health of the tower set to your variable id
-@type variable
-
-@param setting_towerMaxHealthVarId
-@text Tower Max Health variable ID
-@desc This Max health of the tower set to your variable id
-@type variable
-
-@param setting_gameoverSwitchId
-@text Game Over Switch Id
-@desc When health <= 0 this switch will change to ON
-@type switch
-
-@param setting_soundSettings
-@text Sound Settings
-@desc Setting sounds for tower defense
-@type struct<SoundSettings>
-@default {"effectSteal":"Coin","towerDestroy":"Door2","towerCancel":"Cancel1","towerPlace":"Equip1","towerUpgrade":"Coin","towerSell":"Coin"}
-
-@param hudguiSettings
-@text HUD/GUI Settings
-
-@param gui_itemBackpackSlotSize
-@parent hudguiSettings
-@text Item Size
-@type number
-@desc Set the size of the item backpack slot
-@default 64
-
-@param gui_itemBackpackSlotCol
-@parent hudguiSettings
-@text Item Display Number
-@type number
-@desc Set the number item that display in backpack
-@default 12
-
-@param gui_itemBackpackBackgroundType
-@parent hudguiSettings
-@text Item Background Type
-@type select
-@option Default
-@value 0
-@option Dim
-@value 1
-@option Nothing
-@value 2
-@desc Background type for window
-@default 0
-
-@param gui_itemBackpackNumSize
-@parent hudguiSettings
-@text Item Ammount Size
-@type number
-@desc Size of the numsize item
-@default 24
-
-@param towerSettings
-@text Tower Settings
-
-@param animateTower
-@parent towerSettings
-@text Animate Tower
-@type boolean
-@desc Animate tower idle
-@default false
-
-@param attackRangeColor
-@parent towerSettings
-@text Attack Range Color
-@type text
-@desc Set the color of towers' Attack Range. Default = #17b978
-@default #17b978
-
-@param attackRangeOpacity
-@parent towerSettings
-@text Attack Range Opcaity
-@type number
-@desc Set the opacity of towers' Attack Range
-@decimals 1
-@default 0.4
-
-@param auraRangeColor
-@parent towerSettings
-@text Aura Range Color
-@type text
-@desc Set the color of aura towers' Aura Range. Default = #17b978
-@default #17b978
-
-@param auraRangeOpacity
-@parent towerSettings
-@text Aura Range Opcaity
-@type number
-@desc Set the opacity of towers' Attack Range
-@decimals 1
-@default 0.4
-
-@param gridColor
-@parent towerSettings
-@text Grid Tower Color
-@type text
-@desc Set the color of grid. Default = #61FFB4
-@default #61FFB4
-
-@param gridColorOpacity
-@parent towerSettings
-@text Grid Tower Color Opcaity
-@type number
-@desc Set the opacity of grid 
-@decimals 1
-@default 0.4
-
-@param gridTrapColor
-@parent towerSettings
-@text Grid Trap Color
-@type text
-@desc Set the color of grid. Default = #F20505
-@default #F20505
-
-@param gridTrapColorOpacity
-@parent towerSettings
-@text Grid Trap Color Opcaity
-@type number
-@desc Set the opacity of grid 
-@decimals 1
-@default 0.4
-
-@param enemySettings
-@text Enemy Settings
-
-@param enemyHealthUI
-@parent enemySettings
-@text Enemy Health UI
-@desc Configuration for enemy health UI
-@type select
-@option Show
-@value show
-@option Only When Damaged
-@value onlyWhenDamaged
-@option Hide
-@value hide
-@default hide
-
-@param enemyHealthWidth
-@parent enemySettings
-@text Enemy Health Width
-@desc Enemy Health
-@default 48
-@type number
-
-@param enemyHealthHeight
-@parent enemySettings
-@text Enemy Health Height
-@desc Enemy Health
-@default 5
-@type number
-
-@param enemyHealthColor
-@parent enemySettings
-@text Enemy Health Color
-@type text
-@desc Set the color of health enemy. Default = #85DB18
-@default #85DB18
-
-@param enemyHealthColorOpacity
-@parent enemySettings
-@text Enemy Health Color Opcaity
-@type number
-@desc Set the opacity of health enemy 
-@decimals 1
-@default 1
-
-@param tooltip
-@text Tooltip
-@type boolean
-@desc Enable tooltip?
-@default true
-
-@param tooltipYPosition
-@parent tooltip
-@text Y Position
-@type number
-@min -99999
-@desc Y position of tooltip
-@default -40
-
-@param tooltipFontSize
-@parent tooltip
-@text Font Size
-@type number
-@desc Tooltip font size
-@default 18
-
-@param tooltipBackgroundType
-@parent tooltip
-@text Background Type
-@type select
-@option Default
-@value 0
-@option Dim
-@value 1
-@option Nothing
-@value 2
-@desc Background type for tooltip
-@default 1
-
-@param shopgui
-@text Add Shop Button
-@type boolean
-@desc Add shop button gui
-@default true
-
-@param shopguiDefaultItems
-@parent shopgui
-@text Default Items
-@type item[]
-@desc Default items appear in shop
-@default []
-
-@param shopguiMultiplier
-@parent shopgui
-@text Price Multiplier
-@type number
-@decimals 2
-@desc Price multiplier when buy from shop button
-@default 1.2
-
-@param shopguiRoundPrice
-@parent shopgui
-@text Round Price
-@type number
-@default 1
-@desc Round the price power 10, 0 = disable, 1 = 10, 2 = 100. ex: value 2 -> price 140 -> become 200
-
-@param shopguiIconWidth
-@parent shopgui
-@text Shop Button Width
-@type number
-@default 144
-@desc Shop Button Width
-
-@param shopguiIconHeight
-@parent shopgui
-@text Shop Button Height
-@type number
-@default 72
-@desc Shop Button Height
-
-@param shopguiIconXPosition
-@parent shopgui
-@text Shop Button X Position
-@type number
-@min -99999
-@default 0
-@desc Icon X Position
-
-@param shopguiIconYPosition
-@parent shopgui
-@text Shop Button Y Position
-@type number
-@min -99999
-@default 0
-@desc Shop Button Y Position
-
-=========================== DEBUG =================================
-
-@param debugMode
-@text Debug Mode
-@type boolean
-@desc Enable debug mode?
-@default false
-
-@param tickerSpeed
-@parent debugMode
-@text Thick Speed
-@type number
-@desc Speed multiplier for ticker
-@default 2
-
-@param limitAnimation
-@parent debugMode
-@text Limit Animation
-@desc Limit Animation
-@default 5
-@type number
-
-
-
-=========================== Plugin Command =================================
-@command config
-@text Config Tower Defense
-@desc Configuration
-
-@arg placeTower
-@text Place Tower
-
-@arg placeTowerTerrain
-@parent placeTower
-@text Terrain
-
-@arg onlyTerrain
-@parent placeTowerTerrain
-@text Place building terrain
-@desc Set place building only in this terrain tag, If empty building can be placed anywhere
-@type number[]
-@default []
-
-@arg exceptTerrain
-@parent placeTowerTerrain
-@text Can't place terrain
-@desc Set place where building can't be set with this terrain tag.
-@type number[]
-@default []
-
-@arg placeTowerRegionID
-@parent placeTower
-@text RegionID
-
-@arg onlyRegionID
-@parent placeTowerRegionID
-@text Place building region ID
-@desc Set place building only in this region ID
-@type number[]
-@default []
-
-@arg exceptRegionID
-@parent placeTowerRegionID
-@text Can't place region ID
-@desc Set place where building can't be set with this region ID.
-@type number[]
-@default []
-
-@arg placeTrap
-@text Place Trap
-
-@arg placeTrapTerrain
-@parent placeTrap
-@text Terrain
-
-@arg onlyTrapTerrain
-@parent placeTrapTerrain
-@text Place trap terrain
-@desc Set place trap only in this terrain tag, If empty trap can be placed anywhere
-@type number[]
-@default []
-
-@arg exceptTrapTerrain
-@parent placeTrapTerrain
-@text Can't place terrain
-@desc Set place where trap can't be set with this terrain tag.
-@type number[]
-@default []
-
-@arg placeTrapRegionID
-@parent placeTrap
-@text RegionID
-
-@arg onlyTrapRegionID
-@parent placeTrapRegionID
-@text Place trap region ID
-@desc Set place trap only in this region ID
-@type number[]
-@default []
-
-@arg exceptTrapRegionID
-@parent placeTrapRegionID
-@text Can't place region ID
-@desc Set place where trap can't be set with this region ID.
-@type number[]
-@default []
-
-@command disableTowerDefense
-@text Disable Tower Defense
-@desc Disable Tower Defense mean will destroy any tower defense element, to go back to tower defense mode need to call Config again
-
-@arg destroyTower
-@type boolean
-@default false
-@text Destroy Tower
-@desc Destroy/delete any placed tower
-
-@arg destroyEnemy
-@type boolean
-@default false
-@text Destroy Enemy
-@desc Destroy/delete any enemy
-
-@arg deleteTDItems
-@type boolean
-@default true
-@text Delete Tower Defense Item
-@desc Delete every tower defense items in backpack
-
-@command limitAnimation
-@text Limit Animation
-@desc Set limit animation
-
-@arg limit
-@text Total Limit animation
-@desc This will limit animation, set 0 to unlimited animation
-@type number
-@default 0
-
-@command triggerConfig
-@text Trigger Config
-@desc Trigger for specific config
-
-@arg enemyType
-@text Enemy Type
-@type select
-@option All
-@value all
-@option Air
-@value air
-@option Ground
-@value ground
-@default all
-@desc Defines enemy type
-
-@arg onlyEnemy
-@text Only Enemy
-@type string[]
-@desc Only this enemy will be trigger
-@default []
-
-@arg exceptEnemy
-@text Except Enemy
-@type string[]
-@desc This enemy will not get triggered
-@default []
-
-@command triggerWait
-@text Trigger Wait Enemy
-@desc Trigger for wait
-
-@arg duration
-@text Duration
-@desc duration frames (1/60 sec)
-@type number
-@default 60
-
-@command triggerDestroy
-@text Trigger Destroy Enemy
-@desc Enemy will get destroy when go here
-
-@arg attack
-@text Attack
-@desc Is enemy attack before get destroy?
-@type boolean
-@default true
-
-@arg attackEventId
-@text Attack Event ID
-@desc If attack enemy, give attack animation to this event
-@type number
-@default 0
-
-@arg animationId
-@text Death Animation Id
-@desc Give animation when enemy dead
-@type animation
-@default 0
-
-@command triggerMove
-@text Trigger Move Enemy
-@desc Enemy will change their direction here
-
-@arg direction
-@text Direction
-@desc Defines enemy direction, for multiple direction add "/" -> Left/Right/Up mean direction is left, right or up
-@type select
-@option Left
-@option Right
-@option Up
-@option Down
-@option Left/Right
-@option Down/Left
-@option Down/Right
-@option Up/Down
-@option Up/Right
-@option Up/Left
-@option Random
-@default Left
-
-@command startWave
-@text Start Tower Defense
-@desc When this fired the game will play
-
-@arg spawnLocationId
-@text Spawn Location ID
-@type number
-@default 1
-@desc Defines this enemy spanw location
-
-@arg enemy
-@text Enemy Name
-@type text
-@default Jombi
-@desc Defines this enemy name
-
-@arg numberSpawn
-@text Total Spawn
-@type number
-@default 5
-@desc Defines total enemy number
-
-@arg delayPerSpawn
-@text Time Per Spawn
-@type number
-@default 60
-@desc Defines time between each spawn number is perframe 1/60s
-
-@arg delay
-@text Delay Before Spawn
-@type number
-@default 0
-@desc This usefull if have multiple spawn wave and want have delay between them
-
-@arg startSE
-@text Start Wave SE
-@type file
-@dir audio/se/
-@desc Start wave sound effect
-
-@arg startSEVolume
-@text Start Wave SE Volume
-@type text
-@default 100
-@desc Start wave sound effect Volume
-
-@command setSpawn
-@text Set Enemy Spawn Location
-@desc Set up where enemy will spawn
-
-@arg direction
-@text Direction Spawn
-@desc Defines enemy default direction, for multiple direction add "/" -> Left/Right mean direction is left or right
-@type select
-@option Left
-@option Right
-@option Up
-@option Down
-@option Left/Right
-@option Down/Left
-@option Down/Right
-@option Up/Down
-@option Up/Right
-@option Up/Left
-@option Random
-@default Left
-
-@command setupEnemy
-@text Setup enemy data
-@desc Setup enemy data
-
-@arg id
-@text ID
-@type text
-@default anon
-@desc Defines this enemy id, no space or special character
-
-@arg name
-@text Name
-@type text
-@default Anon
-@desc Defines this enemy name
-
-@arg health
-@text Health
-@type number
-@default 10
-@desc Defines this enemy health
-
-@arg attackDamage
-@text Attack Damage
-@type number
-@default 10
-@desc Defines attack damage
-
-@arg attackSpeed
-@text Attack Speed
-@type number
-@default 120
-@desc Defines attack speed
-
-@arg moveSpeed
-@text Move Speed
-@type number
-@decimals 2
-@default 3.5
-@desc Defines this enemy move speed, can use float number
-
-@arg gold
-@text Gold
-@type number
-@default 100
-@desc When enemy get killed get gold
-
-@arg attackAnimation
-@text Attack Animation ID
-@type animation
-@default 1
-@desc Defines attack Animation when this enemy attack
-
-@arg enemyType
-@text Enemy Type
-@type select
-@option All
-@value all
-@option Air
-@value air
-@option Ground
-@value ground
-@default all
-@desc Defines enemy type
-
-@arg isThrough
-@text Is Through
-@type boolean
-@default false
-@desc Is this enemy through?
-
-@arg seDead
-@text Dead SE
-@type file
-@dir audio/se/
-@default Slash2
-@desc Defines Sound effect when dead
-
-@arg seDeadVolume
-@text Dead SE Volume
-@type number
-@default 90
-@desc Defines Sound effect when dead volume
-
-@arg scale
-@text Enemy Scale
-@type number
-@default 1
-@decimals 2
-@desc Defines enemy scale
-
-@arg itemDrop
-@text Item Drop
-@desc Item Drop
-@type struct<ItemDrops>[]
-@default []
-
-@arg resistance
-@text Effects Resistance
-@desc Effect resistance
-@type select[]
-@option Cold
-@value cold
-@option Poison
-@value poison
-@option Stun
-@value stun
-@option Rage
-@value rage
-@option Steal
-@value steal
-@option Critical
-@value critical
-@default []
-
-@command showGUIItemSlot
-@text Show Item Slot GUI
-@desc Show Item Slot GUI
-
-@arg show
-@text Show
-@desc Show Item Slot GUI
-@type boolean
-@default true
-
-@command showHealthBar
-@text Show Health HUD
-@desc Show Health HUD
-
-@arg show
-@text Show
-@desc Show Health Hud
-@type boolean
-@default true
-
-@command showGold
-@text Show Gold HUD
-@desc Show Gold HUD
-
-@arg show
-@text Show
-@desc Show Gold Hud
-@type boolean
-@default true
-
-@command updateHUD
-@text Update Hud
-@desc Update every Hud To Current Variable Value
-
-@command shopGUIItemsEdit
-@text Shop GUI Items
-@desc Change items appear in the Menu Shop
-
-@arg items
-@text Items
-@desc Items appear in the GUI Shop
-@type item[]
-@default []
-
-@command shopGUIItemsReset
-@text Shop GUI Items Reset
-@desc Reset GUI Shop to default
-*/
-
-/*~struct~ItemDrops:
-@param items
-@text Items
-@desc Items
-@type item
-@default 0
-
-@param amount
-@text Amount
-@desc amount drop
-@type number
-@default 1
-
-@param chance
-@text Chance
-@desc chance drop
-@type number
-@default 100
-*/
-
-/*~struct~SoundSettings:
-@param effectSteal
-@text Effect Steal
-@desc Effect Steal sound
-@type file
-@dir audio/se/
-@default Coin
-
-@param towerDestroy
-@text Destroy Tower
-@desc Destroy Tower sound
-@type file
-@dir audio/se/
-@default Door2
-
-@param towerCancel
-@text Cancel Tower Select
-@desc Cancel Tower Select sound
-@type file
-@dir audio/se/
-@default Cancel1
-
-@param towerPlace
-@text Place Tower
-@desc Place Tower sound
-@type file
-@dir audio/se/
-@default Equip1
-
-@param towerUpgrade
-@text Upgrade Tower
-@desc Upgrade Tower sound
-@type file
-@dir audio/se/
-@default Coin
-
-@param towerSell
-@text Sell Tower
-@desc Sell Tower sound
-@type file
-@dir audio/se/
-@default Coin
-*/
-
-
+/* eslint-disable no-redeclare */
 var Imported = Imported || {};
 Imported.UFCTowerDefense = true;
 
@@ -841,6 +24,7 @@ UFC.UFCTD.CONFIG = {
 
 UFC.UFCTD.HUDGUI = {
   SETTINGS: {
+    towerAction: JSON.parse(UFC.UFCTD.PARAMETERS["gui_toweraction"]),
     itemSize: +UFC.UFCTD.PARAMETERS["gui_itemBackpackSlotSize"],
     itemCol: +UFC.UFCTD.PARAMETERS["gui_itemBackpackSlotCol"],
     itemWindowType: +UFC.UFCTD.PARAMETERS["gui_itemBackpackBackgroundType"],
@@ -849,10 +33,12 @@ UFC.UFCTD.HUDGUI = {
   MESSAGE: {
     isHoverHUDItem: false,
     isHoverGUIShop: false,
+    isHoverGUIQuickShop: false,
     isBusy: function () {
       return (
         UFC.UFCTD.HUDGUI.MESSAGE.isHoverHUDItem ||
-        UFC.UFCTD.HUDGUI.MESSAGE.isHoverGUIShop
+        UFC.UFCTD.HUDGUI.MESSAGE.isHoverGUIShop ||
+        UFC.UFCTD.HUDGUI.MESSAGE.isHoverGUIQuickShop
       );
     },
   },
@@ -890,6 +76,8 @@ UFC.UFCTD.TOOLTIPSETTINGS = {
 };
 
 UFC.UFCTD.SHOPGUISETTINGS = {
+  type: UFC.UFCTD.PARAMETERS["shopguiType"],
+  QSSetting: JSON.parse(UFC.UFCTD.PARAMETERS["shopguiQSSetting"]),
   enable: UFC.UFCTD.PARAMETERS["shopgui"] == "true",
   defaultItems: JSON.parse(
     UFC.UFCTD.PARAMETERS["shopguiDefaultItems"]
@@ -908,6 +96,20 @@ UFC.UFCTD.DEBUGMODE = {
   tickerSpeed: +UFC.UFCTD.PARAMETERS["tickerSpeed"],
   limitAnimation: +UFC.UFCTD.PARAMETERS["limitAnimation"],
 };
+
+// Convert number
+Object.keys(UFC.UFCTD.SHOPGUISETTINGS.QSSetting).forEach((item) => {
+  UFC.UFCTD.SHOPGUISETTINGS.QSSetting[item] = parseInt(
+    UFC.UFCTD.SHOPGUISETTINGS.QSSetting[item]
+  );
+});
+
+Object.keys(UFC.UFCTD.HUDGUI.SETTINGS.towerAction).forEach((item) => {
+  // if (!isNaN(UFC.UFCTD.HUDGUI.SETTINGS.towerAction[item]))
+  UFC.UFCTD.HUDGUI.SETTINGS.towerAction[item] = parseInt(
+    UFC.UFCTD.HUDGUI.SETTINGS.towerAction[item]
+  );
+});
 
 PluginManager.registerCommand("UFCTowerDefense", "setupEnemy", function (args) {
   args.characterName = $gameMap._events[this._eventId]._characterName;
@@ -1060,10 +262,13 @@ PluginManager.registerCommand(
     UFC.UFCTD.SHOPGUISETTINGS.itemsEdit = [];
   }
 );
-const Data_ufcGrid = function () {
-  this.initialize(...arguments);
-};
 
+// eslint-disable-next-line no-redeclare
+function Data_ufcGrid() {
+  this.initialize(...arguments);
+}
+
+Data_ufcGrid.prototype.constructor = Data_ufcGrid;
 Data_ufcGrid.prototype.initialize = function (types) {
   this._listType = types;
   this._destroy = false;
@@ -1123,7 +328,7 @@ Data_ufcGrid.prototype.calcGrid = function () {
   let bit = 0x0f;
   for (let type of this._listType) {
     this.setType(type);
-    $gamePlayer.getGuideAction().setType(type);
+    GuideActionManager.getGuideAction.setType(type);
     for (let x = 0; x < $gameMap.width(); x++) {
       for (let y = 0; y < $gameMap.height(); y++) {
         if (!this.getGridData()[x]) {
@@ -1133,7 +338,7 @@ Data_ufcGrid.prototype.calcGrid = function () {
         this.getGridData()[x][y] = true;
         if (
           !$gameMap.checkPassage(x, y, bit) ||
-          $gamePlayer.getGuideAction().checkGrid(x, y)
+          GuideActionManager.getGuideAction.checkGrid(x, y)
         ) {
           this.getGridData()[x][y] = false;
           this.clearGrid(x, y);
@@ -1159,6 +364,7 @@ Data_ufcGrid.prototype.updateEvents = function () {
 
   this._updateEventTime = this._updateEventFreq;
   let _tmpType = this.getType;
+  // Clear Event
   for (const event of this._eventData) {
     let removeEvent = false;
     for (const type of this._listType) {
@@ -1247,6 +453,8 @@ Object.defineProperty(Data_ufcGrid.prototype, "getGridColor", {
     }
   },
 });
+
+// eslint-disable-next-line no-redeclare
 function Game_TDEnemy() {
   this.initialize(...arguments);
 }
@@ -1284,13 +492,19 @@ Game_TDEnemy.prototype.initialize = function (enemyName, spawnId) {
   this._isStun = false;
   this._animationPlaying = false;
   this._through = this._enemyData.isThrough == "true";
-  this._event = new PIXI.utils.EventEmitter();
   this._triggerInit = false;
   this._triggerWait = 0;
   this._target = null;
   this._attack = {
     Damage: +this._enemyData.attackDamage,
     Time: 0,
+  };
+  // this._event = new PIXI.utils.EventEmitter();
+  this._eventTmp = {
+    addEffect: [],
+    removeEffect: [],
+    updateHealth: false,
+    updateHealthValue: false,
   };
   this._forceMove = false;
 };
@@ -1354,6 +568,8 @@ Game_TDEnemy.prototype.update = function () {
   Game_Character.prototype.update.call(this);
 
   this.updateEffects();
+
+  // Trigger Wait
   if (this._triggerWait > 0) this._triggerWait--;
 
   if (!this.isMoving() && this._triggerWait <= 0) {
@@ -1399,7 +615,10 @@ Game_TDEnemy.prototype.update = function () {
 Game_TDEnemy.prototype.updateTrap = function () {
   let trap = this.getTrap();
   if (!trap) return false;
+
+  // Check infront of trap
   if (!trap.isThrough()) {
+    // Trap Blocking
     this._attack.Time--;
     if (this._attack.Time <= 0) {
       this._attack.Time = this._enemyData.attackSpeed;
@@ -1407,6 +626,7 @@ Game_TDEnemy.prototype.updateTrap = function () {
     }
     return true;
   } else {
+    // Trap In grid
     trap.attackTrap(this);
     this._target = null;
     return false;
@@ -1504,7 +724,8 @@ Game_TDEnemy.prototype.updateEffects = function () {
         this._effects[effect].effect = null;
         continue;
       }
-      this._event.emit("addEffect", effect);
+      this._eventTmp.addEffect.push(effect);
+      // this._event.emit("addEffect", effect);
       this._effects[effect].enable = true;
     }
     this._effects[effect].effect.update();
@@ -1520,7 +741,8 @@ Game_TDEnemy.prototype.updateEffects = function () {
       }
       this._effects[effect].enable = false;
       this._effects[effect].effect = null;
-      this._event.emit("removeEffect", effect);
+      this._eventTmp.removeEffect.push(effect);
+      // this._event.emit("removeEffect", effect);
     }
   }
 };
@@ -1577,11 +799,21 @@ Game_TDEnemy.prototype.attackTrigger = function (eventid) {
 };
 
 Game_TDEnemy.prototype.attacked = function (damage) {
+  if (Imported.UFCTextHelper)
+    TextHelper.spawnText(damage.damage, this._realX, this._realY, {
+      animate: {
+        start: true,
+        time: 40,
+      },
+    });
   this._enemyData.health -= damage.damage;
-  this._event.emit(
-    "updateHealth",
-    this._enemyData.health / this._enemyData.maxHealth
-  );
+  // this._event.emit(
+  //   "updateHealth",
+  //   this._enemyData.health / this._enemyData.maxHealth
+  // );
+  this._eventTmp.updateHealth = true;
+  this._eventTmp.updateHealthValue =
+    this._enemyData.health / this._enemyData.maxHealth;
   if (this._enemyData.health <= 0 && !this._destroy) {
     if (this._enemyData.seDead)
       AudioManager.playSe({
@@ -1593,6 +825,8 @@ Game_TDEnemy.prototype.attacked = function (damage) {
     this.destroy();
     return;
   }
+
+  // Effects
   if (damage.effects && damage.effects.length > 0) {
     let _ef = damage.effects;
     for (const effect in _ef) {
@@ -1657,6 +891,8 @@ Object.defineProperty(Game_TDEnemy.prototype, "attackSpeed", {
     return this._enemyData.attackSpeed;
   },
 });
+
+// eslint-disable-next-line no-redeclare
 function Game_TDTower() {
   this.initialize(...arguments);
 }
@@ -1679,7 +915,6 @@ Game_TDTower.prototype.initialize = function (
   this._realY = this._towerData._y;
   this._target = null;
   this._destroy = false;
-  this._towerEffectedByAura = [];
   this._trapAttack = false;
   this._trapAttackTimeDefault = 60;
   this._trapAttackTime = this._trapAttackTimeDefault;
@@ -1693,10 +928,21 @@ Game_TDTower.prototype.initialize = function (
       trap[this._x][this._y] = this;
     }
   } else {
-    this.getTowerData().checkGetBuffs();
-    if (this.getTowerData().isHaveAura()) {
-      this.addAuraEffects();
-    }
+    this.checkAura();
+  }
+};
+
+Game_TDTower.prototype.checkAura = function (resetBuff = false) {
+  this._towerEffectedByAura = [];
+
+  // This is used for reset the aura, when load the game
+  // because the reference is different
+  if (resetBuff) this.getTowerData().resetBuffs();
+
+  // Buffs And Aura From Type Tower
+  this.getTowerData().checkGetBuffs();
+  if (this.getTowerData().isHaveAura()) {
+    this.addAuraEffects();
   }
 };
 
@@ -1760,6 +1006,7 @@ Game_TDTower.prototype.update = function () {
     $gameMap.ufcEnemies().length > 0 &&
     this.getTowerData().getBaseAttack > 0
   ) {
+    // Search target
     for (const enemy of $gameMap.ufcEnemies()) {
       if (
         PIXI.utils.isInRange(
@@ -1787,8 +1034,10 @@ Game_TDTower.prototype.update = function () {
       ) ||
       this._target.isDestroyed()
     ) {
+      // clear target
       this._target = null;
     } else {
+      // shoot projectile
       if (this._attackTime <= 0) {
         this._attackTime = this.getTowerData().getAttackSpeed();
         this.attack(this._target);
@@ -1799,6 +1048,7 @@ Game_TDTower.prototype.update = function () {
 
 Game_TDTower.prototype.attack = function (enemy) {
   let projectileId = $gameMap.ufcProjectiles();
+  // Update bullet
   $gameMap.ufcAddProjectile(
     new Game_ufcProjectile(
       this._x,
@@ -1849,6 +1099,7 @@ Game_TDTower.prototype.destroy = function (onlyDestroy = false) {
   $gameMap.ufcDestroyTower(this);
   if (this.getTowerData().getType == TowerDefenseManager.TOWERTYPE.TRAP) {
     $gameMap.ufcDestroyTrap(this);
+    // TODO: Still notsure if trap tower should effected with aure/buffs or not
     return;
   }
 
@@ -1880,9 +1131,11 @@ Game_TDTower.prototype.isMoving = function () {
 Game_TDTower.prototype.actionTower = function () {
   $gameMessage.setWindowTower(true);
   TowerDefenseManager.actionTower(this.getTowerData(), () => {
-    this.destroy(); 
+    this.destroy(); // Callback for move and upgrade
   });
 };
+
+// eslint-disable-next-line no-redeclare
 function Game_ufcProjectile() {
   this.initialize(...arguments);
 }
@@ -2007,9 +1260,11 @@ if (Imported.VisuMZ_1_EventsMoveCore) {
     return;
   };
 }
-const Sprite_ufcGrid = function () {
+
+// eslint-disable-next-line no-redeclare
+function Sprite_ufcGrid() {
   this.initialize(...arguments);
-};
+}
 
 Sprite_ufcGrid.prototype = Object.create(Sprite.prototype);
 Sprite_ufcGrid.prototype.constructor = Sprite_ufcGrid;
@@ -2042,6 +1297,8 @@ Sprite_ufcGrid.prototype.update = function () {
   this.x = this.screenX(-0.5);
   this.y = this.screenY(-0.5);
 
+  // this._gridData.updateEvents();
+
   if (this._gridData.isDestroyed()) {
     this.destroy();
   }
@@ -2061,9 +1318,11 @@ Sprite_ufcGrid.prototype.destroy = function () {
   this._gridData._event.removeListener("showGrid", this.setVisible, this);
   PIXI.Sprite.prototype.destroy.call(this, { children: true, texture: true });
 };
-const Sprite_ufcProjectile = function () {
+
+// eslint-disable-next-line no-redeclare
+function Sprite_ufcProjectile() {
   this.initialize(...arguments);
-};
+}
 
 Sprite_ufcProjectile.prototype = Object.create(Sprite.prototype);
 Sprite_ufcProjectile.prototype.constructor = Sprite_ufcProjectile;
@@ -2168,9 +1427,11 @@ Sprite_ufcProjectile.prototype.setPosition = function (x, y) {
   let pos = $gameMap.positionToCanvas(x, y);
   this.move(pos.x, pos.y);
 };
-const Sprite_ufcTDEnemy = function () {
+
+// eslint-disable-next-line no-redeclare
+function Sprite_ufcTDEnemy() {
   this.initialize(...arguments);
-};
+}
 
 Sprite_ufcTDEnemy.prototype = Object.create(Sprite.prototype);
 Sprite_ufcTDEnemy.prototype.constructor = Sprite_ufcTDEnemy;
@@ -2192,9 +1453,9 @@ Sprite_ufcTDEnemy.prototype.initMembers = function (enemyData) {
   this._destroy = false;
   this.scale.x = this._enemyData.scale;
   this.scale.y = this._enemyData.scale;
-  this._enemy._event.on("addEffect", this.addEffect, this);
-  this._enemy._event.on("removeEffect", this.removeEffect, this);
-  this._enemy._event.on("updateHealth", this.updateHealthGUI, this);
+  // this._enemy._event.on("addEffect", this.addEffect, this);
+  // this._enemy._event.on("removeEffect", this.removeEffect, this);
+  // this._enemy._event.on("updateHealth", this.updateHealthGUI, this);
   this.setCharacterBitmap();
 
   if (
@@ -2232,9 +1493,9 @@ Sprite_ufcTDEnemy.prototype.updateHealthGUI = function (healthScale = 1) {
 };
 
 Sprite_ufcTDEnemy.prototype.destroy = function () {
-  this._enemy._event.removeListener("addEffect", this.addEffect, this);
-  this._enemy._event.removeListener("removeEffect", this.removeEffect, this);
-  this._enemy._event.removeListener("updateHealth", this.updateHealthGUI, this);
+  // this._enemy._event.removeListener("addEffect", this.addEffect, this);
+  // this._enemy._event.removeListener("removeEffect", this.removeEffect, this);
+  // this._enemy._event.removeListener("updateHealth", this.updateHealthGUI, this);
   if (this._healthGUI)
     this._healthGUI.destroy({ texture: true, baseTexture: true });
   Sprite.prototype.destroy.call(this);
@@ -2282,23 +1543,48 @@ Sprite_ufcTDEnemy.prototype.checkCharacter = function (character) {
 
 Sprite_ufcTDEnemy.prototype.update = function () {
   if (this._destroy) {
+    // Waiting for animation to get destroyed check towerdefense Spriteset_Map.prototype.removeAnimation
     return;
   }
   Sprite.prototype.update.call(this);
+  this.updateEventTmp();
   this.updateCharacterFrame();
   this.updatePosition();
   if (this._enemy.isDestroyed()) {
     this.hide();
   }
-
   if (!this._enemy.isAnimationPlaying() && this._enemy.isDestroyed()) {
     this.destroyEnemy();
   }
 };
 
+Sprite_ufcTDEnemy.prototype.updateEventTmp = function () {
+  if (this._enemy._eventTmp.addEffect.length > 0) {
+    const effect = this._enemy._eventTmp.addEffect;
+    for (let i = 0; i < effect.length; i++) {
+      this.addEffect(effect[i]);
+      effect.splice(i, 1);
+      i--;
+    }
+  }
+  if (this._enemy._eventTmp.removeEffect.length > 0) {
+    const effect = this._enemy._eventTmp.removeEffect;
+    for (let i = 0; i < effect.length; i++) {
+      this.removeEffect(effect[i]);
+      effect.splice(i, 1);
+      i--;
+    }
+  }
+  if (this._enemy._eventTmp.updateHealth) {
+    this.updateHealthGUI(this._enemy._eventTmp.updateHealthValue);
+    this._enemy._eventTmp.updateHealth = false;
+  }
+};
 Sprite_ufcTDEnemy.prototype.destroyEnemy = function () {
   $gameMap.ufcDestroyCharacterSprite(this);
   this._destroy = true;
+  // since use request animation, this sprite can't be destroyed immediately
+  // so try delete it from targes animation first
   SceneManager.getSpriteSetMap().removeTargetFromAnimation(this);
 
   this.destroy();
@@ -2374,6 +1660,8 @@ Sprite_ufcTDEnemy.prototype.setPosition = function (x, y) {
   let pos = $gameMap.positionToCanvas(x, y);
   this.move(pos.x, pos.y);
 };
+
+// eslint-disable-next-line no-redeclare
 function Sprite_ufcTDEnemyEffect() {
   this.initialize(...arguments);
 }
@@ -2443,9 +1731,11 @@ Sprite_ufcTDEnemyEffect.prototype.updateFrame = function () {
     this.setFrame(0, 0, 0, 0);
   }
 };
-const Sprite_ufcTDTower = function () {
+
+// eslint-disable-next-line no-redeclare
+function Sprite_ufcTDTower() {
   this.initialize(...arguments);
-};
+}
 
 Sprite_ufcTDTower.prototype = Object.create(Sprite.prototype);
 Sprite_ufcTDTower.prototype.constructor = Sprite_ufcTDTower;
@@ -2469,11 +1759,11 @@ Sprite_ufcTDTower.prototype.initMembers = function (ufcTD) {
   this.setCharacterBitmap();
   if (this._towerData._placeMode) this.setSelectPosition();
 
-  this._towerData._event.on(
-    "setRangeVisibility",
-    this.setRangeVisibility,
-    this
-  );
+  // this._towerData._event.on(
+  //   "setRangeVisibility",
+  //   this.setRangeVisibility,
+  //   this
+  // );
 };
 
 Sprite_ufcTDTower.prototype.resetRangeGraphics = function () {
@@ -2490,6 +1780,15 @@ Sprite_ufcTDTower.prototype.resetRangeGraphics = function () {
       UFC.UFCTD.TOWERSETTINGS.attackRangeOpacity
     );
 
+  // TODO: Add option for display range grid or plain fill
+  // _rangeGraphics.drawRect(
+  //   0,
+  //   0,
+  //   _realRange * $gameMap.tileWidth(),
+  //   _realRange * $gameMap.tileHeight()
+  // );
+  // _rangeGraphics.endFill();
+
   let lineSize = 6;
   for (let x = 0; x < _realRange; x++) {
     for (let y = 0; y < _realRange; y++) {
@@ -2501,6 +1800,29 @@ Sprite_ufcTDTower.prototype.resetRangeGraphics = function () {
       );
     }
   }
+
+  // TODO: make option for circle radius
+  // https://www.redblobgames.com/grids/circle-drawing/
+  // https://en.wikipedia.org/wiki/Midpoint_circle_algorithm
+  // let pos = {
+  //   x: 0,
+  //   y: 0,
+  // };
+  // let radius = this._range;
+  // for (let y = -radius; y <= radius; y++) {
+  //   let dy = y - pos.y,
+  //     dx = Math.floor(Math.sqrt(radius * radius - dy * dy));
+  //   let left = pos.x - dx,
+  //     right = pos.x + dx;
+  //   for (let x = left; x <= right; x++) {
+  //     _rangeGraphics.drawRect(
+  //       this.posX(x) + lineSize / 2,
+  //       this.posY(y) + lineSize / 2,
+  //       $gameMap.tileWidth() - lineSize,
+  //       $gameMap.tileHeight() - lineSize
+  //     );
+  //   }
+  // }
 
   _rangeGraphics.endFill();
   let rangeSprite = Graphics.app.renderer.generateTexture(_rangeGraphics);
@@ -2532,6 +1854,10 @@ Sprite_ufcTDTower.prototype.checkCharacter = function (character) {
 
 Sprite_ufcTDTower.prototype.update = function () {
   Sprite.prototype.update.call(this);
+  // console.log(this._towerData.getRangeVisibility);
+  if (this._rangeGraphics.visible != this._towerData.getRangeVisibility) {
+    this.setRangeVisibility(this._towerData.getRangeVisibility);
+  }
   this.updateCharacterFrame();
   if (this._towerData._placeMode) return;
   this.updatePosition();
@@ -2635,11 +1961,11 @@ Sprite_ufcTDTower.prototype.posY = function (y) {
 };
 
 Sprite_ufcTDTower.prototype.destroy = function (options) {
-  this._towerData._event.removeListener(
-    "setRangeVisibility",
-    this.setRangeVisibility,
-    this
-  );
+  // this._towerData._event.removeListener(
+  //   "setRangeVisibility",
+  //   this.setRangeVisibility,
+  //   this
+  // );
   this._rangeGraphics.destroy({ texture: true, baseTexture: true });
   Sprite.prototype.destroy.call(this, options);
 };
@@ -2651,6 +1977,8 @@ PIXI.utils.dist = function (x1, y1, x2, y2) {
 PIXI.utils.randomArray = function (array) {
   return array[Math.floor(Math.random() * array.length)];
 };
+
+// x1 y1 is the object that want to be compared with x2 y2 + range
 PIXI.utils.isInRange = function (x1, y1, x2, y2, range) {
   return (
     x1 <= x2 + range && x1 >= x2 - range && y1 <= y2 + range && y1 >= y2 - range
@@ -2674,6 +2002,8 @@ DataManager.createGameObjects = function () {
   UFC.UFCTD.ALIAS._Datamanager_createGameObjects.call(this);
   TowerDefenseManager.initialize();
 };
+
+// Add Status Tower For shop -----------------------------------------
 UFC.UFCTD.ALIAS._Window_ShopStatus_refresh =
   Window_ShopStatus.prototype.refresh;
 Window_ShopStatus.prototype.refresh = function () {
@@ -2754,6 +2084,8 @@ Window_ShopStatus.prototype.drawTowerInfo = function (x, y, align) {
 Window_ShopStatus.prototype.isTowerItem = function () {
   return !!this._item.ufcTower;
 };
+
+// --------------------- Shop --------------------
 UFC.UFCTD.ALIAS._Scene_Shop_popScene = Scene_Shop.prototype.popScene;
 Scene_Shop.prototype.popScene = function () {
   TowerDefenseManager.openShop(false);
@@ -2800,6 +2132,8 @@ Window_ShopCommand.prototype.maxCols = function () {
   }
 };
 
+// ------------------------------------------------------------------
+
 Game_Character.prototype.moveAwayFromHere = function () {
   const d = [4, 2, 6, 8];
   for (let i = 0; i < d.length; i++) {
@@ -2818,10 +2152,12 @@ Game_Player.prototype.triggerButtonAction = function () {
     TowerDefenseManager.isActive &&
     Input.isTriggered("ok") &&
     TowerDefenseManager.getState == TowerDefenseManager.STATE.BUILD &&
-    !this.getGuideAction().isBlocked()
+    !GuideActionManager.getGuideAction.isBlocked()
   ) {
-    this.getGuideAction().updateBlocked(true);
-    if (!this.getGuideAction().isBlocked()) TowerDefenseManager.placeTower();
+    // Doublecheck incase using mouse
+    GuideActionManager.getGuideAction.updateBlocked(true);
+    if (!GuideActionManager.getGuideAction.isBlocked())
+      TowerDefenseManager.placeTower();
     return true;
   }
 
@@ -2841,9 +2177,9 @@ Game_Player.prototype.moveByInput = function () {
     TowerDefenseManager.isActive &&
     TowerDefenseManager.getState == TowerDefenseManager.STATE.BUILD &&
     this.getInputDirection() > 0 &&
-    this.getGuideAction().isMouseMode
+    GuideActionManager.getGuideAction.isMouseMode
   ) {
-    this.getGuideAction().setMouseMode(false);
+    GuideActionManager.getGuideAction.setMouseMode(false);
   }
   UFC.UFCTD.ALIAS._Game_Player_moveByInput.call(this);
 };
@@ -2865,14 +2201,15 @@ Game_Player.prototype.towerAction = function () {
     let dist = $gameMap.distance(this.x, this.y, destX, destY);
     if (dist <= 1) {
       this.turnTowardCharacter({ x: destX, y: destY });
-      this.getGuideAction().updateBlocked();
-      if (!this.getGuideAction().isBlocked()) {
-        this.getGuideAction().updateBlocked(true);
-        if (!this.getGuideAction().isBlocked())
+      GuideActionManager.getGuideAction.updateBlocked();
+      if (!GuideActionManager.getGuideAction.isBlocked()) {
+        // Double check incase the map is scrolled
+        GuideActionManager.getGuideAction.updateBlocked(true);
+        if (!GuideActionManager.getGuideAction.isBlocked())
           TowerDefenseManager.placeTower();
         $gameTemp.clearDestination();
       }
-      this.getGuideAction().clearTrigger();
+      GuideActionManager.getGuideAction.clearTrigger();
       return true;
     }
   }
@@ -2896,6 +2233,19 @@ Game_Player.prototype.update = function () {
     }
   }
 };
+
+// Touch input, check event there (check function Game_Player.prototype.triggerTouchAction)
+UFC.UFCTD.ALIAS._Game_Player_triggerTouchActionD1 =
+  Game_Player.prototype.triggerTouchActionD1;
+Game_Player.prototype.triggerTouchActionD1 = function (x1, y1) {
+  if (this.checkEventTower(x1, y1)) return true;
+
+  return UFC.UFCTD.ALIAS._Game_Player_triggerTouchActionD1.call(
+    this,
+    ...arguments
+  );
+};
+
 UFC.UFCTD.ALIAS._Game_Player_triggerTouchActionD2 =
   Game_Player.prototype.triggerTouchActionD2;
 Game_Player.prototype.triggerTouchActionD2 = function (x2, y2) {
@@ -2927,6 +2277,8 @@ Game_Player.prototype.checkEventTower = function (x, y) {
     return true;
   }
 };
+
+// Since shop icon is get call in start need to be chached
 UFC.UFCTD.ALIAS._Scene_Boot_loadSystemImages =
   Scene_Boot.prototype.loadSystemImages;
 Scene_Boot.prototype.loadSystemImages = function () {
@@ -2959,6 +2311,26 @@ Scene_Map.prototype.createAllWindows = function () {
   UFC.UFCTD.ALIAS._Scene_Map_createAllWindows.call(this);
   if (TowerDefenseManager.isConfigured) this.createHUDTD();
 };
+
+UFC.UFCTD.ALIAS._Scene_Map_onMapLoaded = Scene_Map.prototype.onMapLoaded;
+Scene_Map.prototype.onMapLoaded = function () {
+  let _tmpActive = TowerDefenseManager.isActive;
+  if ($gameSystem.isTowerDefenseMode() && !_tmpActive)
+    TowerDefenseManager.setActive(true);
+
+  UFC.UFCTD.ALIAS._Scene_Map_onMapLoaded.call(this);
+  if ($gameSystem.isTowerDefenseMode() && !_tmpActive) {
+    let config = $gameSystem.getTowerDefenseConfig();
+    TowerDefenseManager.setGuiSettings = config.guiSettings;
+    TowerDefenseManager.config(config.data);
+    TowerDefenseManager.showGUIItemSlot();
+    TowerDefenseManager.showHUDTDGold();
+    TowerDefenseManager.showHUDTDHealth();
+    TowerDefenseManager.loadMode();
+  }
+};
+
+// ----------------------------------- HUD --------------------------------
 Scene_Map.prototype.createHUDTD = function () {
   UFC.UFCTD.HUDGUI.ITEMSLOT = new Window_GUIItemSlot();
   this.addWindow(UFC.UFCTD.HUDGUI.ITEMSLOT);
@@ -2996,6 +2368,10 @@ Scene_Map.prototype.createHUDTD = function () {
     UFC.UFCTD.HUDGUI.SHOP.visible = TowerDefenseManager.getGUIItemSlot;
   }
 };
+
+// ----------------------------------- End HUD -------------------------
+
+// Change Gold
 UFC.UFCTD.ALIAS._Game_Interpreter_command125 =
   Game_Interpreter.prototype.command125;
 Game_Interpreter.prototype.command125 = function () {
@@ -3003,6 +2379,8 @@ Game_Interpreter.prototype.command125 = function () {
   TowerDefenseManager.updateHUDGold();
   return true;
 };
+
+// variable to make message busy
 UFC.UFCTD.ALIAS._Game_Message_clear = Game_Message.prototype.clear;
 Game_Message.prototype.clear = function () {
   UFC.UFCTD.ALIAS._Game_Message_clear.call(this);
@@ -3027,32 +2405,37 @@ Game_Message.prototype.setWindowTower = function (showTower) {
 
 UFC.UFCTD.ALIAS._Game_Map_initialize = Game_Map.prototype.initialize;
 Game_Map.prototype.initialize = function () {
-  UFC.UFCTD.ALIAS._Game_Map_initialize.apply(this, arguments);
-  this._towerDefenseWave = [];
-  this._towerDefenseEnemy = [];
-  this._towerDefenseProjectile = [];
-  this._towerDefenseTraps = [];
-  this._towerDefenseGrid = null;
+  UFC.UFCTD.ALIAS._Game_Map_initialize.call(this, arguments);
 };
 
-Game_Map.prototype.setupTDGrid = function (type) {
-  this._towerDefenseGrid = new Data_ufcGrid(type);
+UFC.UFCTD.ALIAS._Game_Map_setup = Game_Map.prototype.setup;
+Game_Map.prototype.setup = function () {
+  UFC.UFCTD.ALIAS._Game_Map_setup.call(this, ...arguments);
+  this._towerData = {
+    wave: [],
+    enemy: [],
+    projectile: [],
+    trap: [],
+  };
 };
 
 Game_Map.prototype.ufcGetGrid = function () {
   if (
-    this._towerDefenseGrid &&
-    this._towerDefenseGrid.getType !== null &&
-    !this._towerDefenseGrid.getBitmap._canvas
+    TowerDefenseManager.grid &&
+    TowerDefenseManager.grid.getType !== null &&
+    !TowerDefenseManager.grid.getBitmap._canvas
   ) {
-    this._towerDefenseGrid.refreshBitmap();
+    TowerDefenseManager.grid.refreshBitmap();
   }
-  return this._towerDefenseGrid;
+  return TowerDefenseManager.grid;
 };
 
 Game_Map.prototype.ufcCalcGrid = function () {
   this.ufcGetGrid().calcGrid();
 };
+
+// _characterSprites is used by rpgmaker engine to play animation
+// if sprite need animation they need to push it to _characterSprites array
 Game_Map.prototype.ufcAddCharacterSprites = function (characterSprite) {
   const _spriteSet = SceneManager.getSpriteSetMap();
   let newSpritesetIndex = _spriteSet._characterSprites.push(characterSprite);
@@ -3066,10 +2449,11 @@ Game_Map.prototype.getCharacterSprites = function () {
 };
 
 Game_Map.prototype.ufcAddProjectile = function (projectileData) {
+  // since projectile dont need animation, don't include to _charactersprites
   const _spriteSet = SceneManager.getSpriteSetMap();
-  let newTowerIndex = this._towerDefenseProjectile.push(projectileData);
+  let newTowerIndex = this._towerData.projectile.push(projectileData);
   _spriteSet._tilemap.addChild(
-    new Sprite_ufcProjectile(this._towerDefenseProjectile[newTowerIndex - 1])
+    new Sprite_ufcProjectile(this._towerData.projectile[newTowerIndex - 1])
   );
 };
 
@@ -3083,11 +2467,11 @@ Game_Map.prototype.ufcAddTower = function (towerData) {
 };
 
 Game_Map.prototype.ufcSpawnEnemy = function (enemyName, spawnId) {
-  let newEnemy = this._towerDefenseEnemy.push(
+  let newEnemy = this._towerData.enemy.push(
     new Game_TDEnemy(enemyName, spawnId)
   );
   this.ufcAddCharacterSprites(
-    new Sprite_ufcTDEnemy(this._towerDefenseEnemy[newEnemy - 1])
+    new Sprite_ufcTDEnemy(this._towerData.enemy[newEnemy - 1])
   );
 };
 
@@ -3096,11 +2480,11 @@ Game_Map.prototype.ufcDestroyCharacterSprite = function (character) {
 };
 
 Game_Map.prototype.ufcDestroyProjectile = function (projectile) {
-  return this._towerDefenseProjectile.remove(projectile);
+  return this._towerData.projectile.remove(projectile);
 };
 
 Game_Map.prototype.ufcDestroyEnemy = function (enemy) {
-  return this._towerDefenseEnemy.remove(enemy);
+  return this._towerData.enemy.remove(enemy);
 };
 
 Game_Map.prototype.ufcDestroyTower = function (tower) {
@@ -3108,7 +2492,7 @@ Game_Map.prototype.ufcDestroyTower = function (tower) {
 };
 
 Game_Map.prototype.ufcDestroyTrap = function (tower) {
-  delete this._towerDefenseTraps[tower._x][tower._y];
+  delete this._towerData.trap[tower._x][tower._y];
 };
 
 Game_Map.prototype.ufcGetTrap = function (x, y) {
@@ -3117,19 +2501,19 @@ Game_Map.prototype.ufcGetTrap = function (x, y) {
 };
 
 Game_Map.prototype.ufcTraps = function () {
-  return this._towerDefenseTraps;
+  return this._towerData.trap;
 };
 
 Game_Map.prototype.ufcEnemies = function () {
-  return this._towerDefenseEnemy;
+  return this._towerData.enemy;
 };
 
 Game_Map.prototype.ufcProjectiles = function () {
-  return this._towerDefenseProjectile;
+  return this._towerData.projectile;
 };
 
 Game_Map.prototype.isWaveEnd = function () {
-  return this.ufcEnemies().length <= 0 && this._towerDefenseWave.length <= 0;
+  return this.ufcEnemies().length <= 0 && this._towerData.wave.length <= 0;
 };
 
 Game_Map.prototype.xToCanvas = function (x) {
@@ -3151,17 +2535,17 @@ Game_Map.prototype.update = function (sceneActive) {
     this.updateTowerDefenseWave();
     this.updateTowerDefenseEnemy();
     this.updateProjectile();
-    this.updateGrid();
+    if (TowerDefenseManager.grid) this.updateGrid();
   }
 };
 
 Game_Map.prototype.addTowerDefenseNewWave = function (wavedata) {
-  this._towerDefenseWave.push(new ufcTowerWaveData(wavedata));
+  this._towerData.wave.push(new ufcTowerWaveData(wavedata));
 };
 
 Game_Map.prototype.updateTowerDefenseWave = function () {
-  if (this._towerDefenseWave.length > 0) {
-    let td = this._towerDefenseWave;
+  if (this._towerData.wave.length > 0) {
+    let td = this._towerData.wave;
     for (let i = 0; i < td.length; i++) {
       td[i].update();
 
@@ -3188,7 +2572,7 @@ Game_Map.prototype.updateProjectile = function () {
   }
 };
 Game_Map.prototype.updateGrid = function () {
-  this._towerDefenseGrid.updateEvents();
+  TowerDefenseManager.grid.updateEvents();
 };
 
 UFC.UFCTD.ALIAS._Game_Map_refresh = Game_Map.prototype.refresh;
@@ -3205,6 +2589,32 @@ Game_Map.prototype.checkTDTower = function (x, y, getData = false) {
   return towers.length > 0 ? (getData ? towers : true) : false;
 };
 
+UFC.UFCTD.ALIAS._Game_System_initialize = Game_System.prototype.initialize;
+Game_System.prototype.initialize = function () {
+  UFC.UFCTD.ALIAS._Game_System_initialize.call(this);
+  this._ufcTowerDefense = false;
+  this._ufcTowerDefenseConfig = [];
+};
+
+Game_System.prototype.setTowerDefense = function (value, config) {
+  this._ufcTowerDefense = value;
+  if (config) this._ufcTowerDefenseConfig = config;
+};
+
+Game_System.prototype.isTowerDefenseMode = function () {
+  return this._ufcTowerDefense;
+};
+
+Game_System.prototype.getTowerDefenseConfig = function () {
+  return this._ufcTowerDefenseConfig;
+};
+
+UFC.UFCTD.ALIAS._Game_System_onAfterLoad = Game_System.prototype.onAfterLoad;
+Game_System.prototype.onAfterLoad = function () {
+  UFC.UFCTD.ALIAS._Game_System_onAfterLoad.call(this);
+  // if (this._ufcTowerDefense)
+  // TowerDefenseManager.config(this._ufcTowerDefenseConfig);
+};
 Spriteset_Map.prototype.checkLimitAnimation = function () {
   return (
     this._animationSprites.length > TowerDefenseManager.getLimitAnimation &&
@@ -3228,12 +2638,16 @@ UFC.UFCTD.ALIAS._Spriteset_Map_createCharacters =
 Spriteset_Map.prototype.createCharacters = function () {
   UFC.UFCTD.ALIAS._Spriteset_Map_createCharacters.call(this);
   if (!TowerDefenseManager.isActive) return;
+
+  // Create Tower
   let towers = $gameMap._events.filter(
     (event) => event instanceof Game_TDTower
   );
   for (const tower of towers) {
     this._tilemap.addChild(new Sprite_ufcTDTower(tower));
   }
+
+  // Create enemy
   for (const enemy of $gameMap.ufcEnemies()) {
     let newSpritesetIndex = this._characterSprites.push(
       new Sprite_ufcTDEnemy(enemy)
@@ -3246,12 +2660,13 @@ Spriteset_Map.prototype.createCharacters = function () {
   }
 
   let grid = $gameMap.ufcGetGrid();
-  let tmpType = grid.getType;
-  for (let type of grid.getListType) {
-    this._tilemap.addChild(new Sprite_ufcGrid(type));
+  if (grid) {
+    let tmpType = grid.getType;
+    for (let type of grid.getListType) {
+      this._tilemap.addChild(new Sprite_ufcGrid(type));
+    }
+    grid.setType(tmpType);
   }
-  grid.setType(tmpType);
-
   if (TowerDefenseManager.getState != TowerDefenseManager.STATE.IDLE) {
     TowerDefenseManager.selectTowerMode();
   }
@@ -3275,6 +2690,12 @@ Game_Party.prototype.towers = function () {
   return Object.keys(this._towers).map((id) => $dataItems[id].ufcTower);
 };
 
+Game_Party.prototype.towersMaterial = function () {
+  return Object.keys(this._items)
+    .map((id) => $dataItems[id])
+    .filter((item) => item.ufcTowerMaterial);
+};
+
 if (Imported.VisuMZ_1_EventsMoveCore) {
   Game_Player.prototype.executeMoveDir8 = function () {
     if (this.towerAction()) return;
@@ -3290,6 +2711,34 @@ if (Imported.VisuMZ_1_EventsMoveCore) {
     return UFC.UFCTD.ALIAS._Game_Player_canPass.call(this, ...arguments);
   };
 }
+
+UFC.UFCTD.ALIAS._DataManager_makeSaveContents = DataManager.makeSaveContents;
+DataManager.makeSaveContents = function () {
+  const contents = UFC.UFCTD.ALIAS._DataManager_makeSaveContents.call(
+    this,
+    ...arguments
+  );
+  contents.ufcTowerDefense = {
+    enemy: $dataTDEnemy,
+    spawnLocation: $dataTDSpawnLocation,
+    trigger: $dataTDTrigger,
+  };
+  return contents;
+};
+
+UFC.UFCTD.ALIAS._DataManager_extractSaveContents =
+  DataManager.extractSaveContents;
+DataManager.extractSaveContents = function (contents) {
+  UFC.UFCTD.ALIAS._DataManager_extractSaveContents.call(this, ...arguments);
+  const td = contents.ufcTowerDefense;
+  if (td) {
+    $dataTDEnemy = td.enemy;
+    $dataTDSpawnLocation = td.spawnLocation;
+    $dataTDTrigger = td.trigger;
+  }
+};
+
+// eslint-disable-next-line no-redeclare
 function TowerDefenseManager() {
   throw new Error("This is a static class");
 }
@@ -3298,14 +2747,18 @@ TowerDefenseManager.initialize = function () {
   this._active = false;
   this._config = false;
   this._shopOpen = false;
-  this._HUDGold = false;
-  this._HUDHealth = false;
-  this._GUIItemSlot = false;
+  this._GUISettings = {
+    gold: false,
+    health: false,
+    itemSlot: false,
+  };
   this._state = TowerDefenseManager.STATE.IDLE;
   this._selectedUFCTD = null;
   this._limitAnimation = 0;
   this._controlBuildingMouse = false;
   this._cacheSprite = [];
+  this._mapId = 0;
+  this._grid = null;
   this.addTowerList();
   if (UFC.UFCTD.DEBUGMODE.enable) this.debugMode();
 };
@@ -3314,21 +2767,20 @@ TowerDefenseManager.debugMode = function () {
   if (UFC.UFCTD.DEBUGMODE.CONFIG) return;
   UFC.UFCTD.DEBUGMODE.CONFIG = {
     showRange: false,
+    ticker: false,
   };
-  window.addEventListener(
-    "keydown",
-    (e) => {
-      if (e.key == 1) {
-        Graphics.app.ticker.speed = UFC.UFCTD.DEBUGMODE.tickerSpeed;
-      }
-    },
-    false
-  );
+  // window.addEventListener("keydown", (e) => {}, false);
   window.addEventListener(
     "keyup",
     (e) => {
       if (e.key == 1) {
-        Graphics.app.ticker.speed = 1;
+        if (UFC.UFCTD.DEBUGMODE.ticker) {
+          Graphics.app.ticker.speed = 1;
+          UFC.UFCTD.DEBUGMODE.ticker = false;
+        } else {
+          Graphics.app.ticker.speed = UFC.UFCTD.DEBUGMODE.tickerSpeed;
+          UFC.UFCTD.DEBUGMODE.ticker = true;
+        }
       }
       if (e.key == 2) {
         UFC.UFCTD.DEBUGMODE.CONFIG.showRange = !UFC.UFCTD.DEBUGMODE.CONFIG
@@ -3348,6 +2800,29 @@ TowerDefenseManager.debugMode = function () {
       }
       if (e.key == 4) {
         this.setLimitAnimation(UFC.UFCTD.DEBUGMODE.limitAnimation);
+      }
+      if (e.key == 5 && Imported.UFCTextHelper) {
+        TextHelper.spawnText(
+          $gamePlayer._x + "," + $gamePlayer._y,
+          $gamePlayer._realX,
+          $gamePlayer._realY,
+          {
+            animate: {
+              start: true,
+              time: 60,
+            },
+          }
+        );
+        // for (let i = 1; i < 1000; i++) {
+        //   setTimeout(() => {
+        //     TextHelper.spawnText(i, $gamePlayer._realX, $gamePlayer._realY, {
+        //       animate: {
+        //         start: true,
+        //         time: 60,
+        //       },
+        //     });
+        //   }, i * 50);
+        // }
       }
     },
     false
@@ -3425,24 +2900,24 @@ TowerDefenseManager.requestAnimation = function (targets, animation) {
 
 TowerDefenseManager.showGUIItemSlot = function (args) {
   if (!this.isActive) return;
-  this._GUIItemSlot = args["show"] == "true";
-  UFC.UFCTD.HUDGUI.ITEMSLOT.visible = this._GUIItemSlot;
+  if (args) this._GUISettings.itemSlot = args["show"] == "true";
+  UFC.UFCTD.HUDGUI.ITEMSLOT.visible = this._GUISettings.itemSlot;
   if (UFC.UFCTD.SHOPGUISETTINGS.enable)
-    UFC.UFCTD.HUDGUI.SHOP.visible = this._GUIItemSlot;
-  if (this._GUIItemSlot) UFC.UFCTD.HUDGUI.ITEMSLOT.open();
+    UFC.UFCTD.HUDGUI.SHOP.visible = this._GUISettings.itemSlot;
+  if (this._GUISettings.itemSlot) UFC.UFCTD.HUDGUI.ITEMSLOT.open();
   else UFC.UFCTD.HUDGUI.ITEMSLOT.close();
 };
 
 TowerDefenseManager.showHUDTDGold = function (args) {
   if (!this.isActive) return;
-  this._HUDGold = args["show"] == "true";
-  UFC.UFCTD.HUDGUI.GOLDWINDOW.visible = this._HUDGold;
+  if (args) this._GUISettings.gold = args["show"] == "true";
+  UFC.UFCTD.HUDGUI.GOLDWINDOW.visible = this._GUISettings.gold;
 };
 
 TowerDefenseManager.showHUDTDHealth = function (args) {
   if (!this.isActive) return;
-  this._HUDHealth = args["show"] == "true";
-  UFC.UFCTD.HUDGUI.HEALTHWINDOW.visible = this._HUDHealth;
+  if (args) this._GUISettings.health = args["show"] == "true";
+  UFC.UFCTD.HUDGUI.HEALTHWINDOW.visible = this._GUISettings.health;
 };
 
 TowerDefenseManager.gainGold = function (gold) {
@@ -3480,62 +2955,78 @@ TowerDefenseManager.updateHUD = function () {
 };
 
 TowerDefenseManager.config = function (args) {
+  $gameSystem.setTowerDefense(true, {
+    data: args,
+    guiSettings: this._GUISettings,
+  });
+
   SceneManager.getScene().createHUDTD();
+
   let listTowerType = Object.keys(TowerDefenseManager.TOWERTYPE).map(
     (item) => TowerDefenseManager.TOWERTYPE[item]
   );
-  $gameMap.setupTDGrid(listTowerType);
+  this.grid = new Data_ufcGrid(listTowerType);
 
   const _spriteSet = SceneManager.getSpriteSetMap();
 
   for (let type of listTowerType) {
     _spriteSet._tilemap.addChild(new Sprite_ufcGrid(type));
   }
-  $gamePlayer.getGuideAction().setType(TowerDefenseManager.TOWERTYPE.TOWER);
+
+  // Set Terrain Tower
+  GuideActionManager.getGuideAction.setType(
+    TowerDefenseManager.TOWERTYPE.TOWER
+  );
   let ot = JSON.parse(args["onlyTerrain"]);
   if (ot && ot.length > 0) {
     ot = ot.map(Number);
-    $gamePlayer.getGuideAction().setOnlyTerrain(ot);
+    GuideActionManager.getGuideAction.setOnlyTerrain(ot);
   }
 
   let et = JSON.parse(args["exceptTerrain"]);
   if (et && et.length > 0) {
     et = et.map(Number);
-    $gamePlayer.getGuideAction().setExceptTerrain(et);
+    GuideActionManager.getGuideAction.setExceptTerrain(et);
   }
+
+  // Set Region Tower
   let or = JSON.parse(args["onlyRegionID"]);
   if (or && or.length > 0) {
     or = or.map(Number);
-    $gamePlayer.getGuideAction().setOnlyRegion(or);
+    GuideActionManager.getGuideAction.setOnlyRegion(or);
   }
 
   let er = JSON.parse(args["exceptRegionID"]);
   if (er && er.length > 0) {
     er = er.map(Number);
-    $gamePlayer.getGuideAction().setExceptRegion(er);
+    GuideActionManager.getGuideAction.setExceptRegion(er);
   }
-  $gamePlayer.getGuideAction().setType(TowerDefenseManager.TOWERTYPE.TRAP);
+
+  // Set Terrain Trap
+  GuideActionManager.getGuideAction.setType(TowerDefenseManager.TOWERTYPE.TRAP);
   let ott = JSON.parse(args["onlyTrapTerrain"]);
   if (ott && ott.length > 0) {
     ott = ott.map(Number);
-    $gamePlayer.getGuideAction().setOnlyTerrain(ott);
+    GuideActionManager.getGuideAction.setOnlyTerrain(ott);
   }
 
   let ett = JSON.parse(args["exceptTrapTerrain"]);
   if (ett && ett.length > 0) {
     ett = ett.map(Number);
-    $gamePlayer.getGuideAction().setExceptTerrain(ett);
+    GuideActionManager.getGuideAction.setExceptTerrain(ett);
   }
+
+  // Set Region Trap
   let ort = JSON.parse(args["onlyTrapRegionID"]);
   if (ort && ort.length > 0) {
     ort = ort.map(Number);
-    $gamePlayer.getGuideAction().setOnlyRegion(ort);
+    GuideActionManager.getGuideAction.setOnlyRegion(ort);
   }
 
   let ert = JSON.parse(args["exceptTrapRegionID"]);
   if (ert && ert.length > 0) {
     ert = ert.map(Number);
-    $gamePlayer.getGuideAction().setExceptRegion(ert);
+    GuideActionManager.getGuideAction.setExceptRegion(ert);
   }
 
   if (args["limitAnimation"] != "0") {
@@ -3545,12 +3036,16 @@ TowerDefenseManager.config = function (args) {
   TowerDefenseManager.setActive(true);
   TowerDefenseManager.updateHUDHealth();
   $gameMap.ufcCalcGrid();
+
+  // Disable Open Menu
   $gameSystem.disableMenu();
 
   this.cacheImage();
 
   this._config = true;
 };
+
+// Cache image that being used in tower data, bullets & character
 TowerDefenseManager.cacheImage = function () {
   ImageManager.loadSystem("TDSet");
   for (let image of this._cacheSprite) {
@@ -3567,17 +3062,27 @@ TowerDefenseManager.disableTowerDefense = function (
   destroyEnemy = false,
   destroyTDItems = true
 ) {
+  $gameSystem.setTowerDefense(false);
+
   this._config = false;
 
   this.setActive(false);
+
+  // Destroy HUD
   UFC.UFCTD.HUDGUI.ITEMSLOT.destroy();
   UFC.UFCTD.HUDGUI.GOLDWINDOW.destroy();
   UFC.UFCTD.HUDGUI.HEALTHWINDOW.destroy();
   if (UFC.UFCTD.SHOPGUISETTINGS.enable) UFC.UFCTD.HUDGUI.SHOP.destroy();
+
+  // Destroy Grid
   $gameMap.ufcGetGrid().destroy();
+
+  // Destroy Projectile
   for (const projectile of $gameMap.ufcProjectiles()) {
     projectile.destroy(true);
   }
+
+  // Destroy Tower
   if (destroyTower) {
     let towers = $gameMap._events.filter(
       (event) => event instanceof Game_TDTower
@@ -3586,16 +3091,33 @@ TowerDefenseManager.disableTowerDefense = function (
       tower.destroy(true);
     }
   }
+
+  // Destroy Enemy
   if (destroyEnemy) {
     for (let i = 0; i < $gameMap.ufcEnemies().length; i++) {
       $gameMap.ufcEnemies()[i].destroy(true);
       i--;
     }
   }
+
+  // Delete Items
   if (destroyTDItems) {
     $gameParty._towers = {};
   }
+
+  // Enable Open Menu
   $gameSystem.enableMenu();
+};
+
+TowerDefenseManager.loadMode = function () {
+  $gameMap._events
+    .filter((event) => event instanceof Game_TDTower)
+    .forEach((tower) => {
+      // Reset buff & aura
+      tower.checkAura(true);
+      // Reset Target
+      tower._target = null;
+    });
 };
 
 TowerDefenseManager.actionTower = function (towerData, callback) {
@@ -3606,11 +3128,12 @@ TowerDefenseManager.selectTower = function (towerData) {
   this._state = TowerDefenseManager.STATE.BUILD;
   this._selectedUFCTD = new ufcTowerData(towerData);
   this._selectedUFCTD.setPlaceMode(true);
-  $gamePlayer.getGuideAction().setType(this._selectedUFCTD.getType);
+  GuideActionManager.getGuideAction.setType(this._selectedUFCTD.getType);
 };
 
 TowerDefenseManager.cancelSelect = function (sfx = true) {
   this.gainItem(this._selectedUFCTD._id, 1);
+  // SFX
   if (sfx)
     AudioManager.playSe({
       name: UFC.UFCTD.CONFIG.sound.towerCancel,
@@ -3625,9 +3148,9 @@ TowerDefenseManager.cancelSelect = function (sfx = true) {
 TowerDefenseManager.clearSelect = function () {
   this._state = TowerDefenseManager.STATE.IDLE;
   this._selectedUFCTD = null;
-  $gamePlayer.getGuideAction().setActive(false);
-  if ($gamePlayer.getGuideActionGraphics().children.length > 0)
-    $gamePlayer.getGuideActionGraphics().removeChildAt(0);
+  GuideActionManager.getGuideAction.setActive(false);
+  if (GuideActionManager.getGuideActionGraphics.children.length > 0)
+    GuideActionManager.getGuideActionGraphics.removeChildAt(0);
   $gameMap.ufcGetGrid().setVisible(false);
 };
 
@@ -3636,9 +3159,9 @@ TowerDefenseManager.selectTowerMode = function () {
     new Game_TDTower(this.getSelectedTowerData(), $gameMap._mapId)
   );
   selectedTower.setRangeVisibility(true);
-  $gamePlayer.getGuideAction().setActive(true);
+  GuideActionManager.getGuideAction.setActive(true);
 
-  $gamePlayer.getGuideActionGraphics().addChild(selectedTower);
+  GuideActionManager.getGuideActionGraphics.addChild(selectedTower);
   $gameMap
     .ufcGetGrid()
     .setType(this.getSelectedTowerData().getType)
@@ -3654,10 +3177,12 @@ TowerDefenseManager.addDBEnemy = function (enemyData) {
   if (!$dataTDEnemy[enemyData.id]) {
     $dataTDEnemy[enemyData.id] = {};
   } else {
+    // console.warn("Duplicate ID for " + enemyData.id);
     return;
   }
 
   for (let data in enemyData) {
+    // parse in here instead in init Game_TDEnemy, so doesnt need to parse again
     switch (data) {
       case "itemDrop":
         enemyData[data] =
@@ -3703,7 +3228,7 @@ TowerDefenseManager.getTrigger = function (mapid, x, y) {
 };
 
 TowerDefenseManager.placeTower = function () {
-  let _gPosition = $gamePlayer.getGuideAction().getPosition();
+  let _gPosition = GuideActionManager.getGuideAction.getPosition();
   this._selectedUFCTD._x = _gPosition.x;
   this._selectedUFCTD._y = _gPosition.y;
   this._selectedUFCTD.setPlaceMode(false);
@@ -3713,6 +3238,8 @@ TowerDefenseManager.placeTower = function () {
   UFC.UFCTD.HUDGUI.ITEMSLOT.open();
 
   this.clearSelect();
+
+  // SFX
   AudioManager.playSe({
     name: UFC.UFCTD.CONFIG.sound.towerPlace,
     volume: 100,
@@ -3739,19 +3266,19 @@ Object.defineProperty(TowerDefenseManager, "getLimitAnimation", {
 
 Object.defineProperty(TowerDefenseManager, "getHUDGold", {
   get: function () {
-    return this._HUDGold;
+    return this._GUISettings.gold;
   },
 });
 
 Object.defineProperty(TowerDefenseManager, "getHUDHealth", {
   get: function () {
-    return this._HUDHealth;
+    return this._GUISettings.health;
   },
 });
 
 Object.defineProperty(TowerDefenseManager, "getGUIItemSlot", {
   get: function () {
-    return this._GUIItemSlot;
+    return this._GUISettings.itemSlot;
   },
 });
 
@@ -3785,6 +3312,32 @@ Object.defineProperty(TowerDefenseManager, "isShopOpen", {
   },
 });
 
+Object.defineProperty(TowerDefenseManager, "getTDData", {
+  get: function () {
+    if (!this._tdData[this._mapId]) return null;
+
+    return this._tdData[this._mapId];
+  },
+});
+
+Object.defineProperty(TowerDefenseManager, "grid", {
+  get: function () {
+    return this._grid;
+  },
+  set: function (value) {
+    this._grid = value;
+  },
+});
+
+Object.defineProperty(TowerDefenseManager, "setGuiSettings", {
+  get: function () {
+    return this._GUISettings;
+  },
+  set: function (value) {
+    this._GUISettings = value;
+  },
+});
+
 TowerDefenseManager.addTowerList = function () {
   for (let i = 0; i < $dataItems.length; i++) {
     if ($dataItems[i] && $dataItems[i].note) this.addTower(i, $dataItems[i]);
@@ -3798,6 +3351,8 @@ TowerDefenseManager.addTower = function (itemid, item) {
   let note = "";
   let data = null;
   for (let i = 0; i < lines.length; i++) {
+    if (lines[i].match(/<ufcTDMaterial>/)) item.ufcTowerMaterial = true;
+
     if (lines[i].match(/<ufcTD>/)) {
       tdMode = true;
       data = {};
@@ -3831,7 +3386,7 @@ TowerDefenseManager.addTower = function (itemid, item) {
     data.istowerdata = true;
     data.id = itemid;
     data.name = item.name;
-    data.iconindex = item.iconIndex;
+    data.iconIndex = item.iconIndex;
     data.bulletanimationid = item.animationId;
     data.note = note;
     item.ufcTower = data;
@@ -3877,10 +3432,13 @@ TowerDefenseManager.convertDirection = function (direction) {
 
   return dir;
 };
-const ufcTowerData = function () {
-  this.initialize(...arguments);
-};
 
+// eslint-disable-next-line no-redeclare
+function ufcTowerData() {
+  this.initialize(...arguments);
+}
+
+ufcTowerData.prototype.constructor = ufcTowerData;
 ufcTowerData.prototype.initialize = function (data) {
   this._id = data["id"];
   this._name = data["name"];
@@ -3912,9 +3470,17 @@ ufcTowerData.prototype.initialize = function (data) {
       break;
   }
   this._upgrade = [];
-  let listUpgrade = Object.keys(data).filter(
-    (item) => item.slice(0, 7) == "upgrade"
-  );
+
+  let listUpgrade = [];
+  Object.keys(data).forEach((item) => {
+    if (
+      item == "upgrade" ||
+      (item.slice(0, 7) == "upgrade" && !isNaN(item.slice(-1)))
+    ) {
+      listUpgrade.push(item);
+    }
+  });
+
   if (listUpgrade.length > 0) {
     listUpgrade.forEach((item) => {
       let _data = data[item].split("|");
@@ -3924,10 +3490,21 @@ ufcTowerData.prototype.initialize = function (data) {
       } else {
         _price = +_data[1];
       }
-
+      let material = [];
+      if (data[item + "material"]) {
+        let _materials = data[item + "material"].split(",");
+        for (const _material of _materials) {
+          let __material = _material.split("|");
+          material.push({
+            id: +__material[0],
+            ammount: +__material[1] || 1,
+          });
+        }
+      }
       this._upgrade.push({
         id: +_data[0],
         price: _price,
+        material: material,
       });
     });
   }
@@ -3951,6 +3528,7 @@ ufcTowerData.prototype.initialize = function (data) {
       });
     }
   }
+
   this._auras = [];
   if (data["auras"]) {
     let auras = data["auras"].split(",");
@@ -3963,18 +3541,22 @@ ufcTowerData.prototype.initialize = function (data) {
       });
     }
   }
+
   this._attackType = data["attacktype"] || TowerDefenseManager.ENEMYTYPE.ALL;
   this._note = data["note"];
   this._buffs = {};
   this.resetBuffs();
   this._x = 0;
   this._y = 0;
-  this._event = new PIXI.utils.EventEmitter();
+  // Can't use event emitter because of how rpgmaker mz save works ):
+  // this._event = new PIXI.utils.EventEmitter();
   this._placeMode = false;
+  this._rangeVisibility = true;
 };
 
 ufcTowerData.prototype.setRangeVisibility = function (visible) {
-  this._event.emit("setRangeVisibility", visible);
+  this._rangeVisibility = visible;
+  // this._event.emit("setRangeVisibility", visible);
 };
 
 ufcTowerData.prototype.getBulletData = function () {
@@ -4076,7 +3658,7 @@ ufcTowerData.prototype.checkGetBuffs = function () {
     (event) =>
       event instanceof Game_TDTower &&
       event.getTowerData() !== this &&
-      event.getTowerData().getType === TowerDefenseManager.TOWERTYPE.TOWER && 
+      event.getTowerData().getType === TowerDefenseManager.TOWERTYPE.TOWER && // Type trap don't have aura/buffs so exclude
       event.getTowerData().isHaveAura() &&
       PIXI.utils.isInRange(
         this._x,
@@ -4121,10 +3703,38 @@ Object.defineProperty(ufcTowerData.prototype, "getType", {
     return this._type;
   },
 });
-const ufcTowerEffects = function () {
-  this.initialize(...arguments);
-};
 
+Object.defineProperty(ufcTowerData.prototype, "getUpgradeMaterial", {
+  get: function () {
+    return this._upgradeMaterial;
+  },
+});
+
+Object.defineProperty(ufcTowerData.prototype, "getRangeVisibility", {
+  get: function () {
+    return this._rangeVisibility;
+  },
+});
+
+Object.defineProperty(ufcTowerData.prototype, "getAttackTypeAsName", {
+  get: function () {
+    switch (this._attackType) {
+      case TowerDefenseManager.ENEMYTYPE.AIR:
+        return "Air";
+      case TowerDefenseManager.ENEMYTYPE.GROUND:
+        return "Ground";
+      default:
+        return "All";
+    }
+  },
+});
+
+// eslint-disable-next-line no-redeclare
+function ufcTowerEffects() {
+  this.initialize(...arguments);
+}
+
+ufcTowerEffects.prototype.constructor = ufcTowerEffects;
 ufcTowerEffects.prototype.initialize = function (data) {
   this._name = data.name;
   this._effect = data.effect;
@@ -4191,19 +3801,25 @@ ufcTowerEffects.prototype.reset = function () {
   this._curTime = this._duration;
   this._isDone = false;
 };
-const ufcTowerSpawnData = function () {
-  this.initialize(...arguments);
-};
 
+// eslint-disable-next-line no-redeclare
+function ufcTowerSpawnData() {
+  this.initialize(...arguments);
+}
+
+ufcTowerSpawnData.prototype.constructor = ufcTowerSpawnData;
 ufcTowerSpawnData.prototype.initialize = function (data) {
   this._x = data._x;
   this._y = data._y;
   this._direction = data["direction"];
 };
-const ufcTowerWaveData = function () {
-  this.initialize(...arguments);
-};
 
+// eslint-disable-next-line no-redeclare
+function ufcTowerWaveData() {
+  this.initialize(...arguments);
+}
+
+ufcTowerWaveData.prototype.constructor = ufcTowerWaveData;
 ufcTowerWaveData.prototype.initialize = function (data) {
   this._spawnLocationId = data["spawnLocationId"];
   this._enemy = data["enemy"];
@@ -4262,6 +3878,8 @@ ufcTowerWaveData.prototype.isSpawnEnemy = function () {
 ufcTowerWaveData.prototype.isDone = function () {
   return this._numberSpawn <= 0;
 };
+
+// eslint-disable-next-line no-redeclare
 function Window_BaseExtend() {
   this.initialize(...arguments);
 }
@@ -4304,9 +3922,11 @@ Window_BaseExtend.prototype.clear = function () {
   this.contents.clear();
   this.contentsBack.clear();
 };
-const Window_GUIItemSlot = function () {
+
+// eslint-disable-next-line no-redeclare
+function Window_GUIItemSlot() {
   this.initialize(...arguments);
-};
+}
 
 Window_GUIItemSlot.prototype = Object.create(Window_Command.prototype);
 Window_GUIItemSlot.prototype.constructor = Window_GUIItemSlot;
@@ -4394,8 +4014,12 @@ Window_GUIItemSlot.prototype.select = function (index) {
 Window_GUIItemSlot.prototype.callOkHandler = function () {
   this.activate();
   let tower = this._towers[this.index()];
-  if (!tower || ($gameMessage.isBusy() && !this._selectKeyboard)) return;
-  $gamePlayer.getGuideAction().resetParent();
+  if (
+    !tower ||
+    ($gameMessage.isBusy() && !this._selectKeyboard) ||
+    tower.ufcTowerMaterial
+  )
+    return;
   TowerDefenseManager.gainItem(tower.id, -1);
   TowerDefenseManager.clearSelect();
   TowerDefenseManager.selectTower(tower);
@@ -4413,10 +4037,18 @@ Window_GUIItemSlot.prototype.activeKeyboard = function () {
 };
 
 Window_GUIItemSlot.prototype.deactiveKeyboard = function () {
+  if (UFC.UFCTD.HUDGUI.QUICKSHOP.isOpen()) {
+    UFC.UFCTD.HUDGUI.QUICKSHOP.close();
+    UFC.UFCTD.HUDGUI.SHOP.selected();
+    return;
+  }
+
   this._selectKeyboard = false;
   $gameMessage.setWindowTower(false);
   this.deselect();
   this.deactivate();
+
+  // Deactive Shop Selection
   UFC.UFCTD.HUDGUI.SHOP.deselect();
 };
 
@@ -4544,7 +4176,13 @@ Window_Command.prototype.commandIconIndex = function (index) {
 
 Window_GUIItemSlot.prototype.processTouch = function () {
   Window_Command.prototype.processTouch.call(this);
-  if (this.isClosed() || !this.visible) return;
+  if (
+    this.isClosed() ||
+    !this.isOpen() ||
+    !this.visible ||
+    TowerDefenseManager.getState !== TowerDefenseManager.STATE.IDLE
+  )
+    return;
   if (this.isTouchedInsideFrame()) {
     UFC.UFCTD.HUDGUI.MESSAGE.isHoverHUDItem = true;
     this.activate();
@@ -4626,13 +4264,14 @@ Window_GUIItemSlot.prototype.refresh = function () {
 
 Window_GUIItemSlot.prototype.makeCommandTowers = function () {
   this._towers = $gameParty.towers();
+  this._towers.push(...$gameParty.towersMaterial());
   let length =
     this._towers.length < this.maxCols() ? this.maxCols() : this._towers.length;
   for (let i = 0; i < length; i++) {
     if (this._towers[i]) {
       this.addCommand(
         this._towers[i].name,
-        this._towers[i].iconindex,
+        this._towers[i].iconIndex,
         $gameParty.numItems(this._towers[i]),
         true
       );
@@ -4650,6 +4289,8 @@ Window_GUIItemSlot.prototype.close = function () {
   }
 
   UFC.UFCTD.HUDGUI.MESSAGE.isHoverHUDItem = false;
+
+  // Also close shop
   if (UFC.UFCTD.SHOPGUISETTINGS.enable) UFC.UFCTD.HUDGUI.SHOP.close();
 
   Window_Command.prototype.close.call(this);
@@ -4661,10 +4302,14 @@ Window_GUIItemSlot.prototype.open = function () {
       child.open();
     }
   }
+
+  // Also close shop
   if (UFC.UFCTD.SHOPGUISETTINGS.enable) UFC.UFCTD.HUDGUI.SHOP.open();
 
   Window_Command.prototype.open.call(this);
 };
+
+// eslint-disable-next-line no-redeclare
 function Window_TDAction() {
   this.initialize(...arguments);
 }
@@ -4680,14 +4325,18 @@ Window_TDAction.prototype.initialize = function (rect) {
   this._towerDataDestroyCallback = null;
   this._selected = false;
   this.setBackgroundType(0);
+
+  // this.setHandler("ok", this.onOk.bind(this));
   this.setHandler("cancel", this.onCancel.bind(this));
 
   let statusWidth = this.x;
   let statusHeight = 240;
   this.status = new Window_TDStatus(
     new Rectangle(
-      -statusWidth,
-      this.height - statusHeight,
+      -statusWidth + UFC.UFCTD.HUDGUI.SETTINGS.towerAction.statusPositionX,
+      this.height -
+        statusHeight +
+        UFC.UFCTD.HUDGUI.SETTINGS.towerAction.statusPositionY,
       statusWidth,
       statusHeight
     )
@@ -4698,8 +4347,10 @@ Window_TDAction.prototype.initialize = function (rect) {
   let upgradeHeight = this.height;
   this.upgradeWindow = new Window_TDActionUpgrade(
     new Rectangle(
-      this.width,
-      this.height - upgradeHeight,
+      this.width + UFC.UFCTD.HUDGUI.SETTINGS.towerAction.upgradeListPositionX,
+      this.height -
+        upgradeHeight +
+        UFC.UFCTD.HUDGUI.SETTINGS.towerAction.upgradeListPositionY,
       upgradeWidth,
       upgradeHeight
     )
@@ -4709,6 +4360,13 @@ Window_TDAction.prototype.initialize = function (rect) {
   this.upgradeWindow.on("upgradeTower", this.upgradeTower, this);
   this.upgradeWindow.on("selectUpgradeWindow", this.selectUpgradeWindow, this);
 
+  if (
+    UFC.UFCTD.HUDGUI.SETTINGS.towerAction.buttonGroupPositionX != 0 ||
+    UFC.UFCTD.HUDGUI.SETTINGS.towerAction.buttonGroupPositionY != 0
+  ) {
+    this.x += UFC.UFCTD.HUDGUI.SETTINGS.towerAction.buttonGroupPositionX;
+    this.y += UFC.UFCTD.HUDGUI.SETTINGS.towerAction.buttonGroupPositionY;
+  }
   this.hide();
   this.close();
 };
@@ -4740,7 +4398,7 @@ Window_TDAction.prototype.upgradeTower = function (upgradeIndex) {
     pan: 0,
   });
   TowerDefenseManager.gainGold(-+this._towerData._upgrade[upgradeIndex].price);
-  $gamePlayer.getGuideAction().resetParent();
+  // Upgrade
   TowerDefenseManager.selectTower(
     $dataItems[this._towerData._upgrade[upgradeIndex].id].ufcTower
   );
@@ -4752,13 +4410,14 @@ Window_TDAction.prototype.upgradeTower = function (upgradeIndex) {
 
 Window_TDAction.prototype.callOkHandler = function () {
   switch (this.index()) {
+    // Move
     case 0:
-      $gamePlayer.getGuideAction().resetParent();
       TowerDefenseManager.clearSelect();
       TowerDefenseManager.selectTower($dataItems[this._towerData._id].ufcTower);
       TowerDefenseManager.selectTowerMode();
       this._towerDataDestroyCallback();
       break;
+    // Upgrade
     case 1:
       if (this._towerData.isHaveUpgrade()) {
         this._selected = true;
@@ -4771,11 +4430,13 @@ Window_TDAction.prototype.callOkHandler = function () {
         return;
       }
       break;
+    // Pickup
     case 2:
       TowerDefenseManager.selectTower($dataItems[this._towerData._id].ufcTower);
       TowerDefenseManager.cancelSelect(false);
       this._towerDataDestroyCallback();
       break;
+    // Sell
     case 3:
       AudioManager.playSe({
         name: UFC.UFCTD.CONFIG.sound.towerSell,
@@ -4787,6 +4448,7 @@ Window_TDAction.prototype.callOkHandler = function () {
       this._towerDataDestroyCallback();
       UFC.UFCTD.HUDGUI.ITEMSLOT.open();
       break;
+    // Cancel
     case 4:
       UFC.UFCTD.HUDGUI.ITEMSLOT.open();
       break;
@@ -4922,6 +4584,7 @@ Window_TDAction.prototype.drawTextEx = function (text, x, y, width, align) {
 Window_TDAction.prototype.drawItem = function (index) {
   const rect = this.itemLineRect(index);
   this.resetTextColor();
+  // this.changePaintOpacity(this.isCommandEnabled(index));
   this.drawIconTD(this._list[index].icon, rect.x, rect.y);
   let textY = rect.y;
   if (index == 3) {
@@ -4933,6 +4596,8 @@ Window_TDAction.prototype.drawItem = function (index) {
     this.resetLineHeight();
   }
 };
+
+// Enable sound when cursor hover the button
 Window_TDAction.prototype.onTouchSelect = function () {
   this._doubleTouch = false;
   if (this.isCursorMovable()) {
@@ -4986,6 +4651,8 @@ Window_TDAction.prototype.destroy = function () {
   );
   Window_Command.prototype.destroy.call(this);
 };
+
+// eslint-disable-next-line no-redeclare
 function Window_TDActionUpgrade() {
   this.initialize(...arguments);
 }
@@ -5010,7 +4677,12 @@ Window_TDActionUpgrade.prototype.initialize = function (rect) {
   let statusWidth = 360;
   let statusHeight = 240;
   this.status = new Window_TDStatus(
-    new Rectangle(this.width, 0, statusWidth, statusHeight)
+    new Rectangle(
+      this.width + UFC.UFCTD.HUDGUI.SETTINGS.towerAction.upgradeStatusPositionX,
+      0 + UFC.UFCTD.HUDGUI.SETTINGS.towerAction.upgradeStatusPositionY,
+      statusWidth,
+      statusHeight
+    )
   );
   this.addChild(this.status);
 
@@ -5044,13 +4716,26 @@ Window_TDActionUpgrade.prototype.close = function () {
 
 Window_TDActionUpgrade.prototype.callOkHandler = function () {
   let upgradeData = this._upgradeData[this.index()];
-  if ($gameParty.gold() >= upgradeData.price) {
-    this.emit("upgradeTower", this.index());
-    this._selected = false;
-    this.deactivate();
-  } else {
+  if ($gameParty.gold() < upgradeData.price) {
     SoundManager.playBuzzer();
+    return;
   }
+  if (upgradeData.materials.length > 0) {
+    for (let material of upgradeData.materials) {
+      let numItem = $gameParty.numItems($dataItems[material.id]);
+      if (numItem < material.ammount) {
+        SoundManager.playBuzzer();
+        return;
+      }
+    }
+    for (let material of upgradeData.materials) {
+      TowerDefenseManager.gainItem(material.id, -material.ammount);
+    }
+  }
+
+  this.emit("upgradeTower", this.index());
+  this._selected = false;
+  this.deactivate();
 };
 
 Window_TDActionUpgrade.prototype.setUpgrade = function (upgradeData) {
@@ -5060,18 +4745,19 @@ Window_TDActionUpgrade.prototype.setUpgrade = function (upgradeData) {
   this.setLineHeight(28);
   upgradeData.forEach((item) => {
     let upgradeData = {
-      data: $dataItems[item.id].ufcTower,
+      data: new ufcTowerData($dataItems[item.id].ufcTower),
       price: item.price,
+      materials: item.material,
     };
     this.addCommand(
       "\\FS[20]" +
-        upgradeData.data.name +
-        "\n\\C[14]" +
+        upgradeData.data._name +
+        "\\FS\n\\FS[18]\\C[14]" +
         upgradeData.price +
         "\\C " +
         TextManager.currencyUnit,
-      upgradeData.data.character,
-      upgradeData.data.characterindex,
+      upgradeData.data._character,
+      upgradeData.data._characterIndex,
       true
     );
     this._upgradeData.push(upgradeData);
@@ -5098,7 +4784,12 @@ Window_TDActionUpgrade.prototype.drawTitle = function () {
 
 Window_TDActionUpgrade.prototype.processTouch = function () {
   Window_Command.prototype.processTouch.call(this);
-  if (this.isClosed()) return;
+  if (
+    this.isClosed() ||
+    !this.visible ||
+    TowerDefenseManager.getState !== TowerDefenseManager.STATE.IDLE
+  )
+    return;
   if ((this.isTouchedInsideFrame() || this._selected) && !this.active) {
     this.windowHovered(true);
   } else if (!this.isTouchedInsideFrame() && !this._selected && this.active) {
@@ -5163,7 +4854,7 @@ Window_TDActionUpgrade.prototype.drawCharacter = function (
     sy,
     pw,
     ph,
-    x,
+    x - 4,
     y,
     pw * scale,
     ph * scale
@@ -5200,8 +4891,49 @@ Window_TDActionUpgrade.prototype.drawItem = function (index) {
     rect.y
   );
   let textY = rect.y - 10;
-  this.drawTextEx(this.commandName(index), rect.x + 48, textY, 200);
+  this.drawTextEx(this.commandName(index), rect.x + 40, textY, 200);
+  if (this._upgradeData[index].materials.length > 0) {
+    this.drawMaterials(rect.x, rect.y, this._upgradeData[index].materials);
+  }
 };
+
+Window_TDActionUpgrade.prototype.drawMaterials = function (x, y, materials) {
+  const bitmap = ImageManager.loadSystem("IconSet");
+  const pw = ImageManager.iconWidth;
+  const ph = ImageManager.iconHeight;
+  const width = 18;
+  const height = 18;
+  const offset = 62;
+  const offsetIcon = 21;
+  const offsetAmmount = 17;
+  for (let i = 0; i < materials.length; i++) {
+    let material = $dataItems[materials[i].id];
+    const sx = (material.iconIndex % 16) * pw;
+    const sy = Math.floor(material.iconIndex / 16) * ph;
+    const posX = this.width - (offset + i * width + i * offsetIcon);
+    const posY = y + 14;
+    this.contentsBack.blt(
+      bitmap,
+      sx,
+      sy,
+      pw,
+      ph,
+      posX,
+      posY + 5,
+      width,
+      height
+    );
+    this.drawText(
+      materials[i].ammount,
+      posX + offsetAmmount,
+      posY,
+      width,
+      "center"
+    );
+  }
+};
+
+// Enable sound when cursor hover the button
 Window_TDActionUpgrade.prototype.onTouchSelect = function () {
   this._doubleTouch = false;
   if (this.isCursorMovable()) {
@@ -5224,9 +4956,7 @@ Window_TDActionUpgrade.prototype.refreshStatus = function () {
     if (this.index() == -1) this._tmpIndex = 0;
     else this._tmpIndex = this.index();
   }
-  this.status.drawDefaultStatus(
-    new ufcTowerData(this._upgradeData[this._tmpIndex].data)
-  );
+  this.status.drawDefaultStatus(this._upgradeData[this._tmpIndex].data);
 };
 
 Window_TDActionUpgrade.prototype.select = function (index) {
@@ -5258,6 +4988,8 @@ Window_TDActionUpgrade.prototype.setLineHeight = function (lineheight) {
 Window_TDActionUpgrade.prototype.resetLineHeight = function () {
   this._lineHeight = this._defaultLineHeight;
 };
+
+// eslint-disable-next-line no-redeclare
 function Window_TDGold() {
   this.initialize(...arguments);
 }
@@ -5295,6 +5027,8 @@ Window_TDGold.prototype.open = function () {
   this.refresh();
   Window_Selectable.prototype.open.call(this);
 };
+
+// eslint-disable-next-line no-redeclare
 function Window_TDHealth() {
   this.initialize(...arguments);
 }
@@ -5353,6 +5087,8 @@ Window_TDHealth.prototype.open = function () {
   this.refresh();
   Window_Selectable.prototype.open.call(this);
 };
+
+// eslint-disable-next-line no-redeclare
 function Window_TDShop() {
   this.initialize(...arguments);
 }
@@ -5381,6 +5117,16 @@ Window_TDShop.prototype.initialize = function () {
 
   this.addCommand("shop", "TDShopIcon", true);
   this.drawItem(0);
+  if (UFC.UFCTD.SHOPGUISETTINGS.type == "Quick Buy") this.createQuickBuy();
+};
+
+Window_TDShop.prototype.createQuickBuy = function () {
+  let upgradeWidth = UFC.UFCTD.SHOPGUISETTINGS.QSSetting.width;
+  let upgradeHeight = UFC.UFCTD.SHOPGUISETTINGS.QSSetting.height;
+  UFC.UFCTD.HUDGUI.QUICKSHOP = new Window_TDShopQuick(
+    new Rectangle(0, -upgradeHeight, upgradeWidth, upgradeHeight)
+  );
+  this.addChild(UFC.UFCTD.HUDGUI.QUICKSHOP);
 };
 
 Window_TDShop.prototype.lineHeight = function () {
@@ -5396,12 +5142,24 @@ Window_TDShop.prototype.maxRows = function () {
 };
 
 Window_TDShop.prototype.callOkHandler = function () {
-  let items = UFC.UFCTD.SHOPGUISETTINGS.defaultItems;
-  if (UFC.UFCTD.SHOPGUISETTINGS.itemsEdit.length > 0)
-    items = UFC.UFCTD.SHOPGUISETTINGS.itemsEdit;
-  TowerDefenseManager.openShop(true);
-  SceneManager.push(Scene_Shop);
-  SceneManager.prepareNextScene(items, true);
+  if (UFC.UFCTD.SHOPGUISETTINGS.type == "Quick Buy") {
+    if (UFC.UFCTD.HUDGUI.QUICKSHOP.isOpenAndActive()) {
+      UFC.UFCTD.HUDGUI.QUICKSHOP.close();
+      return;
+    }
+    if (!this.isTouchOkEnabled()) UFC.UFCTD.HUDGUI.QUICKSHOP.selected();
+    else UFC.UFCTD.HUDGUI.QUICKSHOP.deselect();
+    UFC.UFCTD.HUDGUI.QUICKSHOP.open();
+    UFC.UFCTD.HUDGUI.QUICKSHOP.show();
+    UFC.UFCTD.HUDGUI.QUICKSHOP.activate();
+  } else {
+    let items = UFC.UFCTD.SHOPGUISETTINGS.defaultItems;
+    if (UFC.UFCTD.SHOPGUISETTINGS.itemsEdit.length > 0)
+      items = UFC.UFCTD.SHOPGUISETTINGS.itemsEdit;
+    TowerDefenseManager.openShop(true);
+    SceneManager.push(Scene_Shop);
+    SceneManager.prepareNextScene(items, true);
+  }
 };
 
 Window_TDShop.prototype.processTouch = function () {
@@ -5497,6 +5255,245 @@ Window_TDShop.prototype.close = function (wrap) {
   UFC.UFCTD.HUDGUI.MESSAGE.isHoverGUIShop = false;
   Window_Command.prototype.close.call(this, wrap);
 };
+
+// eslint-disable-next-line no-redeclare
+function Window_TDShopQuick() {
+  this.initialize(...arguments);
+}
+
+Window_TDShopQuick.prototype = Object.create(Window_Command.prototype);
+Window_TDShopQuick.prototype.constructor = Window_TDShopQuick;
+
+Window_TDShopQuick.prototype.initialize = function (rect) {
+  Window_Command.prototype.initialize.call(this, rect);
+  this._lineHeight = Window_Command.prototype.lineHeight();
+  this._selected = false;
+  this._defaultLineHeight = this._lineHeight;
+  this._listItems = UFC.UFCTD.SHOPGUISETTINGS.defaultItems;
+  if (UFC.UFCTD.SHOPGUISETTINGS.itemsEdit.length > 0)
+    this._listItems = UFC.UFCTD.SHOPGUISETTINGS.itemsEdit;
+
+  this._listItems = this._listItems.map((item) => {
+    let dataItem = Object.assign({}, $dataItems[item[1]]);
+    if (UFC.UFCTD.SHOPGUISETTINGS.multiplier != 1) {
+      let _price = dataItem.price * UFC.UFCTD.SHOPGUISETTINGS.multiplier;
+      if (UFC.UFCTD.SHOPGUISETTINGS.roundPrice != 0) {
+        let _pow = Math.pow(10, UFC.UFCTD.SHOPGUISETTINGS.roundPrice);
+        _price = Math.ceil(_price / _pow) * _pow;
+      }
+      dataItem.price = _price;
+    }
+    return dataItem;
+  });
+  this._listItems.forEach((item) => {
+    this.addCommand(
+      item.ufcTower.name,
+      item.ufcTower.character,
+      item.ufcTower.characterindex,
+      true
+    );
+  });
+  this.setBackgroundType(UFC.UFCTD.SHOPGUISETTINGS.QSSetting.backgroundType);
+
+  this.hide();
+  this.close();
+};
+
+Window_TDShopQuick.prototype.onCancel = function () {
+  this._selected = false;
+};
+
+Window_TDShopQuick.prototype.maxCols = function () {
+  return 1;
+};
+
+Window_TDShopQuick.prototype.itemHeight = function () {
+  return UFC.UFCTD.SHOPGUISETTINGS.QSSetting.itemHeight;
+};
+
+Window_TDShopQuick.prototype.close = function () {
+  Window_Command.prototype.close.call(this);
+  UFC.UFCTD.HUDGUI.MESSAGE.isHoverGUIQuickShop = false;
+};
+
+Window_TDShopQuick.prototype.callOkHandler = function () {
+  if ($gameParty.gold() < this._listItems[this._index].price) {
+    SoundManager.playBuzzer();
+    this.activate();
+    return;
+  }
+  this.close();
+  TowerDefenseManager.gainGold(-+this._listItems[this._index].price);
+  TowerDefenseManager.clearSelect();
+  TowerDefenseManager.selectTower(this._listItems[this._index].ufcTower);
+  TowerDefenseManager.selectTowerMode();
+  this.deselect();
+};
+
+Window_TDShopQuick.prototype.processTouch = function () {
+  Window_Command.prototype.processTouch.call(this);
+  if (
+    !this.visible ||
+    TowerDefenseManager.getState !== TowerDefenseManager.STATE.IDLE ||
+    !this.isOpen() // Use not isOpen instead close, because isClosed return true only when _openness <= 0 check rmmz_core
+  ) {
+    UFC.UFCTD.HUDGUI.MESSAGE.isHoverGUIQuickShop = false;
+    return;
+  }
+
+  let touchInsideFrame = this.isTouchedInsideFrame(0, 100);
+  if (touchInsideFrame) {
+    UFC.UFCTD.HUDGUI.MESSAGE.isHoverGUIQuickShop = true;
+  } else {
+    UFC.UFCTD.HUDGUI.MESSAGE.isHoverGUIQuickShop = false;
+  }
+
+  if (!this._selected && this.isOpenAndActive() && !touchInsideFrame) {
+    this.windowHovered(false);
+  }
+};
+
+Window_TDShopQuick.prototype.windowHovered = function () {
+  this.deselect();
+  this.hide();
+  this.close();
+};
+
+Window_TDShopQuick.prototype.open = function () {
+  SoundManager.playOk();
+  this.paint();
+  Window_Command.prototype.open.call(this);
+};
+
+Window_TDShopQuick.prototype.selected = function (isHovered = false) {
+  this._selected = true;
+  this.activate();
+  if (isHovered) this._selected = false;
+};
+
+Window_TDShopQuick.prototype.deselect = function () {
+  Window_Command.prototype.deselect.call(this);
+  UFC.UFCTD.HUDGUI.MESSAGE.isHoverGUIQuickShop = false;
+  this._selected = false;
+  this.deactivate();
+};
+
+Window_TDShopQuick.prototype.addCommand = function (
+  name,
+  character,
+  characterIndex,
+  enabled = true,
+  callback = null
+) {
+  this._list.push({
+    name: name,
+    character: character,
+    characterIndex: characterIndex,
+    callback: callback,
+    symbol: null,
+    enabled: enabled,
+    ext: null,
+  });
+};
+
+Window_TDShopQuick.prototype.drawCharacter = function (
+  character,
+  characterIndex,
+  x,
+  y
+) {
+  let characterImage = ImageManager.loadCharacter(character);
+  let pw = characterImage.width / 12;
+  let ph = characterImage.height / 8;
+  let sx = ((characterIndex % 4) * 3 + 1) * pw;
+  let sy = (Math.floor(characterIndex / 4) * 4 + 0) * ph;
+  let scale = 0.8;
+  this.contents.blt(
+    characterImage,
+    sx,
+    sy,
+    pw,
+    ph,
+    x,
+    y,
+    pw * scale,
+    ph * scale
+  );
+};
+
+Window_TDShopQuick.prototype.drawItem = function (index) {
+  const rect = this.itemLineRect(index);
+  this.resetTextColor();
+  this.drawCharacter(
+    this._list[index].character,
+    this._list[index].characterIndex,
+    rect.x,
+    rect.y
+  );
+  let textY = rect.y - 10;
+  this.contents.fontSize = UFC.UFCTD.SHOPGUISETTINGS.QSSetting.itemTextSize;
+  this.drawText(this.commandName(index), rect.x + 48, textY, 200);
+
+  textY = rect.y + 13;
+  this.drawTextEx(
+    "\\FS[" +
+      UFC.UFCTD.SHOPGUISETTINGS.QSSetting.itemTextSize +
+      "]\\C[14]" +
+      this._listItems[index].price +
+      "\\C " +
+      TextManager.currencyUnit,
+    rect.x + 48,
+    textY,
+    200
+  );
+};
+
+// Enable sound when cursor hover the button
+Window_TDShopQuick.prototype.onTouchSelect = function () {
+  this._doubleTouch = false;
+  if (this.isCursorMovable()) {
+    const lastIndex = this.index();
+    const hitIndex = this.hitIndex();
+    if (hitIndex >= 0) {
+      if (hitIndex === this.index()) {
+        this._doubleTouch = true;
+      }
+      this.select(hitIndex);
+    }
+    if (this.index() !== lastIndex) {
+      this.playCursorSound();
+    }
+  }
+};
+
+Window_TDShopQuick.prototype.lineHeight = function () {
+  return this._lineHeight;
+};
+
+Window_TDShopQuick.prototype.setLineHeight = function (lineheight) {
+  this._lineHeight = lineheight;
+};
+
+Window_TDShopQuick.prototype.resetLineHeight = function () {
+  this._lineHeight = this._defaultLineHeight;
+};
+
+Window_TDShopQuick.prototype.isTouchedInsideFrame = function (
+  offsetX = 0,
+  offsetY = 0
+) {
+  const touchPos = new Point(TouchInput.x, TouchInput.y);
+  const localPos = this.worldTransform.applyInverse(touchPos);
+  let innerRect = new Rectangle(
+    this._padding,
+    this._padding,
+    this.innerWidth + offsetX,
+    this.innerHeight + offsetY
+  );
+  return innerRect.contains(localPos.x, localPos.y);
+};
+
+// eslint-disable-next-line no-redeclare
 function Window_TDStatus() {
   this.initialize(...arguments);
 }
@@ -5511,6 +5508,8 @@ Window_TDStatus.prototype.initialize = function (rect) {
 Window_TDStatus.prototype.drawDefaultStatus = function (towerData) {
   this.contents.clear();
   this.contentsBack.clear();
+
+  // Character Image
   let x = 0;
   let y = 0;
   let characterImage = ImageManager.loadCharacter(towerData._character);
@@ -5532,6 +5531,8 @@ Window_TDStatus.prototype.drawDefaultStatus = function (towerData) {
     pw * scale,
     ph * scale
   );
+
+  // Name Character
   let xCharacter = pw * scale;
   this.contents.fontSize = 23;
   const c1 = ColorManager.itemBackColor1();
@@ -5542,41 +5543,68 @@ Window_TDStatus.prototype.drawDefaultStatus = function (towerData) {
   let h = this.contents.fontSize + 10;
   this.contentsBack.gradientFillRect(statusX, 0, w, h, c1, c2, true);
   this.drawText(towerData._name, statusX, 0, w, "center");
-  let textY = h;
-  let textX = statusX;
-  let textX2 = 110;
-  let textXValue = 20;
-  let textHeight = 24;
-  let status = ["Attack", "Range", "ASPD", "BSPD"];
-  let statusValue = [
-    towerData.getBaseAttack,
-    towerData.getBaseRange,
-    towerData.getBaseAttackSpeed,
-    towerData._bulletSpeed,
-  ];
-  this.contents.fontSize = 14;
 
-  for (let i = 0; i < status.length; i++) {
-    this.drawText(
-      status[i],
-      textX + (i % 2) * (textXValue + textX2),
-      textY + Math.floor(i / 2) * textHeight,
-      100
-    );
+  // let textY = ph * scale + 30;
+  let textY = h - 4;
+  let textX = statusX + 10;
+  let textX2 = 60;
+  let textYValue = 20;
+  let textHeight = 0;
+  let status, statusValue;
+  if (towerData.getType === TowerDefenseManager.TOWERTYPE.TOWER) {
+    status = ["Attack", "Range", "ASPD", "ATK Type"];
+    statusValue = [
+      towerData.getBaseAttack,
+      towerData.getBaseRange,
+      towerData.getBaseAttackSpeed,
+      towerData.getAttackTypeAsName,
+    ];
+  } else if (towerData.getType === TowerDefenseManager.TOWERTYPE.TRAP) {
+    if (towerData._through) {
+      status = [
+        "Attack",
+        towerData._durability ? "Durability" : "",
+        "Trap Type",
+        "",
+      ];
+      statusValue = [
+        towerData.getBaseAttack,
+        towerData._durability ? towerData._durabilityValue : "",
+        towerData.getAttackTypeAsName,
+        "",
+      ];
+    } else {
+      status = ["Attack", "Health", "Trap Type", ""];
+      statusValue = [
+        towerData.getBaseAttack,
+        towerData._health,
+        towerData.getAttackTypeAsName,
+        "",
+      ];
+    }
   }
 
+  // Draw title Status
+  this.contents.fontSize = 12;
   this.changeTextColor(ColorManager.systemColor());
+  for (let i = 0; i < status.length; i++) {
+    this.drawText(status[i], textX + i * textX2, textY + textHeight, 100);
+  }
+
+  this.contents.fontSize = 18;
+  // Draw title Status value
+  this.resetTextColor();
   for (let i = 0; i < statusValue.length; i++) {
     this.drawText(
       statusValue[i],
-      textX + (i % 2) * (textXValue + textX2),
-      textY + Math.floor(i / 2) * textHeight,
-      80,
-      "right"
+      textX + i * textX2,
+      textY + textHeight + textYValue,
+      80
     );
   }
   this.resetTextColor();
 
+  let buffY = 40;
   let statusBuff = [];
   let buffSymbol = "+";
   let buffColor = ColorManager.powerUpColor();
@@ -5618,13 +5646,15 @@ Window_TDStatus.prototype.drawDefaultStatus = function (towerData) {
       this.changeTextColor(statusBuff[i].color);
       this.drawText(
         statusBuff[i].value,
-        textX + 88 + (i % 2) * (textXValue + textX2),
-        textY + Math.floor(i / 2) * textHeight,
+        textX + i * textX2,
+        textY + textHeight + buffY,
         150
       );
     }
   }
   this.resetFontSettings();
+
+  //Background Note
   let characterY = ph * scale;
   this.contents.fontSize = 18;
   this.drawText("Note", 0, characterY, 100);

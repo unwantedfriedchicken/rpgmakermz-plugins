@@ -1,42 +1,4 @@
-/*:
-@target MZ
-
-@plugindesc Add guide action
-@author Unwanted Fried Chicken
-
-@param blockColor
-@text Block Color
-@type text
-@desc Set the color of blocked action. Default = #e63946
-@default #e63946
-
-@param blockColorAlpha
-@text Block Color Alpha
-@type number
-@decimals 1
-@min 0
-@max 1
-@desc Alpha color of blocked action
-@default 1.0
-
-@param openColor
-@text Open Color
-@type text
-@desc Set the color of opened action. Default = #5BFF54
-@default #5BFF54
-
-@param openColorAlpha
-@text Open Color Alpha
-@type number
-@decimals 1
-@min 0
-@max 1
-@desc Alpha color of opened action
-@default 1.0
-
-*/
-
-
+/* eslint-disable no-redeclare */
 var Imported = Imported || {};
 Imported.UFCGuideAction = true;
 
@@ -58,6 +20,7 @@ function GuideAction() {
   this.initialize(...arguments);
 }
 
+GuideAction.prototype.constructor = GuideAction;
 GuideAction.prototype.initialize = function () {
   this._mouseMode = false;
   this._tmpMouseData = { x: TouchInput.x, y: TouchInput.y };
@@ -87,9 +50,7 @@ GuideAction.prototype.initialize = function () {
   this._onlyRegion = {};
   this._exceptRegion = {};
   this.createSharp();
-  this.setDirection(2); 
   this.setVisible(false);
-  this._event = new PIXI.utils.EventEmitter();
 };
 
 Object.defineProperty(GuideAction.prototype, "isMouseMode", {
@@ -137,22 +98,6 @@ GuideAction.prototype.setType = function (value) {
 
 GuideAction.prototype.setMouseMode = function (mode) {
   this._mouseMode = mode;
-  this.resetParent();
-};
-
-GuideAction.prototype.resetParent = function () {
-  const _spritesetmap = SceneManager.getSpriteSetMap();
-  if (this.isMouseMode) {
-    this._graphics.setParent(_spritesetmap._tilemap);
-  } else {
-    for (const character of _spritesetmap._characterSprites) {
-      if (character._character == $gamePlayer) {
-        this._graphics.setParent(character);
-        break;
-      }
-    }
-    this.clearMouseEvent();
-  }
 };
 
 GuideAction.prototype.setOnlyTerrain = function (terrain) {
@@ -203,6 +148,7 @@ GuideAction.prototype.isBlocked = function () {
 };
 
 GuideAction.prototype.setBlocked = function (block) {
+  if (block === this._blocked) return;
   if (block) {
     this._color.color = UFC.UFCGA.CONFIG.blockColor;
     this._color.alpha = UFC.UFCGA.CONFIG.blockColorAlpha;
@@ -217,6 +163,7 @@ GuideAction.prototype.setBlocked = function (block) {
 GuideAction.prototype.createSharp = function (shape = "rectangle") {
   if (!this._graphics || this._graphics._destroyed) {
     this._graphics = new PIXI.Graphics();
+    this._graphics.pivot.set(0.5);
   } else {
     this._graphics.clear();
     this._graphics.removeAllListeners();
@@ -250,19 +197,28 @@ GuideAction.prototype.setDirection = function (
   let offsetY = 6;
   switch (d) {
     case 2:
-      this.setPosition(-this._tileWidth / 2, offsetY);
+      this.setPosition(
+        $gamePlayer.screenX() + -this._tileWidth / 2,
+        $gamePlayer.screenY() + offsetY
+      );
       break;
     case 4:
       this.setPosition(
-        -(this._tileWidth / 2) - this._tileWidth,
-        -this._tileHeight + offsetY
+        $gamePlayer.screenX() + -(this._tileWidth / 2) - this._tileWidth,
+        $gamePlayer.screenY() + -this._tileHeight + offsetY
       );
       break;
     case 6:
-      this.setPosition(this._tileWidth / 2, -this._tileHeight + offsetY);
+      this.setPosition(
+        $gamePlayer.screenX() + this._tileWidth / 2,
+        $gamePlayer.screenY() + -this._tileHeight + offsetY
+      );
       break;
     case 8:
-      this.setPosition(-(this._tileWidth / 2), -this._tileHeight * 2 + offsetY);
+      this.setPosition(
+        $gamePlayer.screenX() + -(this._tileWidth / 2),
+        $gamePlayer.screenY() + -this._tileHeight * 2 + offsetY
+      );
       break;
   }
 };
@@ -341,6 +297,8 @@ GuideAction.prototype.checkGrid = function (x, y) {
 
   let terrainTag = $gameMap.terrainTag(x, y);
   let regionID = $gameMap.regionId(x, y);
+
+  //allows for Place everywhere, except exceptTerrain or exceptRegion
   if (
     this.getOnlyTerrain.length <= 0 &&
     this.getOnlyRegion.length <= 0 &&
@@ -405,6 +363,8 @@ GuideAction.prototype.update = function () {
         this._mouseTrigger.y = this._y;
       }
     }
+  } else {
+    this.setDirection();
   }
   if (this._perciseMode) {
     this.updateBlocked();
@@ -503,6 +463,7 @@ GuideAction.prototype.isCollidedWithVehicles = function (x, y) {
 };
 
 GuideAction.prototype.getPosition = function () {
+  // Update to current gameplayer incase the position not updated
   this._x = $gamePlayer._x;
   this._y = $gamePlayer._y;
   this._d = $gamePlayer._direction;
@@ -512,54 +473,62 @@ GuideAction.prototype.getPosition = function () {
   };
 };
 
+function GuideActionManager() {}
+
+GuideActionManager.initialize = function () {
+  this._guideAction = new GuideAction();
+};
+
+Object.defineProperty(GuideActionManager, "getGuideAction", {
+  get: function () {
+    return this._guideAction;
+  },
+});
+
+Object.defineProperty(GuideActionManager, "getGuideActionGraphics", {
+  get: function () {
+    return this.getGuideAction.getGraphics();
+  },
+});
+
 UFC.UFCGA.ALIAS._Game_Player_update = Game_Player.prototype.update;
 Game_Player.prototype.update = function () {
-  UFC.UFCGA.ALIAS._Game_Player_update.apply(this, arguments);
-  this.getGuideAction().update();
+  UFC.UFCGA.ALIAS._Game_Player_update.call(this, ...arguments);
+  GuideActionManager.getGuideAction.update();
 };
 
 UFC.UFCGA.ALIAS._Game_Player_initMembers = Game_Player.prototype.initMembers;
 Game_Player.prototype.initMembers = function () {
-  UFC.UFCGA.ALIAS._Game_Player_initMembers.apply(this, arguments);
-  this._guideAction = new GuideAction();
+  UFC.UFCGA.ALIAS._Game_Player_initMembers.call(this, ...arguments);
+  GuideActionManager.initialize();
 };
 
 UFC.UFCGA.ALIAS._Game_Player_clearTransferInfo =
   Game_Player.prototype.clearTransferInfo;
 Game_Player.prototype.clearTransferInfo = function () {
-  UFC.UFCGA.ALIAS._Game_Player_clearTransferInfo.apply(this, arguments);
-  this.getGuideAction().setDirection(this._direction, this._x, this._y);
+  UFC.UFCGA.ALIAS._Game_Player_clearTransferInfo.call(this, ...arguments);
+  GuideActionManager.getGuideAction.setDirection(
+    this._direction,
+    this._x,
+    this._y
+  );
 };
 
 UFC.UFCGA.ALIAS._Game_Player_setDirection = Game_Player.prototype.setDirection;
 Game_Player.prototype.setDirection = function (d) {
-  UFC.UFCGA.ALIAS._Game_Player_setDirection.apply(this, arguments);
-  this.getGuideAction().setDirection(d, this._x, this._y);
+  UFC.UFCGA.ALIAS._Game_Player_setDirection.call(this, ...arguments);
+  GuideActionManager.getGuideAction.setDirection(d, this._x, this._y);
 };
 
 UFC.UFCGA.ALIAS._Game_Player_moveStraight = Game_Player.prototype.moveStraight;
 Game_Player.prototype.moveStraight = function (d) {
-  UFC.UFCGA.ALIAS._Game_Player_moveStraight.apply(this, arguments);
-  this.getGuideAction().setDirection(d, this._x, this._y);
-};
-
-Game_Player.prototype.getGuideActionGraphics = function () {
-  return this.getGuideAction().getGraphics();
-};
-
-Game_Player.prototype.getGuideAction = function () {
-  return this._guideAction;
+  UFC.UFCGA.ALIAS._Game_Player_moveStraight.call(this, ...arguments);
+  GuideActionManager.getGuideAction.setDirection(d, this._x, this._y);
 };
 
 UFC.UFCGA.ALIAS._Spriteset_Map_createCharacters =
   Spriteset_Map.prototype.createCharacters;
 Spriteset_Map.prototype.createCharacters = function () {
-  UFC.UFCGA.ALIAS._Spriteset_Map_createCharacters.call(this, arguments);
-
-  for (let character of this._characterSprites) {
-    if (character._character == $gamePlayer) {
-      character.addChild(character._character.getGuideActionGraphics());
-      break;
-    }
-  }
+  UFC.UFCGA.ALIAS._Spriteset_Map_createCharacters.call(this, ...arguments);
+  this._tilemap.addChild(GuideActionManager.getGuideActionGraphics);
 };
