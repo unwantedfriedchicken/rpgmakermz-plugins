@@ -161,11 +161,17 @@ module.exports = function (grunt) {
     grunt.task.run("watch");
   });
 
+  grunt.registerTask("run", "Run Task", function (taskName, dist) {
+    let init = initTask([...taskName.split(",")], dist || CONFIG.dest);
+    grunt.config.init(init.init);
+    grunt.task.run("watch");
+  });
+
   // register what to do when using the default 'grunt' command
   grunt.registerTask("default", DEFAULTTASK);
   grunt.registerTask("build", "Build Task", function (dist) {
     let init = initTask(
-      ["UFCTowerDefense", "UFCGuideAction"],
+      ["UFCTowerDefense", "UFCGuideAction", "UFCTextHelper"],
       dist || CONFIG.dest
     );
     grunt.config.init(init.init);
