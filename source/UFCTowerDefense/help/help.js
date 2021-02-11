@@ -61,6 +61,7 @@ unwantedfriedchicken<at>gmail.com
 
 @param gui_toweraction
 @parent hudguiSettings
+@default {"statusPositionX":"0","statusPositionY":"0","buttonGroupPositionX":"0","buttonGroupPositionY":"0","upgradeListPositionX":"0","upgradeListPositionY":"0","upgradeStatusPositionX":"0","upgradeStatusPositionY":"0"}
 @text Tower Action Settings
 @type struct<TowerActionSettings>
 @desc Setting for tower action
