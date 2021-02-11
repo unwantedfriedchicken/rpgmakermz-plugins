@@ -130,7 +130,7 @@ module.exports = function (grunt) {
         "remove_comments:" + taskid,
         "concat:" + taskid + "help",
       ];
-      tasks.push(_task);
+      tasks.push(..._task);
 
       tasksBuild.push(..._task, "terser:" + taskid);
 

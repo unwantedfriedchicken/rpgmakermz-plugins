@@ -2,6 +2,7 @@
 
 ## Version 1.3 - dev
 
+- ADD: Add new parameter `Health Bar Width`, to configure the width of health bar
 - ADD: Add new plugin command `Cache Tower Defense`. This command will cache image.load that used by tower defense, for example if this not called when buying tower in shop, the sprite will not get displayed for first time
 - ADD: Add new parameter `Tower Action Settings` for tower action setting position
 - ADD: Add ability to using save/load function, now you can save during gameplay

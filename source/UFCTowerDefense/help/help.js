@@ -24,26 +24,11 @@ https://github.com/unwantedfriedchicken/rpgmakermz-plugins/issues
 Need support or want private convo? I can easly reachout by email
 unwantedfriedchicken<at>gmail.com
 
-@param setting_crystalName
-@text Crystal Name
-@desc Name of the crystal/gate
-@type string
-@default Crystal Health
 
 @param setting_limitAnimation
 @text Limit Animation
 @desc If frame rate become low because so many effect try limit the animation
 @type number
-
-@param setting_towerHealthVarId
-@text Tower Health variable ID
-@desc This health of the tower set to your variable id
-@type variable
-
-@param setting_towerMaxHealthVarId
-@text Tower Max Health variable ID
-@desc This Max health of the tower set to your variable id
-@type variable
 
 @param setting_gameoverSwitchId
 @text Game Over Switch Id
@@ -55,6 +40,35 @@ unwantedfriedchicken<at>gmail.com
 @desc Setting sounds for tower defense
 @type struct<SoundSettings>
 @default {"effectSteal":"Coin","towerDestroy":"Door2","towerCancel":"Cancel1","towerPlace":"Equip1","towerUpgrade":"Coin","towerSell":"Coin"}
+
+@param healthSettings
+@text Health Settings
+
+@param healthTitleName
+@parent healthSettings
+@text Health Name
+@desc Name of the health title
+@type string
+@default Crystal Health
+
+@param healthVariableID
+@parent healthSettings
+@text Health variable ID
+@desc This health of the tower set to your variable id
+@type variable
+
+@param healthVariableIDMax
+@parent healthSettings
+@text Max Health variable ID
+@desc This Max health of the tower set to your variable id
+@type variable
+
+@param healthBarWidth
+@parent healthSettings
+@text Health Bar Width
+@desc Width of the health bar
+@type number
+@default 240
 
 @param hudguiSettings
 @text HUD/GUI Settings

@@ -54,7 +54,7 @@ TowerDefenseManager.debugMode = function () {
           );
       }
       if (e.key == 3) {
-        $gameVariables.setValue(UFC.UFCTD.CONFIG.healthVarId, 99999);
+        $gameVariables.setValue(UFC.UFCTD.HEALTHSETTINGS.variableID, 99999);
         TowerDefenseManager.updateHUDHealth();
         TowerDefenseManager.gainGold(99999999);
       }
@@ -144,7 +144,10 @@ TowerDefenseManager.setLimitAnimation = function (limit) {
 
 TowerDefenseManager.attackTrigger = function (damage) {
   let _curHealth = this.getHUDHealthValue;
-  $gameVariables.setValue(UFC.UFCTD.CONFIG.healthVarId, _curHealth - damage);
+  $gameVariables.setValue(
+    UFC.UFCTD.HEALTHSETTINGS.variableID,
+    _curHealth - damage
+  );
 
   if (_curHealth - damage <= 0) {
     $gameSwitches.setValue(UFC.UFCTD.CONFIG.gameOverSwitchId, true);
@@ -546,13 +549,13 @@ Object.defineProperty(TowerDefenseManager, "getGUIItemSlot", {
 
 Object.defineProperty(TowerDefenseManager, "getHUDHealthValue", {
   get: function () {
-    return $gameVariables.value(UFC.UFCTD.CONFIG.healthVarId);
+    return $gameVariables.value(UFC.UFCTD.HEALTHSETTINGS.variableID);
   },
 });
 
 Object.defineProperty(TowerDefenseManager, "getHUDHealthMaxValue", {
   get: function () {
-    return $gameVariables.value(UFC.UFCTD.CONFIG.healthMaxVarId);
+    return $gameVariables.value(UFC.UFCTD.HEALTHSETTINGS.variableIDMax);
   },
 });
 

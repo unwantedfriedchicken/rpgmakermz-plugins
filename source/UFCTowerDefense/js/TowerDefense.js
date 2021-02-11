@@ -415,7 +415,7 @@ Scene_Map.prototype.createHUDTD = function () {
   this.addWindow(UFC.UFCTD.HUDGUI.GOLDWINDOW);
   UFC.UFCTD.HUDGUI.GOLDWINDOW.visible = TowerDefenseManager.getHUDGold;
 
-  let windowWidth = 200;
+  let windowWidth = UFC.UFCTD.HEALTHSETTINGS.barWidth;
   UFC.UFCTD.HUDGUI.HEALTHWINDOW = new Window_TDHealth(
     new Rectangle(Graphics.boxWidth / 2 - windowWidth / 2, -10, windowWidth, 80)
   );

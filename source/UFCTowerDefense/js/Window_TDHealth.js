@@ -20,8 +20,14 @@ Window_TDHealth.prototype.refresh = function () {
   const rect = this.itemLineRect(0);
   this.contents.clear();
   this.contents.fontSize = 22;
-  this.drawBackground(-5, 3, 200, 30);
-  this.drawText(UFC.UFCTD.CONFIG.crystalName, -10, 0, 200, "center");
+  this.drawBackground(-5, 3, this.width, 30);
+  this.drawText(
+    UFC.UFCTD.HEALTHSETTINGS.titleName,
+    -10,
+    0,
+    this.width,
+    "center"
+  );
   this.drawGaugeRect(0, rect.height, this.innerWidth, 20);
 };
 

@@ -2,11 +2,15 @@ UFC.UFCTD.PARAMETERS = PluginManager.parameters("UFCTowerDefense");
 
 UFC.UFCTD.CONFIG = {
   limitAnimation: +UFC.UFCTD.PARAMETERS["setting_limitAnimation"],
-  healthVarId: +UFC.UFCTD.PARAMETERS["setting_towerHealthVarId"],
-  healthMaxVarId: +UFC.UFCTD.PARAMETERS["setting_towerMaxHealthVarId"],
   gameOverSwitchId: +UFC.UFCTD.PARAMETERS["setting_gameoverSwitchId"],
-  crystalName: UFC.UFCTD.PARAMETERS["setting_crystalName"],
   sound: JSON.parse(UFC.UFCTD.PARAMETERS["setting_soundSettings"]),
+};
+
+UFC.UFCTD.HEALTHSETTINGS = {
+  titleName: UFC.UFCTD.PARAMETERS["healthTitleName"],
+  variableID: +UFC.UFCTD.PARAMETERS["healthVariableID"],
+  variableIDMax: +UFC.UFCTD.PARAMETERS["healthVariableIDMax"],
+  barWidth: +UFC.UFCTD.PARAMETERS["healthBarWidth"],
 };
 
 UFC.UFCTD.HUDGUI = {
