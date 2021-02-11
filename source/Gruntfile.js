@@ -171,10 +171,12 @@ module.exports = function (grunt) {
     grunt.task.run(["connect", "watch"]);
   });
 
-  grunt.registerTask("run", "Run Task", function (taskName, dist) {
+  grunt.registerTask("run", "Run Task", function (taskName, connect, dist) {
     let init = initTask([...taskName.split(",")], dist || CONFIG.dest);
     grunt.config.init(init.init);
-    grunt.task.run("watch");
+    let task = ["watch"];
+    if (connect) task.unshift("connect");
+    grunt.task.run(task);
   });
 
   grunt.registerTask("default", DEFAULTTASK);
