@@ -283,13 +283,6 @@ Object.defineProperty(ufcTowerData.prototype, "getRangeVisibility", {
 
 Object.defineProperty(ufcTowerData.prototype, "getAttackTypeAsName", {
   get: function () {
-    switch (this._attackType) {
-      case TowerDefenseManager.ENEMYTYPE.AIR:
-        return "Air";
-      case TowerDefenseManager.ENEMYTYPE.GROUND:
-        return "Ground";
-      default:
-        return "All";
-    }
+    return TowerDefenseManager.getAttackTypeAsName(this._attackType);
   },
 });

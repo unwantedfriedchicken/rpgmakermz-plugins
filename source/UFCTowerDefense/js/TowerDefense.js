@@ -75,12 +75,21 @@ Window_ShopStatus.prototype.drawTowerInfo = function (x, y, align) {
   let textHeight = 30;
   let textValueX = 180;
   let fontSize = 20;
-  let status = ["Attack", "Range", "Attack Speed", "Bullet Speed"];
+  let status = [
+    "Attack",
+    "Range",
+    "Attack Speed",
+    "Bullet Speed",
+    "Attack Type",
+  ];
   let statusValue = [
     towerData.attack,
     towerData.range,
     towerData.attackspeed,
     towerData.bulletspeed,
+    TowerDefenseManager.getAttackTypeAsName(
+      towerData.attacktype || TowerDefenseManager.ENEMYTYPE.ALL
+    ),
   ];
   this.contents.fontSize = fontSize;
   for (let i = 0; i < status.length; i++) {
@@ -95,7 +104,7 @@ Window_ShopStatus.prototype.drawTowerInfo = function (x, y, align) {
     );
   }
   this.resetTextColor();
-  this.drawText("Effect", textX, textY + status.length * textHeight, 150);
+  this.drawText("Note", textX, textY + status.length * textHeight, 150);
 
   let note = `\\FS[${fontSize - 3}]\n`;
   if (!towerData.note) note += "\\C[16]None";

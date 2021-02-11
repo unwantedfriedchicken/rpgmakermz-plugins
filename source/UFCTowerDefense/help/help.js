@@ -451,6 +451,10 @@ unwantedfriedchicken<at>gmail.com
 @text Delete Tower Defense Item
 @desc Delete every tower defense items in backpack
 
+@command cacheTowerDefense
+@text Cache Tower Defense
+@desc This will cache some tower defense element, like sprite used in items, weapon, etc
+
 @command limitAnimation
 @text Limit Animation
 @desc Set limit animation

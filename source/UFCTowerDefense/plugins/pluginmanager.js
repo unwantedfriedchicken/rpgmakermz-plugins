@@ -117,6 +117,14 @@ PluginManager.registerCommand("UFCTowerDefense", "setSpawn", function (args) {
 
 PluginManager.registerCommand(
   "UFCTowerDefense",
+  "cacheTowerDefense",
+  function () {
+    TowerDefenseManager.cacheImage();
+  }
+);
+
+PluginManager.registerCommand(
+  "UFCTowerDefense",
   "showGUIItemSlot",
   function (args) {
     TowerDefenseManager.showGUIItemSlot(args);

@@ -112,7 +112,7 @@ Window_GUIItemSlot.prototype.activeKeyboard = function () {
 };
 
 Window_GUIItemSlot.prototype.deactiveKeyboard = function () {
-  if (UFC.UFCTD.HUDGUI.QUICKSHOP.isOpen()) {
+  if (UFC.UFCTD.HUDGUI.QUICKSHOP && UFC.UFCTD.HUDGUI.QUICKSHOP.isOpen()) {
     UFC.UFCTD.HUDGUI.QUICKSHOP.close();
     UFC.UFCTD.HUDGUI.SHOP.selected();
     return;

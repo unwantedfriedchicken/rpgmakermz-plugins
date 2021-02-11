@@ -692,3 +692,14 @@ TowerDefenseManager.convertDirection = function (direction) {
 
   return dir;
 };
+
+TowerDefenseManager.getAttackTypeAsName = function (attacktype) {
+  switch (attacktype) {
+    case TowerDefenseManager.ENEMYTYPE.AIR:
+      return "Air";
+    case TowerDefenseManager.ENEMYTYPE.GROUND:
+      return "Ground";
+    default:
+      return "All";
+  }
+};
