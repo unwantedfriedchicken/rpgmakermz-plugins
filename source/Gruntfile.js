@@ -87,7 +87,7 @@ module.exports = function (grunt) {
 
   // grunt.config.set("PATHDEST", "../dist/");
 
-  let initTask = function (id, dest) {
+  let initTask = function (id, dest, watchRMProject = false) {
     let listTask = {
       connect: {},
       concat: {},
@@ -134,10 +134,13 @@ module.exports = function (grunt) {
       );
       files.push(taskid + "/**/*.js");
     }
+    if (watchRMProject) files.push(dest + "/**/*");
     listTask["watch"] = {
-      files: files,
-      options: { spawn: false, livereload: true },
-      tasks: tasks,
+      default: {
+        files: files,
+        options: { spawn: false, livereload: true },
+        tasks: tasks,
+      },
     };
     listTask["connect"]["server"] = {
       options: {
@@ -165,14 +168,15 @@ module.exports = function (grunt) {
     // else grunt.task.run(DEFAULTTASK);
     let init = initTask(
       ["UFCTowerDefense", "UFCGuideAction", "UFCTextHelper"],
-      dist || CONFIG.dest
+      dist || CONFIG.dest,
+      true
     );
     grunt.config.init(init.init);
     grunt.task.run(["connect", "watch"]);
   });
 
   grunt.registerTask("run", "Run Task", function (taskName, connect, dist) {
-    let init = initTask([...taskName.split(",")], dist || CONFIG.dest);
+    let init = initTask([...taskName.split(",")], dist || CONFIG.dest, connect);
     grunt.config.init(init.init);
     let task = ["watch"];
     if (connect) task.unshift("connect");

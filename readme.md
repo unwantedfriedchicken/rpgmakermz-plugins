@@ -7,6 +7,9 @@ You can use **run** to serve webserver see the **COMMAND list**
 
 to enable livereload add `<script src="//localhost:35729/livereload.js"></script>` to your `index.html` in your project folder
 
+When you enable livereload this will also watching change in your project
+so when you made change to rpgmaker project the web will refresh
+
 ## Instruction to develop
 
 ### Configuration
