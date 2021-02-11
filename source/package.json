@@ -19,6 +19,7 @@
   },
   "devDependencies": {
     "eslint": "^7.15.0",
+    "grunt-contrib-connect": "^3.0.0",
     "grunt-remove-comments": "^0.1.6",
     "grunt-terser": "^2.0.0"
   }

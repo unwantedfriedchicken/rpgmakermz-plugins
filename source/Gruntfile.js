@@ -83,11 +83,13 @@ module.exports = function (grunt) {
   grunt.loadNpmTasks("grunt-contrib-watch");
   grunt.loadNpmTasks("grunt-terser");
   grunt.loadNpmTasks("grunt-remove-comments");
+  grunt.loadNpmTasks("grunt-contrib-connect");
 
   // grunt.config.set("PATHDEST", "../dist/");
 
   let initTask = function (id, dest) {
     let listTask = {
+      connect: {},
       concat: {},
       remove_comments: {},
       terser: {
@@ -99,9 +101,10 @@ module.exports = function (grunt) {
     let tasks = [];
     let tasksBuild = [];
     let files = [];
+    const pluginPath = dest + "/js/plugins/";
     for (let taskid of id) {
       listTask["concat"][taskid] = {
-        dest: dest + taskid + ".js",
+        dest: pluginPath + taskid + ".js",
         src: [
           taskid + "/global/*.js",
           taskid + "/plugins/*.js",
@@ -110,16 +113,16 @@ module.exports = function (grunt) {
         ],
       };
       listTask["concat"][taskid + "help"] = {
-        dest: dest + taskid + ".js",
-        src: [taskid + "/help/*.js", dest + taskid + ".js"],
+        dest: pluginPath + taskid + ".js",
+        src: [taskid + "/help/*.js", pluginPath + taskid + ".js"],
       };
       listTask["remove_comments"][taskid] = {
-        dest: dest + taskid + ".js",
-        src: dest + taskid + ".js",
+        dest: pluginPath + taskid + ".js",
+        src: pluginPath + taskid + ".js",
       };
       listTask["terser"][taskid] = {
-        dest: dest + taskid + ".min.js",
-        src: [dest + taskid + ".js"],
+        dest: pluginPath + taskid + ".min.js",
+        src: [pluginPath + taskid + ".js"],
       };
 
       tasksBuild.push("concat:" + taskid, "terser:" + taskid);
@@ -133,8 +136,15 @@ module.exports = function (grunt) {
     }
     listTask["watch"] = {
       files: files,
-      options: { spawn: false },
+      options: { spawn: false, livereload: true },
       tasks: tasks,
+    };
+    listTask["connect"]["server"] = {
+      options: {
+        port: 9001,
+        base: dest,
+        livereload: true,
+      },
     };
     return {
       init: listTask,
@@ -158,7 +168,7 @@ module.exports = function (grunt) {
       dist || CONFIG.dest
     );
     grunt.config.init(init.init);
-    grunt.task.run("watch");
+    grunt.task.run(["connect", "watch"]);
   });
 
   grunt.registerTask("run", "Run Task", function (taskName, dist) {
@@ -167,7 +177,6 @@ module.exports = function (grunt) {
     grunt.task.run("watch");
   });
 
-  // register what to do when using the default 'grunt' command
   grunt.registerTask("default", DEFAULTTASK);
   grunt.registerTask("build", "Build Task", function (dist) {
     let init = initTask(

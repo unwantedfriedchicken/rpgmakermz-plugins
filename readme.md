@@ -1,14 +1,18 @@
 # Collection exercise for rpg maker mz
 
-This is using grunt to concat the files
+This is using grunt to concat the files, also configured for watch and livereload.
+
+When using command **td** or **run** static web server is served. You can open in browser `http://localhost:9001/`
+
+to enable livereload add `<script src="//localhost:35729/livereload.js"></script>` to your `index.html` in your project folder
 
 ## Instruction to develop
 
 ### Configuration
 
-- Open source folder and rename _sample.gruntconfig.json_ to _config.gruntconfig.json_
+- Open source folder and rename _`sample.gruntconfig.json`_ to _`config.gruntconfig.json`_
 - Open it and set dest to set default destination when export the task
-- example : "D:/rpgmakermz/project/js/plugins/"
+- example : `"D:/rpgmakermz/project game"`
 
 ### Running task
 
