@@ -324,6 +324,8 @@ TowerDefenseManager.disableTowerDefense = function (
 ) {
   $gameSystem.setTowerDefense(false);
 
+  this.clearSelect();
+
   this._config = false;
 
   this.setActive(false);

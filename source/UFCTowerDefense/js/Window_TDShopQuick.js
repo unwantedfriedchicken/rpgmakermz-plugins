@@ -69,6 +69,7 @@ Window_TDShopQuick.prototype.callOkHandler = function () {
   TowerDefenseManager.clearSelect();
   TowerDefenseManager.selectTower(this._listItems[this._index].ufcTower);
   TowerDefenseManager.selectTowerMode();
+  $gameMessage.setWindowTower(false);
   this.deselect();
 };
 
