@@ -125,13 +125,15 @@ module.exports = function (grunt) {
         src: [pluginPath + taskid + ".js"],
       };
 
-      tasksBuild.push("concat:" + taskid, "terser:" + taskid);
-
-      tasks.push(
+      let _task = [
         "concat:" + taskid,
         "remove_comments:" + taskid,
-        "concat:" + taskid + "help"
-      );
+        "concat:" + taskid + "help",
+      ];
+      tasks.push(_task);
+
+      tasksBuild.push(..._task, "terser:" + taskid);
+
       files.push(taskid + "/**/*.js");
     }
     if (watchRMProject) files.push(dest + "/**/*");

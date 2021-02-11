@@ -50,7 +50,8 @@ Window_ShopStatus.prototype.drawTowerInfo = function (x, y, align) {
   let characterIndex = towerData.characterindex;
   let pw = characterImage.width / 12;
   let ph = characterImage.height / 8;
-  let sx = ((characterIndex % 4) * 3 + 1) * pw;
+  let chIndexX = towerData.characterindexx ? +towerData.characterindexx : 1;
+  let sx = ((characterIndex % 4) * 3 + chIndexX) * pw;
   let sy = (Math.floor(characterIndex / 4) * 4 + 0) * ph;
   let scale = 1.5;
   if (align == "center") {
@@ -75,22 +76,44 @@ Window_ShopStatus.prototype.drawTowerInfo = function (x, y, align) {
   let textHeight = 30;
   let textValueX = 180;
   let fontSize = 20;
-  let status = [
-    "Attack",
-    "Range",
-    "Attack Speed",
-    "Bullet Speed",
-    "Attack Type",
-  ];
-  let statusValue = [
-    towerData.attack,
-    towerData.range,
-    towerData.attackspeed,
-    towerData.bulletspeed,
-    TowerDefenseManager.getAttackTypeAsName(
-      towerData.attacktype || TowerDefenseManager.ENEMYTYPE.ALL
-    ),
-  ];
+  let status, statusValue;
+  let towerType = towerData.type || TowerDefenseManager.TOWERTYPE.TOWER;
+  let through = towerData.through == "true";
+  if (towerType === TowerDefenseManager.TOWERTYPE.TOWER) {
+    status = ["Attack", "Range", "Attack Speed", "Bullet Speed", "Attack Type"];
+    statusValue = [
+      towerData.attack,
+      towerData.range,
+      towerData.attackspeed,
+      towerData.bulletspeed,
+      TowerDefenseManager.getAttackTypeAsName(
+        towerData.attacktype || TowerDefenseManager.ENEMYTYPE.ALL
+      ),
+    ];
+  } else if (towerType === TowerDefenseManager.TOWERTYPE.TRAP) {
+    if (through) {
+      status = ["Attack", "Durability", "Trap Type", ""];
+      statusValue = [
+        towerData.attack || 0,
+        towerData.durability == "true" ? towerData.durabilityvalue : "Infinite",
+        TowerDefenseManager.getAttackTypeAsName(
+          towerData.attacktype || TowerDefenseManager.ENEMYTYPE.ALL
+        ),
+        "",
+      ];
+    } else {
+      status = ["Attack", "Health", "Trap Type", ""];
+      statusValue = [
+        towerData.attack || 0,
+        towerData.health,
+        TowerDefenseManager.getAttackTypeAsName(
+          towerData.attacktype || TowerDefenseManager.ENEMYTYPE.ALL
+        ),
+        "",
+      ];
+    }
+  }
+
   this.contents.fontSize = fontSize;
   for (let i = 0; i < status.length; i++) {
     this.resetTextColor();

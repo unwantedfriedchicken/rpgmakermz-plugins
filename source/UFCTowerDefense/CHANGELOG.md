@@ -2,6 +2,7 @@
 
 ## Version 1.3 - dev
 
+- ADD: Add new plugin command `Cache Tower Defense`. This command will cache image.load that used by tower defense, for example if this not called when buying tower in shop, the sprite will not get displayed for first time
 - ADD: Add new parameter `Tower Action Settings` for tower action setting position
 - ADD: Add ability to using save/load function, now you can save during gameplay
 - ADD: Add upgrade with material, with `<upgradematerial>` to require multiple material use `,` seprator and to set ammount use `|` after the item ID
@@ -34,15 +35,15 @@
 <bulletspriteindex:0> -> become optional. Default: 0
 <bulletspriteindexy:0> -> become optional. Default: 0
 <bulletspeed:600> -> bulletspeed become optional. Default: 600
-<type:tower>(optional) -> Add tower type , has 2 type tower/trap. Default: tower
-<through:false>(optional) -> Add through option for tower . This make if the tower is through or not. Default: false
-<health:1>(optional) -> Add health to the tower . This is used for trap. Default: 1
-<sedestroy:Blow4>(optional) -> Add custom sound effect when tower is destroyed, if not stated destroy se using destroy sound in plugin parameter. Default:null
-<sedestroyvolume:25>(optional) -> Setting volume for destroyed volume. Default: 25
-<characterindexx:0>(optional) -> Setting for X index in character sprite, used for TRAP. Default: 0
-<durability:false>(optional) -> Setting if through trap has durability or not. Default: false
-<durabilityvalue:1>(optional) -> If `durability` set true, then when trap attacking this value will decrease, and reach 0 the trap is destroyed. Default: 1
-<attackspritey:3>(optional) -> When trap through attacking, the sprite will change to this Y index. Default: 0
+<type:tower>(optional)(new) -> Add tower type , has 2 type tower/trap. Default: tower
+<through:false>(optional)(new) -> Add through option for tower . This make if the tower is through or not. Default: false
+<health:1>(optional)(new) -> Add health to the tower . This is used for trap. Default: 1
+<sedestroy:Blow4>(optional)(new) -> Add custom sound effect when tower is destroyed, if not stated destroy se using destroy sound in plugin parameter. Default:null
+<sedestroyvolume:25>(optional)(new) -> Setting volume for destroyed volume. Default: 25
+<characterindexx:0>(optional)(new) -> Setting for X index in character sprite, used for TRAP. Default: 0
+<durability:false>(optional)(new) -> Setting if through trap has durability or not. Default: false
+<durabilityvalue:1>(optional)(new) -> If `durability` set true, then when trap attacking this value will decrease, and reach 0 the trap is destroyed. Default: 1
+<attackspritey:3>(optional)(new) -> When trap through attacking, the sprite will change to this Y index. Default: 0
 ```
 
 - CHANGE: Change BSPD in tower action to ATK Type, Status will also change if the tower is trap type

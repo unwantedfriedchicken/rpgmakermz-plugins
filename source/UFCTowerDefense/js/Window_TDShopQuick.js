@@ -28,10 +28,14 @@ Window_TDShopQuick.prototype.initialize = function (rect) {
     return dataItem;
   });
   this._listItems.forEach((item) => {
+    let indexX = item.ufcTower.characterindexx
+      ? +item.ufcTower.characterindexx
+      : 1;
     this.addCommand(
       item.ufcTower.name,
       item.ufcTower.character,
       item.ufcTower.characterindex,
+      indexX,
       true
     );
   });
@@ -125,6 +129,7 @@ Window_TDShopQuick.prototype.addCommand = function (
   name,
   character,
   characterIndex,
+  characterIndexX,
   enabled = true,
   callback = null
 ) {
@@ -132,6 +137,7 @@ Window_TDShopQuick.prototype.addCommand = function (
     name: name,
     character: character,
     characterIndex: characterIndex,
+    characterIndexX: characterIndexX,
     callback: callback,
     symbol: null,
     enabled: enabled,
@@ -142,13 +148,14 @@ Window_TDShopQuick.prototype.addCommand = function (
 Window_TDShopQuick.prototype.drawCharacter = function (
   character,
   characterIndex,
+  characterIndexX,
   x,
   y
 ) {
   let characterImage = ImageManager.loadCharacter(character);
   let pw = characterImage.width / 12;
   let ph = characterImage.height / 8;
-  let sx = ((characterIndex % 4) * 3 + 1) * pw;
+  let sx = ((characterIndex % 4) * 3 + characterIndexX) * pw;
   let sy = (Math.floor(characterIndex / 4) * 4 + 0) * ph;
   let scale = 0.8;
   this.contents.blt(
@@ -170,6 +177,7 @@ Window_TDShopQuick.prototype.drawItem = function (index) {
   this.drawCharacter(
     this._list[index].character,
     this._list[index].characterIndex,
+    this._list[index].characterIndexX,
     rect.x,
     rect.y
   );
