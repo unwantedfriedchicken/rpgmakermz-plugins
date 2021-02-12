@@ -1,6 +1,6 @@
 # Change Log
 
-## Version 1.1 - dev
+## Version 1.1 - 12/02/2020
 
 - ADD: Add `Region` checking. this will add `setOnlyRegion` and `setExceptRegion` method
 - ADD: Add `type`, default for type is `default`. To set type of terrain use `setType`

@@ -9,13 +9,14 @@ Version: 1.3
 Itch.io : https://unwantedfriedchicken.itch.io
 Github : https://github.com/unwantedfriedchicken/rpgmakermz-plugins/
 
-This plugin add tower defense mechanic for more detail explaination checkout the documentation
+This plugin add tower defense mechanic for more detail explaination 
+checkout the documentation
 
 Documentation
-https://github.com/unwantedfriedchicken/rpgmakermz-plugins/blob/master/dev/towerdefense/README.md
+https://github.com/unwantedfriedchicken/rpgmakermz-plugins/blob/master/source/UFCTowerDefense/README.md
 
 Changelog
-https://github.com/unwantedfriedchicken/rpgmakermz-plugins/blob/master/dev/towerdefense/CHANGELOG.md
+https://github.com/unwantedfriedchicken/rpgmakermz-plugins/blob/master/source/UFCTowerDefense/CHANGELOG.md
 
 Found bug? report the bug here:
 https://forums.rpgmakerweb.com/index.php?threads/ufc-tower-defense.130384/
@@ -24,26 +25,11 @@ https://github.com/unwantedfriedchicken/rpgmakermz-plugins/issues
 Need support or want private convo? I can easly reachout by email
 unwantedfriedchicken<at>gmail.com
 
-@param setting_crystalName
-@text Crystal Name
-@desc Name of the crystal/gate
-@type string
-@default Crystal Health
 
 @param setting_limitAnimation
 @text Limit Animation
 @desc If frame rate become low because so many effect try limit the animation
 @type number
-
-@param setting_towerHealthVarId
-@text Tower Health variable ID
-@desc This health of the tower set to your variable id
-@type variable
-
-@param setting_towerMaxHealthVarId
-@text Tower Max Health variable ID
-@desc This Max health of the tower set to your variable id
-@type variable
 
 @param setting_gameoverSwitchId
 @text Game Over Switch Id
@@ -56,11 +42,41 @@ unwantedfriedchicken<at>gmail.com
 @type struct<SoundSettings>
 @default {"effectSteal":"Coin","towerDestroy":"Door2","towerCancel":"Cancel1","towerPlace":"Equip1","towerUpgrade":"Coin","towerSell":"Coin"}
 
+@param healthSettings
+@text Health Settings
+
+@param healthTitleName
+@parent healthSettings
+@text Health Name
+@desc Name of the health title
+@type string
+@default Crystal Health
+
+@param healthVariableID
+@parent healthSettings
+@text Health variable ID
+@desc This health of the tower set to your variable id
+@type variable
+
+@param healthVariableIDMax
+@parent healthSettings
+@text Max Health variable ID
+@desc This Max health of the tower set to your variable id
+@type variable
+
+@param healthBarWidth
+@parent healthSettings
+@text Health Bar Width
+@desc Width of the health bar
+@type number
+@default 240
+
 @param hudguiSettings
 @text HUD/GUI Settings
 
 @param gui_toweraction
 @parent hudguiSettings
+@default {"statusPositionX":"0","statusPositionY":"0","buttonGroupPositionX":"0","buttonGroupPositionY":"0","upgradeListPositionX":"0","upgradeListPositionY":"0","upgradeStatusPositionX":"0","upgradeStatusPositionY":"0"}
 @text Tower Action Settings
 @type struct<TowerActionSettings>
 @desc Setting for tower action
@@ -450,6 +466,10 @@ unwantedfriedchicken<at>gmail.com
 @default true
 @text Delete Tower Defense Item
 @desc Delete every tower defense items in backpack
+
+@command cacheTowerDefense
+@text Cache Tower Defense
+@desc This will cache some tower defense element, like sprite used in items, weapon, etc
 
 @command limitAnimation
 @text Limit Animation
@@ -950,11 +970,15 @@ UFC.UFCTD.PARAMETERS = PluginManager.parameters("UFCTowerDefense");
 
 UFC.UFCTD.CONFIG = {
   limitAnimation: +UFC.UFCTD.PARAMETERS["setting_limitAnimation"],
-  healthVarId: +UFC.UFCTD.PARAMETERS["setting_towerHealthVarId"],
-  healthMaxVarId: +UFC.UFCTD.PARAMETERS["setting_towerMaxHealthVarId"],
   gameOverSwitchId: +UFC.UFCTD.PARAMETERS["setting_gameoverSwitchId"],
-  crystalName: UFC.UFCTD.PARAMETERS["setting_crystalName"],
   sound: JSON.parse(UFC.UFCTD.PARAMETERS["setting_soundSettings"]),
+};
+
+UFC.UFCTD.HEALTHSETTINGS = {
+  titleName: UFC.UFCTD.PARAMETERS["healthTitleName"],
+  variableID: +UFC.UFCTD.PARAMETERS["healthVariableID"],
+  variableIDMax: +UFC.UFCTD.PARAMETERS["healthVariableIDMax"],
+  barWidth: +UFC.UFCTD.PARAMETERS["healthBarWidth"],
 };
 
 UFC.UFCTD.HUDGUI = {
@@ -1059,6 +1083,14 @@ PluginManager.registerCommand("UFCTowerDefense", "setSpawn", function (args) {
     args
   );
 });
+
+PluginManager.registerCommand(
+  "UFCTowerDefense",
+  "cacheTowerDefense",
+  function () {
+    TowerDefenseManager.cacheImage();
+  }
+);
 
 PluginManager.registerCommand(
   "UFCTowerDefense",
@@ -1894,7 +1926,10 @@ Game_TDTower.prototype.update = function () {
   if (this.getTowerData().getType === TowerDefenseManager.TOWERTYPE.TRAP) {
     if (this._trapAttack) {
       this._trapAttackTime--;
-      if (this._trapAttackTime <= 0) this._trapAttack = false;
+      if (this._trapAttackTime <= 0) {
+        this._trapAttack = false;
+        this._trapAttackTime = this._trapAttackTimeDefault;
+      }
     }
     return;
   }
@@ -2015,9 +2050,7 @@ Game_TDTower.prototype.getYPattern = function () {
     return 0;
 
   if (!this._trapAttack) return 0;
-  else {
-    return this.getTowerData()._attackIndexY;
-  }
+  return this.getTowerData()._attackIndexY;
 };
 
 Game_TDTower.prototype.isDestroyed = function () {
@@ -2851,7 +2884,8 @@ Window_ShopStatus.prototype.drawTowerInfo = function (x, y, align) {
   let characterIndex = towerData.characterindex;
   let pw = characterImage.width / 12;
   let ph = characterImage.height / 8;
-  let sx = ((characterIndex % 4) * 3 + 1) * pw;
+  let chIndexX = towerData.characterindexx ? +towerData.characterindexx : 1;
+  let sx = ((characterIndex % 4) * 3 + chIndexX) * pw;
   let sy = (Math.floor(characterIndex / 4) * 4 + 0) * ph;
   let scale = 1.5;
   if (align == "center") {
@@ -2876,13 +2910,44 @@ Window_ShopStatus.prototype.drawTowerInfo = function (x, y, align) {
   let textHeight = 30;
   let textValueX = 180;
   let fontSize = 20;
-  let status = ["Attack", "Range", "Attack Speed", "Bullet Speed"];
-  let statusValue = [
-    towerData.attack,
-    towerData.range,
-    towerData.attackspeed,
-    towerData.bulletspeed,
-  ];
+  let status, statusValue;
+  let towerType = towerData.type || TowerDefenseManager.TOWERTYPE.TOWER;
+  let through = towerData.through == "true";
+  if (towerType === TowerDefenseManager.TOWERTYPE.TOWER) {
+    status = ["Attack", "Range", "Attack Speed", "Bullet Speed", "Attack Type"];
+    statusValue = [
+      towerData.attack,
+      towerData.range,
+      towerData.attackspeed,
+      towerData.bulletspeed,
+      TowerDefenseManager.getAttackTypeAsName(
+        towerData.attacktype || TowerDefenseManager.ENEMYTYPE.ALL
+      ),
+    ];
+  } else if (towerType === TowerDefenseManager.TOWERTYPE.TRAP) {
+    if (through) {
+      status = ["Attack", "Durability", "Trap Type", ""];
+      statusValue = [
+        towerData.attack || 0,
+        towerData.durability == "true" ? towerData.durabilityvalue : "Infinite",
+        TowerDefenseManager.getAttackTypeAsName(
+          towerData.attacktype || TowerDefenseManager.ENEMYTYPE.ALL
+        ),
+        "",
+      ];
+    } else {
+      status = ["Attack", "Health", "Trap Type", ""];
+      statusValue = [
+        towerData.attack || 0,
+        towerData.health,
+        TowerDefenseManager.getAttackTypeAsName(
+          towerData.attacktype || TowerDefenseManager.ENEMYTYPE.ALL
+        ),
+        "",
+      ];
+    }
+  }
+
   this.contents.fontSize = fontSize;
   for (let i = 0; i < status.length; i++) {
     this.resetTextColor();
@@ -2896,7 +2961,7 @@ Window_ShopStatus.prototype.drawTowerInfo = function (x, y, align) {
     );
   }
   this.resetTextColor();
-  this.drawText("Effect", textX, textY + status.length * textHeight, 150);
+  this.drawText("Note", textX, textY + status.length * textHeight, 150);
 
   let note = `\\FS[${fontSize - 3}]\n`;
   if (!towerData.note) note += "\\C[16]None";
@@ -3172,7 +3237,7 @@ Scene_Map.prototype.createHUDTD = function () {
   this.addWindow(UFC.UFCTD.HUDGUI.GOLDWINDOW);
   UFC.UFCTD.HUDGUI.GOLDWINDOW.visible = TowerDefenseManager.getHUDGold;
 
-  let windowWidth = 200;
+  let windowWidth = UFC.UFCTD.HEALTHSETTINGS.barWidth;
   UFC.UFCTD.HUDGUI.HEALTHWINDOW = new Window_TDHealth(
     new Rectangle(Graphics.boxWidth / 2 - windowWidth / 2, -10, windowWidth, 80)
   );
@@ -3592,7 +3657,7 @@ TowerDefenseManager.debugMode = function () {
           );
       }
       if (e.key == 3) {
-        $gameVariables.setValue(UFC.UFCTD.CONFIG.healthVarId, 99999);
+        $gameVariables.setValue(UFC.UFCTD.HEALTHSETTINGS.variableID, 99999);
         TowerDefenseManager.updateHUDHealth();
         TowerDefenseManager.gainGold(99999999);
       }
@@ -3672,7 +3737,10 @@ TowerDefenseManager.setLimitAnimation = function (limit) {
 
 TowerDefenseManager.attackTrigger = function (damage) {
   let _curHealth = this.getHUDHealthValue;
-  $gameVariables.setValue(UFC.UFCTD.CONFIG.healthVarId, _curHealth - damage);
+  $gameVariables.setValue(
+    UFC.UFCTD.HEALTHSETTINGS.variableID,
+    _curHealth - damage
+  );
 
   if (_curHealth - damage <= 0) {
     $gameSwitches.setValue(UFC.UFCTD.CONFIG.gameOverSwitchId, true);
@@ -3839,6 +3907,8 @@ TowerDefenseManager.disableTowerDefense = function (
   destroyTDItems = true
 ) {
   $gameSystem.setTowerDefense(false);
+
+  this.clearSelect();
 
   this._config = false;
 
@@ -4039,13 +4109,13 @@ Object.defineProperty(TowerDefenseManager, "getGUIItemSlot", {
 
 Object.defineProperty(TowerDefenseManager, "getHUDHealthValue", {
   get: function () {
-    return $gameVariables.value(UFC.UFCTD.CONFIG.healthVarId);
+    return $gameVariables.value(UFC.UFCTD.HEALTHSETTINGS.variableID);
   },
 });
 
 Object.defineProperty(TowerDefenseManager, "getHUDHealthMaxValue", {
   get: function () {
-    return $gameVariables.value(UFC.UFCTD.CONFIG.healthMaxVarId);
+    return $gameVariables.value(UFC.UFCTD.HEALTHSETTINGS.variableIDMax);
   },
 });
 
@@ -4186,6 +4256,17 @@ TowerDefenseManager.convertDirection = function (direction) {
   }
 
   return dir;
+};
+
+TowerDefenseManager.getAttackTypeAsName = function (attacktype) {
+  switch (attacktype) {
+    case TowerDefenseManager.ENEMYTYPE.AIR:
+      return "Air";
+    case TowerDefenseManager.ENEMYTYPE.GROUND:
+      return "Ground";
+    default:
+      return "All";
+  }
 };
 function ufcTowerData() {
   this.initialize(...arguments);
@@ -4468,14 +4549,7 @@ Object.defineProperty(ufcTowerData.prototype, "getRangeVisibility", {
 
 Object.defineProperty(ufcTowerData.prototype, "getAttackTypeAsName", {
   get: function () {
-    switch (this._attackType) {
-      case TowerDefenseManager.ENEMYTYPE.AIR:
-        return "Air";
-      case TowerDefenseManager.ENEMYTYPE.GROUND:
-        return "Ground";
-      default:
-        return "All";
-    }
+    return TowerDefenseManager.getAttackTypeAsName(this._attackType);
   },
 });
 function ufcTowerEffects() {
@@ -4777,7 +4851,7 @@ Window_GUIItemSlot.prototype.activeKeyboard = function () {
 };
 
 Window_GUIItemSlot.prototype.deactiveKeyboard = function () {
-  if (UFC.UFCTD.HUDGUI.QUICKSHOP.isOpen()) {
+  if (UFC.UFCTD.HUDGUI.QUICKSHOP && UFC.UFCTD.HUDGUI.QUICKSHOP.isOpen()) {
     UFC.UFCTD.HUDGUI.QUICKSHOP.close();
     UFC.UFCTD.HUDGUI.SHOP.selected();
     return;
@@ -5763,8 +5837,14 @@ Window_TDHealth.prototype.refresh = function () {
   const rect = this.itemLineRect(0);
   this.contents.clear();
   this.contents.fontSize = 22;
-  this.drawBackground(-5, 3, 200, 30);
-  this.drawText(UFC.UFCTD.CONFIG.crystalName, -10, 0, 200, "center");
+  this.drawBackground(-5, 3, this.width, 30);
+  this.drawText(
+    UFC.UFCTD.HEALTHSETTINGS.titleName,
+    -10,
+    0,
+    this.width,
+    "center"
+  );
   this.drawGaugeRect(0, rect.height, this.innerWidth, 20);
 };
 
@@ -5995,10 +6075,14 @@ Window_TDShopQuick.prototype.initialize = function (rect) {
     return dataItem;
   });
   this._listItems.forEach((item) => {
+    let indexX = item.ufcTower.characterindexx
+      ? +item.ufcTower.characterindexx
+      : 1;
     this.addCommand(
       item.ufcTower.name,
       item.ufcTower.character,
       item.ufcTower.characterindex,
+      indexX,
       true
     );
   });
@@ -6036,6 +6120,7 @@ Window_TDShopQuick.prototype.callOkHandler = function () {
   TowerDefenseManager.clearSelect();
   TowerDefenseManager.selectTower(this._listItems[this._index].ufcTower);
   TowerDefenseManager.selectTowerMode();
+  $gameMessage.setWindowTower(false);
   this.deselect();
 };
 
@@ -6091,6 +6176,7 @@ Window_TDShopQuick.prototype.addCommand = function (
   name,
   character,
   characterIndex,
+  characterIndexX,
   enabled = true,
   callback = null
 ) {
@@ -6098,6 +6184,7 @@ Window_TDShopQuick.prototype.addCommand = function (
     name: name,
     character: character,
     characterIndex: characterIndex,
+    characterIndexX: characterIndexX,
     callback: callback,
     symbol: null,
     enabled: enabled,
@@ -6108,13 +6195,14 @@ Window_TDShopQuick.prototype.addCommand = function (
 Window_TDShopQuick.prototype.drawCharacter = function (
   character,
   characterIndex,
+  characterIndexX,
   x,
   y
 ) {
   let characterImage = ImageManager.loadCharacter(character);
   let pw = characterImage.width / 12;
   let ph = characterImage.height / 8;
-  let sx = ((characterIndex % 4) * 3 + 1) * pw;
+  let sx = ((characterIndex % 4) * 3 + characterIndexX) * pw;
   let sy = (Math.floor(characterIndex / 4) * 4 + 0) * ph;
   let scale = 0.8;
   this.contents.blt(
@@ -6136,6 +6224,7 @@ Window_TDShopQuick.prototype.drawItem = function (index) {
   this.drawCharacter(
     this._list[index].character,
     this._list[index].characterIndex,
+    this._list[index].characterIndexX,
     rect.x,
     rect.y
   );
@@ -6246,7 +6335,7 @@ Window_TDStatus.prototype.drawDefaultStatus = function (towerData) {
   this.drawText(towerData._name, statusX, 0, w, "center");
   let textY = h - 4;
   let textX = statusX + 10;
-  let textX2 = 60;
+  let textX2 = 62;
   let textYValue = 20;
   let textHeight = 0;
   let status, statusValue;
@@ -6262,14 +6351,14 @@ Window_TDStatus.prototype.drawDefaultStatus = function (towerData) {
     if (towerData._through) {
       status = [
         "Attack",
-        towerData._durability ? "Durability" : "",
         "Trap Type",
+        towerData._durability ? "Durability" : "",
         "",
       ];
       statusValue = [
         towerData.getBaseAttack,
-        towerData._durability ? towerData._durabilityValue : "",
         towerData.getAttackTypeAsName,
+        towerData._durability ? towerData._durabilityValue : "",
         "",
       ];
     } else {

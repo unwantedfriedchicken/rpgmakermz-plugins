@@ -87,7 +87,12 @@ module.exports = function (grunt) {
 
   // grunt.config.set("PATHDEST", "../dist/");
 
-  let initTask = function (id, dest, watchRMProject = false) {
+  let initTask = function (
+    id,
+    dest,
+    watchRMProject = false,
+    buildMode = false
+  ) {
     let listTask = {
       connect: {},
       concat: {},
@@ -101,7 +106,7 @@ module.exports = function (grunt) {
     let tasks = [];
     let tasksBuild = [];
     let files = [];
-    const pluginPath = dest + "/js/plugins/";
+    const pluginPath = buildMode ? dest : dest + "/js/plugins/";
     for (let taskid of id) {
       listTask["concat"][taskid] = {
         dest: pluginPath + taskid + ".js",
@@ -189,7 +194,9 @@ module.exports = function (grunt) {
   grunt.registerTask("build", "Build Task", function (dist) {
     let init = initTask(
       ["UFCTowerDefense", "UFCGuideAction", "UFCTextHelper"],
-      dist || CONFIG.dest
+      dist || CONFIG.dest,
+      false,
+      true
     );
     grunt.config.init(init.init);
     grunt.task.run(init.build);
