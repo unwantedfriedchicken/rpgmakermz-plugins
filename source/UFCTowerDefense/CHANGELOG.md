@@ -44,7 +44,7 @@
 <characterindexx:0>(optional)(new) -> Setting for X index in character sprite, used for TRAP. Default: 0
 <durability:false>(optional)(new) -> Setting if through trap has durability or not. Default: false
 <durabilityvalue:1>(optional)(new) -> If `durability` set true, then when trap attacking this value will decrease, and reach 0 the trap is destroyed. Default: 1
-<attackspritey:3>(optional)(new) -> When trap through attacking, the sprite will change to this Y index. Default: 0
+<attackindexy:3>(optional)(new) -> When trap through attacking, the sprite will change to this Y index. Default: 0
 ```
 
 - CHANGE: Change BSPD in tower action to ATK Type, Status will also change if the tower is trap type

@@ -95,7 +95,10 @@ Game_TDTower.prototype.update = function () {
   if (this.getTowerData().getType === TowerDefenseManager.TOWERTYPE.TRAP) {
     if (this._trapAttack) {
       this._trapAttackTime--;
-      if (this._trapAttackTime <= 0) this._trapAttack = false;
+      if (this._trapAttackTime <= 0) {
+        this._trapAttack = false;
+        this._trapAttackTime = this._trapAttackTimeDefault;
+      }
     }
     return;
   }
@@ -221,9 +224,7 @@ Game_TDTower.prototype.getYPattern = function () {
     return 0;
 
   if (!this._trapAttack) return 0;
-  else {
-    return this.getTowerData()._attackIndexY;
-  }
+  return this.getTowerData()._attackIndexY;
 };
 
 Game_TDTower.prototype.isDestroyed = function () {

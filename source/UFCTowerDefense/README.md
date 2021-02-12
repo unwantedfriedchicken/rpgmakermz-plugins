@@ -3,10 +3,21 @@
 This plugin will add tower defense mechanic to your rpg maker  
 for demo check https://unwantedfriedchicken.itch.io/adventurer-guild-the-barrier-defender
 
+## Demo
+
+**Demon Lord Training** This is made purely for demonstration of this plugins,
+you can see the event that get used and some comment about it
+
+[**Adventurer Guild**](https://unwantedfriedchicken.itch.io/adventurer-guild-the-barrier-defender) This plugin is made because of this game, it's more complicated than prev demo since it's complete game, this is game using old version of this plugin, you can see the source with download, source version
+
 ## How to use
 
-- Install **Guideaction** & **UFCTowerDefense**
+For more accurate to use, see source in **demo**
+
+- Install **UFCGuideAction** & **UFCTowerDefense**
+- If you want add text damage when attacking install **UFCTextHelper**
 - Download **TDSet.png** & **TDShopIcon.png** from [**Resources**](https://github.com/unwantedfriedchicken/rpgmakermz-plugins/tree/master/resources) folder and place it to **img/system**
+- And **!Weapon_TD.png** to **img/characters**
 - Setup your plugin parameter
 - Add tower to your database, see **Setup Tower** section
 - Add enemy event, setup the character image and set trigger to parallel and add event **Setup Enemy Data** and **erase event**
@@ -59,6 +70,12 @@ you can delete any **optional** note
 **bulletspriteindexy** (optional) : Y index from bulletspritename **_Default : 0_**  
 **range** (optional) : Range of the tower **_Default : 0_**  
 **through** (optional) : Through option for tower . This make if the tower is through or not. **_Default : false_**  
+**health** (optional) : health to the tower. This is used for trap. **_Default : 1_**  
+**sedestroy** (optional) : Add custom sound effect when tower is destroyed, if not stated destroy se using destroy sound in plugin parameter. **_Default : null_**  
+**sedestroyvolume** (optional) : Setting volume for destroyed volume. **_Default : 25_**  
+**durability** (optional) : Setting if through trap has durability or not. **_Default : false_**  
+**durabilityvalue** (optional) : If `durability` set true, then when trap attacking this value will decrease, and reach 0 the trap is destroyed. **_Default : 1_**  
+**attackindexy** (optional) : When trap through attacking, the sprite will change to this Y index. **_Default : 0_**  
 **character** : Character name in character folder  
 **characterindex** : Index of the character 0 ~ 7  
 **attacktype** (optional) : What monster type that this tower can attack the mode is  
@@ -81,6 +98,20 @@ you can delete any **optional** note
 ```
 
 > Have 2 upgrade from this tower and the second upgrade price is 200
+
+**upgradematerial** (optional) : Make upgrade to require multiple material use , seprator and to set ammount use | after the item ID
+
+```markdown
+<upgrade:32|200> -> upgrade ID | Price
+<upgradematerial:2,3|3>
+-> upgrade material need:
+-> ITEM ID 2 ammount 1
+-> ITEM ID 3 ammount 3
+<upgrade2:33> -> upgrade 2 ID | Price
+<upgrade2material:3>
+-> upgrade 2 material need:
+-> ITEM ID 3 ammount 1
+```
 
 **note** : Note when tower is selected / in upgrade  
 **sellprice** (optional) : if you want custom sellprice set here otherwise the sell price is half of the price item **_Default : Half of buy price_**  
@@ -154,6 +185,13 @@ you can delete any **optional** note
 
 This is used for configuration and initialize the mode make it parallel if you want current map have tower defense mode
 
+### **Cache Tower Defense**
+
+This plugin command will cache image.load that used by tower defense
+For example if this not called when buying tower in shop,
+the sprite will not get displayed for first time
+This plugin is not needed if you already call plugin TowerDefense.Config
+
 ### **Disable Tower Defense**
 
 This will disable & destroy any tower defense mode,
@@ -220,9 +258,9 @@ Reset items in Shop GUI to default items
 
 ## Debug Mode
 
-When debug mode is set to true in plugin parameters
+When debug mode is set to `true` in plugin parameters
 
-- `hold 1` to multiplier ticker speed so the game become more faster
+- `press 1` to multiplier ticker speed so the game become more faster
 - `press 2` to show all tower range
 - `press 3` to cheat gold and crystal hp
 - `press 4` to limit animation

@@ -378,7 +378,7 @@ Window_GUIItemSlot.prototype.open = function () {
     }
   }
 
-  // Also close shop
+  // Also open shop
   if (UFC.UFCTD.SHOPGUISETTINGS.enable) UFC.UFCTD.HUDGUI.SHOP.open();
 
   Window_Command.prototype.open.call(this);
