@@ -1,7 +1,6 @@
 # Tower Defense Plugins Documentation
 
-This plugin will add tower defense mechanic to your rpg maker  
-for demo check https://unwantedfriedchicken.itch.io/adventurer-guild-the-barrier-defender
+This plugin will add tower defense mechanic to your rpg maker
 
 ## Demo
 
