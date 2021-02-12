@@ -9,13 +9,14 @@ Version: 1.3
 Itch.io : https://unwantedfriedchicken.itch.io
 Github : https://github.com/unwantedfriedchicken/rpgmakermz-plugins/
 
-This plugin add tower defense mechanic for more detail explaination checkout the documentation
+This plugin add tower defense mechanic for more detail explaination 
+checkout the documentation
 
 Documentation
-https://github.com/unwantedfriedchicken/rpgmakermz-plugins/blob/master/dev/towerdefense/README.md
+https://github.com/unwantedfriedchicken/rpgmakermz-plugins/blob/master/source/UFCTowerDefense/README.md
 
 Changelog
-https://github.com/unwantedfriedchicken/rpgmakermz-plugins/blob/master/dev/towerdefense/CHANGELOG.md
+https://github.com/unwantedfriedchicken/rpgmakermz-plugins/blob/master/source/UFCTowerDefense/CHANGELOG.md
 
 Found bug? report the bug here:
 https://forums.rpgmakerweb.com/index.php?threads/ufc-tower-defense.130384/

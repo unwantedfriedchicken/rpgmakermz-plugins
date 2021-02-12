@@ -52,7 +52,7 @@ Window_TDStatus.prototype.drawDefaultStatus = function (towerData) {
   // let textY = ph * scale + 30;
   let textY = h - 4;
   let textX = statusX + 10;
-  let textX2 = 60;
+  let textX2 = 62;
   let textYValue = 20;
   let textHeight = 0;
   let status, statusValue;
@@ -68,14 +68,14 @@ Window_TDStatus.prototype.drawDefaultStatus = function (towerData) {
     if (towerData._through) {
       status = [
         "Attack",
-        towerData._durability ? "Durability" : "",
         "Trap Type",
+        towerData._durability ? "Durability" : "",
         "",
       ];
       statusValue = [
         towerData.getBaseAttack,
-        towerData._durability ? towerData._durabilityValue : "",
         towerData.getAttackTypeAsName,
+        towerData._durability ? towerData._durabilityValue : "",
         "",
       ];
     } else {
