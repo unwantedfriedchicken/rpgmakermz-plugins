@@ -5,10 +5,8 @@ for demo check https://unwantedfriedchicken.itch.io/adventurer-guild-the-barrier
 
 ## Demo
 
-**Demon Lord Training** This is made purely for demonstration of this plugins,
+[**Demon Lord Training**](https://unwantedfriedchicken.itch.io/demon-lord-training-ufc-tower-defense-demo) This is made purely for demonstration of this plugins,
 you can see the event that get used and some comment about it
-
-[**Adventurer Guild**](https://unwantedfriedchicken.itch.io/adventurer-guild-the-barrier-defender) This plugin is made because of this game, it's more complicated than prev demo since it's complete game, this is game using old version of this plugin, you can see the source with download, source version
 
 ## How to use
 
@@ -272,3 +270,9 @@ When debug mode is set to `true` in plugin parameters
 ### **$gameMap.isWaveEnd()**
 
 This is for checking if the wave is end, it will check if every monster is defeated and every wave is spawned
+
+---
+
+## Released Game
+
+[**Adventurer Guild**](https://unwantedfriedchicken.itch.io/adventurer-guild-the-barrier-defender) This plugin is made because of this game, it's more complicated than prev demo since it's complete game, this is game using old version of this plugin, you can see the source, with download source version
