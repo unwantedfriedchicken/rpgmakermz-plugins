@@ -67,12 +67,6 @@ you can delete any **optional** note
 **bulletspriteindexy** (optional) : Y index from bulletspritename **_Default : 0_**  
 **range** (optional) : Range of the tower **_Default : 0_**  
 **through** (optional) : Through option for tower . This make if the tower is through or not. **_Default : false_**  
-**health** (optional) : health to the tower. This is used for trap. **_Default : 1_**  
-**sedestroy** (optional) : Add custom sound effect when tower is destroyed, if not stated destroy se using destroy sound in plugin parameter. **_Default : null_**  
-**sedestroyvolume** (optional) : Setting volume for destroyed volume. **_Default : 25_**  
-**durability** (optional) : Setting if through trap has durability or not. **_Default : false_**  
-**durabilityvalue** (optional) : If `durability` set true, then when trap attacking this value will decrease, and reach 0 the trap is destroyed. **_Default : 1_**  
-**attackindexy** (optional) : When trap through attacking, the sprite will change to this Y index. **_Default : 0_**  
 **character** : Character name in character folder  
 **characterindex** : Index of the character 0 ~ 7  
 **attacktype** (optional) : What monster type that this tower can attack the mode is  
@@ -169,8 +163,15 @@ you can delete any **optional** note
 **characterindexx** (optional) (trap only): Setting for X index in character sprite, used for TRAP. **_Default : 0_**  
 **durability** (optional) (trap only): Setting if through trap has durability or not **_Default : false_**  
 **durabilityvalue** (optional) (trap only): If `durability` set true, then when trap attacking this value will decrease, and when reach 0 the trap is destroyed **_Default : 1_**  
-**attackspritey** (optional) (trap only): When trap through attacking, the sprite will change to this Y index, then go back to 0 **_Default : 0_**  
+**attackindexy** (optional) (trap only): When trap through attacking, the sprite will change to this Y index, then go back to 0 **_Default : 0_**  
 <br>
+
+---
+
+## Add item to displayed in backpack
+
+Item except Tower Defense item will not get displayed in the backpack tower defense
+to show custom item to the backpack you need to add `<ufcTDMaterial>` in the **item note**
 
 ---
 
